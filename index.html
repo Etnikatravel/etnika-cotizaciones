@@ -1,10 +1,362 @@
+```html
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-<title>Etnika Cotizaciones</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ETNIKA TRAVEL | Cotización</title>
+
+<style>
+:root{
+  --violeta:#7700E0;
+  --turquesa:#00E5BF;
+  --gris:#F2F2F2;
+  --oscuro:#171717;
+  --blanco:#ffffff;
+}
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+  background:var(--gris);
+  color:var(--oscuro);
+}
+
+.header{
+  background:linear-gradient(135deg,var(--turquesa),var(--violeta));
+  color:white;
+  padding:40px 20px;
+  text-align:center;
+}
+
+.header h1{
+  font-size:34px;
+  letter-spacing:1px;
+}
+
+.header p{
+  margin-top:8px;
+  font-size:18px;
+}
+
+.container{
+  max-width:1100px;
+  margin:30px auto;
+  padding:0 20px;
+}
+
+.card{
+  background:white;
+  border-radius:18px;
+  padding:25px;
+  margin-bottom:22px;
+  box-shadow:0 6px 20px rgba(0,0,0,.08);
+}
+
+h2{
+  color:var(--violeta);
+  margin-bottom:18px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:15px;
+}
+
+.box{
+  background:#fafafa;
+  border-radius:14px;
+  padding:16px;
+  border:1px solid #eee;
+}
+
+.label{
+  font-weight:bold;
+  color:#555;
+  margin-bottom:6px;
+}
+
+.flight{
+  border-left:5px solid var(--turquesa);
+}
+
+.includes{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:12px;
+}
+
+.include-item{
+  background:#fafafa;
+  padding:14px;
+  border-radius:12px;
+  border:1px solid #eee;
+}
+
+.hotels{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:18px;
+}
+
+.hotel{
+  border:1px solid #eee;
+  border-radius:18px;
+  padding:20px;
+  background:white;
+  box-shadow:0 4px 14px rgba(0,0,0,.06);
+}
+
+.hotel h3{
+  color:var(--violeta);
+  margin-bottom:10px;
+}
+
+.room{
+  margin:12px 0;
+  color:#444;
+}
+
+.price{
+  font-size:28px;
+  font-weight:bold;
+  margin:15px 0 5px;
+  color:var(--oscuro);
+}
+
+.price-detail{
+  font-size:14px;
+  color:#666;
+}
+
+.buttons{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-top:18px;
+}
+
+.btn{
+  display:block;
+  text-align:center;
+  text-decoration:none;
+  padding:13px 18px;
+  border-radius:30px;
+  font-weight:bold;
+}
+
+.btn-google{
+  background:#f1f1f1;
+  color:#333;
+}
+
+.btn-whatsapp{
+  background:var(--turquesa);
+  color:#061b16;
+}
+
+.payment{
+  background:linear-gradient(135deg,var(--violeta),#4d0099);
+  color:white;
+}
+
+.payment h2{
+  color:white;
+}
+
+.conditions a{
+  color:var(--violeta);
+  font-weight:bold;
+}
+
+.footer{
+  text-align:center;
+  padding:30px 20px;
+  color:#666;
+}
+
+@media(max-width:600px){
+  .header h1{
+    font-size:28px;
+  }
+}
+</style>
 </head>
+
 <body>
-<h1>ETNIKA VIAJES</h1>
-<p>Sistema de cotizaciones en construcción.</p>
+
+<header class="header">
+  <h1>ETNIKA TRAVEL</h1>
+  <p>Cotización personalizada de viaje</p>
+</header>
+
+<main class="container">
+
+<section class="card">
+  <h2>PUNTA CANA / BAYAHIBE</h2>
+
+  <div class="grid">
+    <div class="box">
+      <div class="label">Cliente</div>
+      Familia Rodríguez
+    </div>
+
+    <div class="box">
+      <div class="label">Pasajeros</div>
+      2 adultos + 2 menores
+    </div>
+
+    <div class="box">
+      <div class="label">Fecha de viaje</div>
+      19/03 al 27/03
+    </div>
+
+    <div class="box">
+      <div class="label">Fecha de cotización</div>
+      12/06/2026
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Vuelos</h2>
+
+  <div class="grid">
+    <div class="box flight">
+      <div class="label">Ida</div>
+      Rosario → Panamá → Punta Cana<br>
+      Copa Airlines<br>
+      Incluye mochila y carry on
+    </div>
+
+    <div class="box flight">
+      <div class="label">Regreso</div>
+      Punta Cana → Panamá → Rosario<br>
+      Copa Airlines<br>
+      Incluye mochila y carry on
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Tu viaje incluye</h2>
+
+  <div class="includes">
+    <div class="include-item">✈️ Aéreo desde Rosario</div>
+    <div class="include-item">🧳 Mochila y carry on</div>
+    <div class="include-item">🚐 Traslados en destino</div>
+    <div class="include-item">🏨 8 noches de alojamiento</div>
+    <div class="include-item">🍽️ Régimen All Inclusive</div>
+    <div class="include-item">💬 Asesoramiento ETNIKA</div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Opciones de alojamiento</h2>
+
+  <div class="hotels">
+
+    <div class="hotel">
+      <h3>Catalonia Bavaro Beach Golf & Casino Resort</h3>
+      <p class="room">Hab. Junior Suite Doble</p>
+      <div class="price">USD 6.900</div>
+      <div class="price-detail">Precio final grupo familiar</div>
+
+      <div class="buttons">
+        <a class="btn btn-google" href="https://www.google.com/maps/search/Catalonia+Bavaro+Beach+Golf+Casino+Resort" target="_blank">
+          Ver hotel en Google
+        </a>
+        <a class="btn btn-whatsapp" href="https://wa.me/5493410000000?text=Hola%20ETNIKA,%20quiero%20avanzar%20con%20la%20opci%C3%B3n%20Catalonia%20Bavaro." target="_blank">
+          Quiero esta opción
+        </a>
+      </div>
+    </div>
+
+    <div class="hotel">
+      <h3>Vista Sol Punta Cana Beach Resort & Spa</h3>
+      <p class="room">Hab. Vista Mar con balcón privado</p>
+      <div class="price">USD 6.350</div>
+      <div class="price-detail">Precio final grupo familiar</div>
+
+      <div class="buttons">
+        <a class="btn btn-google" href="https://www.google.com/maps/search/Vista+Sol+Punta+Cana+Beach+Resort+Spa" target="_blank">
+          Ver hotel en Google
+        </a>
+        <a class="btn btn-whatsapp" href="https://wa.me/5493410000000?text=Hola%20ETNIKA,%20quiero%20avanzar%20con%20la%20opci%C3%B3n%20Vista%20Sol%20Punta%20Cana." target="_blank">
+          Quiero esta opción
+        </a>
+      </div>
+    </div>
+
+    <div class="hotel">
+      <h3>Sunscape Dominicus</h3>
+      <p class="room">Habitación Doble Deluxe con vista tropical</p>
+      <div class="price">USD 6.200</div>
+      <div class="price-detail">Precio final grupo familiar</div>
+
+      <div class="buttons">
+        <a class="btn btn-google" href="https://www.google.com/maps/search/Sunscape+Dominicus" target="_blank">
+          Ver hotel en Google
+        </a>
+        <a class="btn btn-whatsapp" href="https://wa.me/5493410000000?text=Hola%20ETNIKA,%20quiero%20avanzar%20con%20la%20opci%C3%B3n%20Sunscape%20Dominicus." target="_blank">
+          Quiero esta opción
+        </a>
+      </div>
+    </div>
+
+    <div class="hotel">
+      <h3>Viva Dominicus Beach by Wyndham</h3>
+      <p class="room">Superior Rooms</p>
+      <div class="price">USD 7.100</div>
+      <div class="price-detail">Precio final grupo familiar</div>
+
+      <div class="buttons">
+        <a class="btn btn-google" href="https://www.google.com/maps/search/Viva+Dominicus+Beach+by+Wyndham" target="_blank">
+          Ver hotel en Google
+        </a>
+        <a class="btn btn-whatsapp" href="https://wa.me/5493410000000?text=Hola%20ETNIKA,%20quiero%20avanzar%20con%20la%20opci%C3%B3n%20Viva%20Dominicus." target="_blank">
+          Quiero esta opción
+        </a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="card payment">
+  <h2>Forma de pago</h2>
+  <p>50% al momento de la reserva.</p>
+  <p>Saldo en entregas parciales hasta 30 días antes de viajar.</p>
+</section>
+
+<section class="card conditions">
+  <h2>Condiciones importantes</h2>
+  <p>
+    Tarifas sujetas a disponibilidad y modificación sin previo aviso hasta el momento de la reserva y emisión.
+  </p>
+  <br>
+  <p>
+    La contratación de cualquiera de los servicios implica la aceptación de las
+    <a href="https://etnikatravel.tur.ar/general-conditions" target="_blank">
+      Condiciones Generales de ETNIKA TRAVEL
+    </a>.
+  </p>
+</section>
+
+</main>
+
+<footer class="footer">
+  <strong>ETNIKA TRAVEL</strong><br>
+  Rosario, Argentina<br>
+  www.etnikatravel.tur.ar
+</footer>
+
 </body>
 </html>
+```
