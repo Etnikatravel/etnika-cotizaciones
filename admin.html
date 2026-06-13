@@ -660,14 +660,148 @@ function mostrarLink(codigo){
   `;
 }
 
-function generarPDF(){
-  const element = document.getElementById("preview");
-  if(!element.innerHTML.trim()) {
-    alert("Primero generá la vista previa.");
+
+function renderPDFCotizacion(data){
+  const incluye = (data.incluyeItems && data.incluyeItems.length ? data.incluyeItems : [
+    "Aéreo incluido",
+    "Equipaje incluido",
+    "Traslados en destino",
+    "Alojamiento según opción elegida",
+    "Asesoramiento ETNIKA"
+  ]);
+
+  const hotelesHtml = (data.hoteles || []).map(h => `
+    <div class="hotel-card">
+      <div class="hotel-left">
+        <h3>${h.nombre || "Hotel"}</h3>
+        ${h.habitacion ? `<p><strong>Hab.</strong> ${h.habitacion}</p>` : ""}
+        ${h.regimen ? `<p><strong>Régimen:</strong> ${h.regimen}</p>` : ""}
+        ${h.categoria ? `<p><strong>Categoría:</strong> ${h.categoria}</p>` : ""}
+      </div>
+      <div class="hotel-right">
+        ${h.precio ? `<div class="price">${h.precio}</div>` : ""}
+        <div class="price-note">${h.tipoPrecio || "grupo familiar"}</div>
+      </div>
+    </div>
+  `).join("");
+
+  const vuelosTexto = `
+    ${data.simple?.vueloIda ? `<div class="flight"><strong>Ida</strong><br>${escapeLineas(data.simple.vueloIda)}</div>` : ""}
+    ${data.simple?.vueloVuelta ? `<div class="flight"><strong>Regreso</strong><br>${escapeLineas(data.simple.vueloVuelta)}</div>` : ""}
+  `;
+
+  return `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Cotización ETNIKA</title>
+<style>
+  body{font-family:Arial, Helvetica, sans-serif;background:#f7f7fb;color:#222;margin:0;padding:24px;}
+  .page{max-width:1050px;margin:0 auto;background:white;border-radius:24px;padding:28px;}
+  .logo{text-align:center;margin-bottom:24px;}
+  .logo img{max-width:230px;height:auto;}
+  h1,h2{color:#7700E0;}
+  h1{text-align:center;font-size:48px;margin:18px 0 8px;text-transform:uppercase;}
+  .date{text-align:center;color:#00A98D;font-size:24px;font-weight:900;margin-bottom:24px;}
+  .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:22px;}
+  .box{border:1px solid #e9e9ef;border-radius:14px;padding:14px;background:#fbfbff;}
+  .label{font-size:12px;color:#555;font-weight:800;margin-bottom:6px;}
+  .value{font-size:15px;font-weight:700;}
+  .section{background:white;border:1px solid #e9e9ef;border-radius:18px;padding:22px;margin:18px 0;}
+  .includes{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+  .include{border:1px solid #e9e9ef;border-radius:14px;padding:14px;text-align:center;background:#fbfbff;font-weight:700;}
+  .flights{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+  .flight{border:1px solid #e9e9ef;border-left:6px solid #00E5BF;border-radius:14px;padding:14px;line-height:1.4;}
+  .flight-img{max-width:100%;border-radius:14px;margin-top:14px;}
+  .hotel-card{display:grid;grid-template-columns:1fr 240px;gap:20px;align-items:center;border:1px solid #e9e9ef;border-radius:18px;padding:18px;margin:12px 0;}
+  .hotel-card h3{color:#7700E0;font-size:24px;margin:0 0 10px;}
+  .hotel-card p{margin:6px 0;font-size:16px;}
+  .hotel-right{text-align:center;}
+  .price{color:#7700E0;font-size:32px;font-weight:900;}
+  .price-note{color:#666;font-size:14px;margin-top:6px;text-transform:uppercase;}
+  .legal{text-align:center;color:#777;font-size:12px;margin-top:18px;}
+  @media print{
+    body{background:white;padding:0;}
+    .page{box-shadow:none;border-radius:0;}
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="logo"><img src="DEGRADADO CON LEGAJO.png"></div>
+
+    <div class="section">
+      <h2>Datos de la cotización</h2>
+      <div class="grid">
+        <div class="box"><div class="label">Cliente</div><div class="value">${data.cliente || ""}</div></div>
+        <div class="box"><div class="label">Pasajeros</div><div class="value">${data.pasajeros || ""}</div></div>
+        <div class="box"><div class="label">Fecha cotización</div><div class="value">${data.fechaCotizacion || ""}</div></div>
+        <div class="box"><div class="label">Cotización</div><div class="value">${data.codigo || ""}</div></div>
+        <div class="box"><div class="label">Agente</div><div class="value">${data.vendedora || ""}</div></div>
+      </div>
+      <h1>${data.destino || "Cotización"}</h1>
+      <div class="date">${data.fechaViaje || ""}</div>
+    </div>
+
+    <div class="section">
+      <h2>Tu viaje incluye</h2>
+      <div class="includes">
+        ${incluye.map(x => `<div class="include">${x}</div>`).join("")}
+      </div>
+    </div>
+
+    ${(data.simple?.vueloIda || data.simple?.vueloVuelta || data.simple?.capturaVuelo) ? `
+      <div class="section">
+        <h2>Vuelos</h2>
+        <div class="flights">${vuelosTexto}</div>
+        ${data.simple?.capturaVuelo ? `<img class="flight-img" src="${data.simple.capturaVuelo}">` : ""}
+      </div>
+    ` : ""}
+
+    <div class="section">
+      <h2>Opciones de alojamiento</h2>
+      ${hotelesHtml || "<p>No se cargaron hoteles.</p>"}
+    </div>
+
+    ${data.formaPago ? `<div class="section"><h2>Forma de pago</h2><p>${escapeLineas(data.formaPago)}</p></div>` : ""}
+    ${data.mostrarObservaciones && data.observaciones ? `<div class="section"><h2>Observaciones</h2><p>${escapeLineas(data.observaciones)}</p></div>` : ""}
+
+    <div class="legal">
+      ETNIKA TRAVEL S.R.L. | Legajo EVT Nº 18418 | CUIT 30-71775467-7<br>
+      Tarifas sujetas a disponibilidad y modificación sin previo aviso.
+      ${data.validez ? `<br>Validez de la cotización: ${data.validez}` : ""}
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+async function generarPDF(){
+  const data = await construirData();
+
+  if(!data.cliente && !data.destino){
+    alert("Primero completá los datos de la cotización.");
     return;
   }
-  html2pdf().from(element).save("cotizacion-etnika.pdf");
+
+  const win = window.open("", "_blank");
+
+  if(!win){
+    alert("El navegador bloqueó la ventana del PDF. Permití ventanas emergentes para este sitio.");
+    return;
+  }
+
+  win.document.open();
+  win.document.write(renderPDFCotizacion(data));
+  win.document.close();
+
+  setTimeout(() => {
+    win.focus();
+    win.print();
+  }, 900);
 }
+
 
 async function cargarCotizacion(codigo, duplicando=false){
   const { data, error } = await supabaseClient
