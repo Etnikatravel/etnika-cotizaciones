@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ETNIKA TRAVEL | Historial de Cotizaciones</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+  --violeta:#7700E0;
+  --turquesa:#00E5BF;
+  --gris:#F2F2F2;
+  --oscuro:#171717;
+}
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+  background:var(--gris);
+  color:var(--oscuro);
+}
+
+.header{
+  background:white;
+  text-align:center;
+  padding:22px 20px;
+}
+
+.logo{
+  max-width:320px;
+  width:100%;
+  height:auto;
+}
+
+.container{
+  max-width:1200px;
+  margin:30px auto;
+  padding:0 20px;
+}
+
+.card{
+  background:white;
+  border-radius:20px;
+  padding:25px;
+  box-shadow:0 6px 20px rgba(0,0,0,.08);
+}
+
+h1{
+  color:var(--violeta);
+  margin-bottom:18px;
+}
+
+.actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-bottom:20px;
+}
+
+input{
+  padding:13px;
+  border:1px solid #ddd;
+  border-radius:12px;
+  font-size:15px;
+  min-width:280px;
+  flex:1;
+}
+
+.btn{
+  border:none;
+  padding:13px 18px;
+  border-radius:30px;
+  font-weight:bold;
+  cursor:pointer;
+  text-decoration:none;
+  display:inline-block;
+  text-align:center;
+}
+
+.btn-main{
+  background:linear-gradient(135deg,var(--turquesa),var(--violeta));
+  color:white;
+}
+
+.btn-secondary{
+  background:#eee;
+  color:#333;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:12px;
+}
+
+th,td{
+  padding:14px 10px;
+  border-bottom:1px solid #eee;
+  text-align:left;
+  vertical-align:top;
+}
+
+th{
+  color:#555;
+  background:#fafafa;
+}
+
+.codigo{
+  font-weight:bold;
+  color:var(--violeta);
+}
+
+.empty{
+  padding:20px;
+  background:#fafafa;
+  border-radius:14px;
+  margin-top:15px;
+}
+
+@media(max-width:800px){
+  table, thead, tbody, th, td, tr{display:block;}
+  thead{display:none;}
+  tr{background:#fafafa;margin-bottom:14px;border-radius:14px;padding:12px;}
+  td{border:none;padding:8px 0;}
+  td::before{font-weight:bold;color:#555;display:block;}
+  td:nth-child(1)::before{content:"Código";}
+  td:nth-child(2)::before{content:"Cliente";}
+  td:nth-child(3)::before{content:"Destino";}
+  td:nth-child(4)::before{content:"Vendedora";}
+  td:nth-child(5)::before{content:"Fecha";}
+  td:nth-child(6)::before{content:"Acciones";}
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+  <img src="DEGRADADO CON LEGAJO.png" class="logo" alt="ETNIKA TRAVEL">
+</header>
+
+<div class="container">
+  <section class="card">
+    <h1>Historial de cotizaciones</h1>
+
+    <div class="actions">
+      <input id="buscador" placeholder="Buscar por cliente, destino, vendedora o código..." oninput="filtrar()">
+      <a class="btn btn-main" href="admin.html">+ Nueva cotización</a>
+      <button class="btn btn-secondary" onclick="cargarCotizaciones()">Actualizar</button>
+    </div>
+
+    <div id="resultado">
+      Cargando cotizaciones...
+    </div>
+  </section>
+</div>
+
+<script>
+const SUPABASE_URL = "https://izuvvwnqczvmphuvjzyf.supabase.co";
+const SUPABASE_KEY = "sb_publishable_r8syG_LzXy7NUymta20UFA_kPjGw_HN";
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let cotizaciones = [];
+
+async function cargarCotizaciones(){
+  const { data, error } = await supabaseClient
+    .from("cotizaciones")
+    .select("*")
+    .order("id", { ascending:false });
+
+  if(error){
+    document.getElementById("resultado").innerHTML = '<div class="empty">No se pudieron cargar las cotizaciones.</div>';
+    console.error(error);
+    return;
+  }
+
+  cotizaciones = data || [];
+  mostrar(cotizaciones);
+}
+
+function mostrar(lista){
+  if(!lista.length){
+    document.getElementById("resultado").innerHTML = '<div class="empty">Todavía no hay cotizaciones guardadas.</div>';
+    return;
+  }
+
+  let html = `
+    <table>
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Cliente</th>
+          <th>Destino</th>
+          <th>Vendedora</th>
+          <th>Fecha</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  lista.forEach(c=>{
+    const link = window.location.origin + "/cotizacion.html?id=" + encodeURIComponent(c.codigo || "");
+    html += `
+      <tr>
+        <td class="codigo">${c.codigo || ""}</td>
+        <td>${c.cliente || ""}</td>
+        <td>${c.destino || ""}</td>
+        <td>${c.vendedora || ""}</td>
+        <td>${new Date(c.created_at).toLocaleDateString("es-AR")}</td>
+        <td>
+          <a class="btn btn-main" href="${link}" target="_blank">Ver</a>
+          <button class="btn btn-secondary" onclick="copiar('${link}')">Copiar link</button>
+        </td>
+      </tr>
+    `;
+  });
+
+  html += "</tbody></table>";
+  document.getElementById("resultado").innerHTML = html;
+}
+
+function filtrar(){
+  const q = document.getElementById("buscador").value.toLowerCase().trim();
+
+  const filtradas = cotizaciones.filter(c =>
+    String(c.codigo || "").toLowerCase().includes(q) ||
+    String(c.cliente || "").toLowerCase().includes(q) ||
+    String(c.destino || "").toLowerCase().includes(q) ||
+    String(c.vendedora || "").toLowerCase().includes(q)
+  );
+
+  mostrar(filtradas);
+}
+
+function copiar(link){
+  navigator.clipboard.writeText(link);
+  alert("Link copiado");
+}
+
+cargarCotizaciones();
+</script>
+
+</body>
+</html>
