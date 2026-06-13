@@ -17,12 +17,7 @@
   --sombra:0 14px 38px rgba(32,18,54,.09);
 }
 
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-  font-family:Arial, Helvetica, sans-serif;
-}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial, Helvetica, sans-serif;}
 
 body{
   background:
@@ -35,21 +30,24 @@ body{
 .header{
   background:white;
   text-align:center;
-  padding:22px 20px 18px;
+  padding:18px 20px 14px;
   border-bottom:1px solid var(--borde);
 }
 
-.logo{
-  max-width:260px;
-  width:100%;
-  height:auto;
+.logo{max-width:260px;width:100%;height:auto;}
+
+.agent-bar{
+  max-width:1180px;
+  margin:18px auto -8px;
+  padding:0 20px;
+  text-align:right;
+  color:var(--violeta);
+  font-size:16px;
+  font-weight:900;
+  text-transform:uppercase;
 }
 
-.container{
-  max-width:1180px;
-  margin:28px auto 42px;
-  padding:0 20px;
-}
+.container{max-width:1180px;margin:28px auto 42px;padding:0 20px;}
 
 .card{
   background:white;
@@ -60,18 +58,9 @@ body{
   border:1px solid rgba(255,255,255,.85);
 }
 
-.section-title{
-  color:var(--violeta);
-  font-size:28px;
-  margin-bottom:20px;
-  font-weight:900;
-}
+.section-title{color:var(--violeta);font-size:28px;margin-bottom:20px;font-weight:900;}
 
-.data-grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:16px;
-}
+.data-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
 
 .data-box{
   background:#fbfbff;
@@ -79,20 +68,16 @@ body{
   border-radius:16px;
   padding:18px 20px;
   min-height:78px;
+  display:flex;
+  align-items:center;
+  gap:14px;
 }
 
-.data-label{
-  font-size:15px;
-  font-weight:900;
-  color:#555;
-  margin-bottom:7px;
-}
+.data-icon{font-size:30px;color:var(--violeta);line-height:1;}
 
-.data-value{
-  font-size:18px;
-  color:#111;
-  line-height:1.25;
-}
+.data-label{font-size:15px;font-weight:900;color:#555;margin-bottom:6px;}
+
+.data-value{font-size:18px;color:#111;line-height:1.25;}
 
 .destination-box{
   margin-top:18px;
@@ -120,35 +105,27 @@ body{
   text-transform:uppercase;
 }
 
-.includes-grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:14px;
-}
+.includes-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;}
 
 .include-item{
   background:#fbfbff;
   border:1px solid var(--borde);
   border-radius:16px;
-  padding:16px 18px;
-  font-size:18px;
+  padding:18px 12px;
+  min-height:96px;
   display:flex;
+  flex-direction:column;
   align-items:center;
-  gap:10px;
-  min-height:62px;
+  justify-content:center;
+  gap:8px;
+  text-align:center;
+  font-size:15px;
+  font-weight:800;
 }
 
-.include-icon{
-  color:var(--violeta);
-  font-size:22px;
-  flex:0 0 auto;
-}
+.include-icon{color:var(--violeta);font-size:30px;line-height:1;}
 
-.flights-grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:18px;
-}
+.flights-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;}
 
 .flight-box{
   background:#fbfbff;
@@ -160,17 +137,16 @@ body{
   font-size:17px;
 }
 
-.flight-title{
-  color:#555;
-  font-weight:900;
-  margin-bottom:8px;
+.flight-title{color:var(--violeta);font-weight:900;margin-bottom:8px;}
+
+.preview-img{
+  max-width:100%;
+  border-radius:16px;
+  margin-top:14px;
+  box-shadow:0 8px 20px rgba(0,0,0,.08);
 }
 
-.hotel-list{
-  display:flex;
-  flex-direction:column;
-  gap:16px;
-}
+.hotel-list{display:flex;flex-direction:column;gap:16px;}
 
 .hotel-card{
   background:white;
@@ -180,12 +156,7 @@ body{
   box-shadow:0 8px 24px rgba(0,0,0,.06);
 }
 
-.hotel-row{
-  display:grid;
-  grid-template-columns:1fr 260px;
-  gap:26px;
-  align-items:center;
-}
+.hotel-row{display:grid;grid-template-columns:1fr 270px;gap:26px;align-items:center;}
 
 .hotel-name{
   font-size:26px;
@@ -195,19 +166,11 @@ body{
   margin-bottom:12px;
 }
 
-.hotel-detail{
-  font-size:18px;
-  line-height:1.45;
-  color:#333;
-}
+.hotel-detail{font-size:18px;line-height:1.55;color:#333;}
 
-.hotel-detail strong{
-  color:#555;
-}
+.hotel-detail strong{color:#555;}
 
-.hotel-price{
-  text-align:right;
-}
+.hotel-price{text-align:center;}
 
 .hotel-price-value{
   color:var(--violeta);
@@ -217,18 +180,9 @@ body{
   white-space:nowrap;
 }
 
-.hotel-price-note{
-  color:#666;
-  font-size:15px;
-  margin-top:8px;
-}
+.hotel-price-note{color:#666;font-size:15px;margin-top:8px;}
 
-.hotel-actions{
-  margin-top:16px;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
+.hotel-actions{margin-top:16px;display:flex;flex-direction:column;gap:10px;}
 
 .btn{
   border:none;
@@ -244,15 +198,9 @@ body{
   font-size:15px;
 }
 
-.btn-google{
-  background:#f0f0f0;
-  color:#222;
-}
+.btn-google{background:#f0f0f0;color:#222;}
 
-.btn-option{
-  background:linear-gradient(135deg,var(--turquesa),#7be2c4);
-  color:#061b16;
-}
+.btn-option{background:linear-gradient(135deg,var(--turquesa),#7be2c4);color:#061b16;}
 
 .info-section{
   background:#fbfbff;
@@ -263,118 +211,39 @@ body{
   font-size:16px;
 }
 
-.footer{
-  text-align:center;
-}
+.footer{text-align:center;}
 
-.footer h3{
-  color:var(--violeta);
-  font-size:22px;
-  margin-bottom:8px;
-}
+.footer h3{color:var(--violeta);font-size:22px;margin-bottom:8px;}
 
-.footer p{
-  margin:7px 0;
-  line-height:1.45;
-}
+.footer p{margin:7px 0;line-height:1.45;}
 
-.legal{
-  text-align:center;
-  color:#777;
-  font-size:12px;
-  line-height:1.5;
-  margin-top:18px;
-}
+.legal{text-align:center;color:#777;font-size:12px;line-height:1.5;margin-top:18px;}
 
-.validez{
-  font-size:12px;
-  color:#777;
-  text-align:center;
-  margin-top:10px;
-}
+.validez{font-size:12px;color:#777;text-align:center;margin-top:10px;}
 
-.preview-img{
-  max-width:100%;
-  border-radius:16px;
-  margin-top:14px;
-  box-shadow:0 8px 20px rgba(0,0,0,.08);
-}
-
-a{
-  color:var(--violeta);
-  font-weight:800;
-}
+a{color:var(--violeta);font-weight:800;}
 
 @media(max-width:900px){
-  .data-grid,
-  .includes-grid{
-    grid-template-columns:repeat(2,1fr);
-  }
-
-  .flights-grid{
-    grid-template-columns:1fr;
-  }
-
-  .hotel-row{
-    grid-template-columns:1fr;
-  }
-
-  .hotel-price{
-    text-align:left;
-  }
-
-  .hotel-actions{
-    max-width:320px;
-  }
-
-  .destination-title{
-    font-size:42px;
-  }
-
-  .destination-date{
-    font-size:22px;
-  }
+  .data-grid,.includes-grid{grid-template-columns:repeat(2,1fr);}
+  .flights-grid{grid-template-columns:1fr;}
+  .hotel-row{grid-template-columns:1fr;}
+  .hotel-price{text-align:left;}
+  .hotel-actions{max-width:320px;}
+  .destination-title{font-size:42px;}
+  .destination-date{font-size:22px;}
 }
 
 @media(max-width:560px){
-  .container{
-    padding:0 12px;
-    margin-top:18px;
-  }
-
-  .header{
-    padding:16px 12px 12px;
-  }
-
-  .logo{
-    max-width:210px;
-  }
-
-  .card{
-    padding:20px;
-    border-radius:20px;
-  }
-
-  .data-grid,
-  .includes-grid{
-    grid-template-columns:1fr;
-  }
-
-  .destination-title{
-    font-size:34px;
-  }
-
-  .destination-date{
-    font-size:19px;
-  }
-
-  .hotel-name{
-    font-size:22px;
-  }
-
-  .hotel-price-value{
-    font-size:30px;
-  }
+  .container{padding:0 12px;margin-top:18px;}
+  .header{padding:16px 12px 12px;}
+  .logo{max-width:220px;}
+  .card{padding:20px;border-radius:20px;}
+  .data-grid,.includes-grid{grid-template-columns:1fr;}
+  .destination-title{font-size:34px;}
+  .destination-date{font-size:19px;}
+  .hotel-name{font-size:22px;}
+  .hotel-price-value{font-size:30px;}
+  .agent-bar{text-align:center;margin:14px auto -6px;}
 }
 </style>
 </head>
@@ -384,6 +253,8 @@ a{
 <header class="header">
   <img src="DEGRADADO CON LEGAJO.png" class="logo" alt="ETNIKA TRAVEL">
 </header>
+
+<div id="agentBar"></div>
 
 <main class="container">
   <section id="cotizacion">
@@ -406,10 +277,19 @@ function limpiarPrecio(precio){
   return precio ? String(precio).replace(/precio final grupo familiar/ig,"").trim() : "";
 }
 
+function tipoPrecioLabel(tipo){
+  if(!tipo) return "Precio final grupo familiar";
+  const t = String(tipo).toLowerCase();
+  if(t.includes("persona")) return "Precio por persona";
+  if(t.includes("total")) return "Precio total";
+  return "Precio final grupo familiar";
+}
+
 function textoWhatsApp(data, hotel){
   const numero = data.whatsapp ? String(data.whatsapp).replace(/\D/g,"") : "5493412177311";
   const msg = encodeURIComponent(
     "Hola, quiero avanzar con esta opción de ETNIKA TRAVEL:\n\n" +
+    "Agente: " + (data.vendedora || "") + "\n" +
     "Cotización: " + (data.codigo || "") + "\n" +
     "Destino: " + (data.destino || "") + "\n" +
     "Fecha: " + (data.fechaViaje || "") + "\n" +
@@ -420,18 +300,9 @@ function textoWhatsApp(data, hotel){
 }
 
 function renderIncluye(data){
-  const base = [];
-
-  if(data.simple?.vueloIda || data.simple?.vueloVuelta) base.push("Aéreo incluido");
-  if(data.simple?.equipaje) base.push(data.simple.equipaje);
-  base.push("Asesoramiento ETNIKA");
-
-  const extra = data.simple?.incluye
-    ? data.simple.incluye.split("\n").map(x=>x.trim()).filter(Boolean)
-    : [];
-
-  const items = [...new Set([...base, ...extra])];
-  if(!items.length) return "";
+  const items = data.incluyeItems && data.incluyeItems.length
+    ? data.incluyeItems
+    : ["Aéreo incluido","Equipaje incluido","Traslados en destino","Alojamiento según opción elegida","Asesoramiento ETNIKA"];
 
   const icons = ["✈️","🧳","🚐","🏨","💬","🛡️","🎟️","✅"];
 
@@ -451,7 +322,19 @@ function renderIncluye(data){
 }
 
 function renderVuelos(data){
-  if(!data.simple?.vueloIda && !data.simple?.vueloVuelta && !data.simple?.capturaVuelo) return "";
+  const tieneTexto = data.simple?.vueloIda || data.simple?.vueloVuelta;
+  const tieneCaptura = data.simple?.capturaVuelo;
+
+  if(!tieneTexto && !tieneCaptura) return "";
+
+  if(tieneCaptura && !tieneTexto){
+    return `
+      <section class="card">
+        <h2 class="section-title">Vuelos</h2>
+        <img src="${data.simple.capturaVuelo}" class="preview-img">
+      </section>
+    `;
+  }
 
   return `
     <section class="card">
@@ -487,7 +370,7 @@ function renderHoteles(data){
 
               <div class="hotel-price">
                 ${h.precio ? `<div class="hotel-price-value">${limpiarPrecio(h.precio)}</div>` : ""}
-                <div class="hotel-price-note">Precio final grupo familiar</div>
+                <div class="hotel-price-note">${tipoPrecioLabel(h.tipoPrecio || data.tipoPrecio)}</div>
 
                 <div class="hotel-actions">
                   ${h.link ? `<a class="btn btn-google" href="${h.link}" target="_blank">Ver hotel en Google</a>` : ""}
@@ -536,32 +419,36 @@ function renderTramos(data){
 }
 
 function renderCotizacion(data){
+  document.getElementById("agentBar").innerHTML = data.vendedora
+    ? `<div class="agent-bar">AGENTE: ${data.vendedora}</div>`
+    : "";
+
   return `
     <section class="card">
       <h2 class="section-title">Datos de la cotización</h2>
 
       <div class="data-grid">
-        ${data.cliente ? `<div class="data-box"><div class="data-label">Cliente</div><div class="data-value">${data.cliente}</div></div>` : ""}
-        ${data.pasajeros ? `<div class="data-box"><div class="data-label">Pasajeros</div><div class="data-value">${data.pasajeros}</div></div>` : ""}
-        ${data.fechaCotizacion ? `<div class="data-box"><div class="data-label">Fecha de cotización</div><div class="data-value">${data.fechaCotizacion}</div></div>` : ""}
-        ${data.codigo ? `<div class="data-box"><div class="data-label">Cotización</div><div class="data-value">${data.codigo}</div></div>` : ""}
+        ${data.cliente ? `<div class="data-box"><div class="data-icon">👤</div><div><div class="data-label">Cliente</div><div class="data-value">${data.cliente}</div></div></div>` : ""}
+        ${data.pasajeros ? `<div class="data-box"><div class="data-icon">👥</div><div><div class="data-label">Pasajeros</div><div class="data-value">${data.pasajeros}</div></div></div>` : ""}
+        ${data.fechaCotizacion ? `<div class="data-box"><div class="data-icon">📅</div><div><div class="data-label">Fecha de cotización</div><div class="data-value">${data.fechaCotizacion}</div></div></div>` : ""}
+        ${data.codigo ? `<div class="data-box"><div class="data-icon">📄</div><div><div class="data-label">Cotización</div><div class="data-value">${data.codigo}</div></div></div>` : ""}
       </div>
 
       <div class="destination-box">
-        <div class="destination-title">${data.destino || "Cotización de viaje"}</div>
-        ${data.fechaViaje ? `<div class="destination-date">${data.fechaViaje}</div>` : ""}
+        <div class="destination-title">📍 ${data.destino || "Cotización de viaje"}</div>
+        ${data.fechaViaje ? `<div class="destination-date">📅 ${data.fechaViaje}</div>` : ""}
       </div>
     </section>
 
     ${renderIncluye(data)}
 
-    ${data.modo === "simple" ? renderHoteles(data) : renderTramos(data)}
-
     ${renderVuelos(data)}
+
+    ${data.modo === "simple" ? renderHoteles(data) : renderTramos(data)}
 
     ${data.formaPago ? `<section class="card"><h2 class="section-title">Forma de pago</h2><div class="info-section">${escapeLineas(data.formaPago)}</div></section>` : ""}
 
-    ${data.observaciones ? `<section class="card"><h2 class="section-title">Observaciones</h2><div class="info-section">${escapeLineas(data.observaciones)}</div></section>` : ""}
+    ${data.mostrarObservaciones && data.observaciones ? `<section class="card"><h2 class="section-title">Observaciones</h2><div class="info-section">${escapeLineas(data.observaciones)}</div></section>` : ""}
 
     <section class="card footer">
       <h3>ETNIKA TRAVEL S.R.L.</h3>

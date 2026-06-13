@@ -567,7 +567,7 @@ async function cargarDatosEnFormulario(data){
   setValue("precioTotal", data.precioTotal);
   setValue("validez", data.validez);
   setValue("formaPago", data.formaPago);
-  setValue("observaciones", data.observaciones);
+  setValue("observaciones", data.observaciones);\n  if(document.getElementById("mostrarObservaciones")) document.getElementById("mostrarObservaciones").checked = data.mostrarObservaciones !== false;
 
   limpiarListas();
 
@@ -585,7 +585,7 @@ async function cargarDatosEnFormulario(data){
       box.querySelector(".hotelCategoria").value = h.categoria || "";
       box.querySelector(".hotelHab").value = h.habitacion || "";
       box.querySelector(".hotelRegimen").value = h.regimen || "";
-      box.querySelector(".hotelPrecio").value = h.precio || "";
+      box.querySelector(".hotelPrecio").value = h.precio || "";\n      if(box.querySelector(".hotelTipoPrecio")) box.querySelector(".hotelTipoPrecio").value = h.tipoPrecio || "grupo familiar";
       box.querySelector(".hotelEtiqueta").value = h.etiqueta || "";
       box.querySelector(".hotelLink").value = h.link || "";
       box.querySelector(".hotelEstado").value = h.estado || "";
@@ -623,7 +623,7 @@ function agregarHotelSimple(){
       <div class="campo"><label>Categoría</label><input class="hotelCategoria" placeholder="Ej: 5 estrellas"></div>
       <div class="campo"><label>Habitación</label><input class="hotelHab" placeholder="Ej: Junior Suite Doble"></div>
       <div class="campo"><label>Régimen</label><input class="hotelRegimen" placeholder="Ej: All Inclusive / Desayuno"></div>
-      <div class="campo"><label>Precio</label><input class="hotelPrecio" placeholder="Ej: USD 6.900 grupo familiar"></div>
+      <div class="campo"><label>Precio</label><input class="hotelPrecio" placeholder="Ej: USD 6.900">\n              <select class="hotelTipoPrecio">\n                <option value="grupo familiar">Grupo familiar</option>\n                <option value="por persona">Por persona</option>\n                <option value="precio total">Precio total</option>\n              </select></div>
       <div class="campo">
         <label>Etiqueta comercial</label>
         <select class="hotelEtiqueta">
@@ -762,7 +762,7 @@ async function construirData(){
     precioTotal: document.getElementById("precioTotal").value,
     validez: document.getElementById("validez").value,
     formaPago: document.getElementById("formaPago").value,
-    observaciones: document.getElementById("observaciones").value,
+    observaciones: document.getElementById("observaciones").value,\n      mostrarObservaciones: document.getElementById("mostrarObservaciones") ? document.getElementById("mostrarObservaciones").checked : true,\n      incluyeItems: document.getElementById("simpleIncluye") ? document.getElementById("simpleIncluye").value.split("\\n").map(x=>x.trim()).filter(Boolean) : [],
     simple: {},
     hoteles: [],
     tramos: []
