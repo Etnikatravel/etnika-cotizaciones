@@ -567,7 +567,8 @@ async function cargarDatosEnFormulario(data){
   setValue("precioTotal", data.precioTotal);
   setValue("validez", data.validez);
   setValue("formaPago", data.formaPago);
-  setValue("observaciones", data.observaciones);\n  if(document.getElementById("mostrarObservaciones")) document.getElementById("mostrarObservaciones").checked = data.mostrarObservaciones !== false;
+  setValue("observaciones", data.observaciones);
+  if(document.getElementById("mostrarObservaciones")) document.getElementById("mostrarObservaciones").checked = data.mostrarObservaciones !== false;\n  if(document.getElementById("mostrarObservaciones")) document.getElementById("mostrarObservaciones").checked = data.mostrarObservaciones !== false;
 
   limpiarListas();
 
@@ -585,7 +586,8 @@ async function cargarDatosEnFormulario(data){
       box.querySelector(".hotelCategoria").value = h.categoria || "";
       box.querySelector(".hotelHab").value = h.habitacion || "";
       box.querySelector(".hotelRegimen").value = h.regimen || "";
-      box.querySelector(".hotelPrecio").value = h.precio || "";\n      if(box.querySelector(".hotelTipoPrecio")) box.querySelector(".hotelTipoPrecio").value = h.tipoPrecio || "grupo familiar";
+      box.querySelector(".hotelPrecio").value = h.precio || "";
+      if(box.querySelector(".hotelTipoPrecio")) box.querySelector(".hotelTipoPrecio").value = h.tipoPrecio || "grupo familiar";\n      if(box.querySelector(".hotelTipoPrecio")) box.querySelector(".hotelTipoPrecio").value = h.tipoPrecio || "grupo familiar";
       box.querySelector(".hotelEtiqueta").value = h.etiqueta || "";
       box.querySelector(".hotelLink").value = h.link || "";
       box.querySelector(".hotelEstado").value = h.estado || "";
@@ -762,7 +764,8 @@ async function construirData(){
     precioTotal: document.getElementById("precioTotal").value,
     validez: document.getElementById("validez").value,
     formaPago: document.getElementById("formaPago").value,
-    observaciones: document.getElementById("observaciones").value,\n      mostrarObservaciones: document.getElementById("mostrarObservaciones") ? document.getElementById("mostrarObservaciones").checked : true,\n      incluyeItems: document.getElementById("simpleIncluye") ? document.getElementById("simpleIncluye").value.split("\\n").map(x=>x.trim()).filter(Boolean) : [],
+    observaciones: document.getElementById("observaciones").value,
+      mostrarObservaciones: document.getElementById("mostrarObservaciones") ? document.getElementById("mostrarObservaciones").checked : true,\n      mostrarObservaciones: document.getElementById("mostrarObservaciones") ? document.getElementById("mostrarObservaciones").checked : true,\n      incluyeItems: document.getElementById("simpleIncluye") ? document.getElementById("simpleIncluye").value.split("\\n").map(x=>x.trim()).filter(Boolean) : [],
     simple: {},
     hoteles: [],
     tramos: []
