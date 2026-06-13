@@ -216,6 +216,8 @@ function mostrar(lista){
         <td>${new Date(c.created_at).toLocaleDateString("es-AR")}</td>
         <td>
           <a class="btn btn-main" href="${link}" target="_blank">Ver</a>
+          <a class="btn btn-secondary" href="admin.html?edit=${encodeURIComponent(c.codigo || "")}">Editar</a>
+          <a class="btn btn-secondary" href="admin.html?duplicar=${encodeURIComponent(c.codigo || "")}">Duplicar</a>
           <button class="btn btn-secondary" onclick="copiar('${link}')">Copiar link</button>
         </td>
       </tr>
