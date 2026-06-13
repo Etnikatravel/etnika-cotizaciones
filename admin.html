@@ -152,7 +152,20 @@ alt="ETNIKA TRAVEL">
 <label>Fecha de cotización</label>
 <input id="fechacotizacion">
 </div>
+<div class="campo">
+<label>Vuelo de ida</label>
+<textarea id="vueloida"></textarea>
+</div>
 
+<div class="campo">
+<label>Vuelo de vuelta</label>
+<textarea id="vuelovuelta"></textarea>
+</div>
+
+<div class="campo">
+<label>Equipaje incluido</label>
+<input id="equipaje">
+</div>
 <div class="campo">
 <label>Vendedora</label>
 <input id="vendedora">
@@ -216,6 +229,9 @@ let cliente=document.getElementById("cliente").value;
 let destino=document.getElementById("destino").value;
 let fechaviaje=document.getElementById("fechaviaje").value;
 let fechacotizacion=document.getElementById("fechacotizacion").value;
+let vueloida=document.getElementById("vueloida").value;
+let vuelovuelta=document.getElementById("vuelovuelta").value;
+let equipaje=document.getElementById("equipaje").value;
 let vendedora=document.getElementById("vendedora").value;
 let hotel=document.getElementById("hotel").value;
 let habitacion=document.getElementById("habitacion").value;
@@ -233,6 +249,11 @@ document.getElementById("preview").innerHTML=`
 <p><strong>Fecha de viaje:</strong> ${fechaviaje}</p>
 
 <p><strong>Fecha de cotización:</strong> ${fechacotizacion}</p>
+<p><strong>Vuelo de ida:</strong><br>${vueloida}</p>
+
+<p><strong>Vuelo de vuelta:</strong><br>${vuelovuelta}</p>
+
+<p><strong>Equipaje incluido:</strong> ${equipaje}</p>
 
 <p><strong>Hotel:</strong> ${hotel}</p>
 
