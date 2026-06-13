@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ETNIKA TRAVEL | Cotización</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{--violeta:#7700E0;--turquesa:#00E5BF;--gris:#F2F2F2;--oscuro:#171717}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,Helvetica,sans-serif}
+body{background:var(--gris);color:var(--oscuro)}
+.container{max-width:1100px;margin:30px auto;padding:0 20px}
+.preview{background:white;border-radius:20px;padding:25px;box-shadow:0 6px 20px rgba(0,0,0,.08)}
+.preview-logo{text-align:center;margin-bottom:25px}
+.preview-logo img{max-width:300px;width:100%}
+h2{color:var(--violeta);margin-bottom:18px}
+.preview-section{border-left:5px solid var(--turquesa);background:#fafafa;border-radius:14px;padding:18px;margin-bottom:16px}
+.preview-section h3{color:var(--violeta);margin-bottom:8px}
+.hotel-card{border:1px solid #eee;border-radius:16px;padding:16px;margin-bottom:12px;background:white}
+.badge{display:inline-block;background:#00E5BF;color:#111;border-radius:20px;padding:4px 10px;font-weight:bold;font-size:12px;margin:4px 4px 4px 0}
+.price-big{font-size:28px;font-weight:bold;color:var(--violeta)}
+.preview-img{max-width:100%;border-radius:12px;margin-top:12px}
+.btn{border:none;padding:14px 22px;border-radius:30px;font-weight:bold;cursor:pointer;text-decoration:none;display:inline-block;text-align:center}
+.btn-whatsapp{background:var(--turquesa);color:#061b16}
+</style>
+</head>
+
+<body>
+<div class="container">
+  <section class="preview" id="cotizacion">
+    <h2>Cargando cotización...</h2>
+  </section>
+</div>
+
+<script>
+const SUPABASE_URL = "https://izuvvwnqczvmphuvjzyf.supabase.co";
+const SUPABASE_KEY = "sb_publishable_r8syG_LzXy7NUymta20UFA_kPjGw_HN";
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+function escapeLineas(texto){ return texto ? texto.replace(/\n/g,"<br>") : ""; }
+
+function renderCotizacion(data){
+  let contenido = "";
+
+  if(data.modo === "simple"){
+    contenido += `
+      <h2>Vuelos</h2>
+      <div class="preview-section">
+        ${data.simple?.vueloIda ? `<p><strong>Ida:</strong><br>${escapeLineas(data.simple.vueloIda)}</p>` : ""}
+        ${data.simple?.vueloVuelta ? `<p><strong>Vuelta:</strong><br>${escapeLineas(data.simple.vueloVuelta)}</p>` : ""}
+        ${data.simple?.equipaje ? `<p><strong>Equipaje incluido:</strong> ${data.simple.equipaje}</p>` : ""}
+        ${data.simple?.capturaVuelo ? `<img src="${data.simple.capturaVuelo}" class="preview-img">` : ""}
+      </div>
+    `;
+
+    if(data.simple?.incluye){
+      contenido += `<h2>Incluye</h2><div class="preview-section">${data.simple.incluye.split("\n").map(x=>x.trim()?`<p>✓ ${x}</p>`:"").join("")}</div>`;
+    }
+
+    if(data.simple?.noIncluye){
+      contenido += `<h2>No incluye</h2><div class="preview-section">${data.simple.noIncluye.split("\n").map(x=>x.trim()?`<p>✗ ${x}</p>`:"").join("")}</div>`;
+    }
+
+    let hotelesHtml = "";
+    (data.hoteles || []).forEach(h=>{
+      hotelesHtml += `
+        <div class="hotel-card">
+          <h3>${h.nombre || "Hotel"}</h3>
+          ${h.etiqueta ? `<span class="badge">${h.etiqueta}</span>` : ""}
+          ${h.estado ? `<span class="badge">${h.estado}</span>` : ""}
+          ${h.categoria ? `<p><strong>Categoría:</strong> ${h.categoria}</p>` : ""}
+          ${h.habitacion ? `<p><strong>Habitación:</strong> ${h.habitacion}</p>` : ""}
+          ${h.regimen ? `<p><strong>Régimen:</strong> ${h.regimen}</p>` : ""}
+          ${h.precio ? `<p><strong>Precio:</strong> ${h.precio}</p>` : ""}
+          ${h.link ? `<p><a href="${h.link}" target="_blank">Ver hotel en Google</a></p>` : ""}
+        </div>
+      `;
+    });
+    contenido += `<h2>Opciones de alojamiento</h2>${hotelesHtml || "<p>No se agregaron hoteles.</p>"}`;
+  } else {
+    let tramosHtml = "";
+    (data.tramos || []).forEach(t=>{
+      tramosHtml += `
+        <div class="preview-section">
+          <h3>${t.tipo}: ${t.titulo}</h3>
+          ${t.fechas ? `<p><strong>Fechas:</strong> ${t.fechas}</p>` : ""}
+          ${t.duracion ? `<p><strong>Duración / noches:</strong> ${t.duracion}</p>` : ""}
+          ${t.detalle ? `<p><strong>Detalle:</strong><br>${escapeLineas(t.detalle)}</p>` : ""}
+          ${t.regimen ? `<p><strong>Incluye / empresa:</strong> ${t.regimen}</p>` : ""}
+          ${t.precio ? `<p><strong>Precio:</strong> ${t.precio}</p>` : ""}
+          ${t.estado ? `<p><span class="badge">${t.estado}</span></p>` : ""}
+          ${t.link ? `<p><a href="${t.link}" target="_blank">Ver link / ubicación</a></p>` : ""}
+          ${t.imagen ? `<img src="${t.imagen}" class="preview-img">` : ""}
+        </div>
+      `;
+    });
+    contenido += `<h2>Itinerario y servicios</h2>${tramosHtml || "<p>No se agregaron tramos.</p>"}`;
+  }
+
+  return `
+    <div class="preview-logo"><img src="DEGRADADO CON LEGAJO.png" alt="ETNIKA TRAVEL"></div>
+    <h2>${data.destino || "Cotización de viaje"}</h2>
+    <div class="preview-section">
+      ${data.cliente ? `<p><strong>Cliente:</strong> ${data.cliente}</p>` : ""}
+      ${data.pasajeros ? `<p><strong>Pasajeros:</strong> ${data.pasajeros}</p>` : ""}
+      ${data.fechaViaje ? `<p><strong>Fecha de viaje:</strong> ${data.fechaViaje}</p>` : ""}
+      ${data.fechaCotizacion ? `<p><strong>Fecha de cotización:</strong> ${data.fechaCotizacion}</p>` : ""}
+      ${data.codigo ? `<p><strong>Cotización:</strong> ${data.codigo}</p>` : ""}
+      ${data.vendedora ? `<p><strong>Asesora:</strong> ${data.vendedora}</p>` : ""}
+      ${data.precioTotal ? `<p class="price-big">${data.precioTotal}</p>` : ""}
+      ${data.validez ? `<p><strong>Validez:</strong> ${data.validez}</p>` : ""}
+    </div>
+    ${contenido}
+    <div class="preview-section"><h3>Forma de pago</h3><p>${escapeLineas(data.formaPago || "")}</p></div>
+    <div class="preview-section">
+      <h3>Condiciones importantes</h3>
+      <p>${escapeLineas(data.observaciones || "")}</p>
+      <p>La contratación implica la aceptación de las <a href="https://etnikatravel.tur.ar/general-conditions" target="_blank">Condiciones Generales de ETNIKA TRAVEL</a>.</p>
+    </div>
+    <div class="preview-section" style="text-align:center;">
+      <h3>ETNIKA TRAVEL S.R.L.</h3>
+      <p>Legajo EVT Nº 18418 | CUIT 30-71775467-7</p>
+      <p><a href="https://maps.app.goo.gl/QGwE9kNAV4aiuszz9" target="_blank">📍 Ver oficina en Google Maps</a></p>
+      <p>🕒 Lunes a Viernes de 10:00 a 18:00 hs</p>
+      <p><a href="https://etnikatravel.tur.ar" target="_blank">🌐 etnikatravel.tur.ar</a></p>
+      ${data.whatsapp ? `<p><a class="btn btn-whatsapp" href="https://wa.me/${data.whatsapp}" target="_blank">📲 Contactar por WhatsApp</a></p>` : ""}
+    </div>
+  `;
+}
+
+async function cargar(){
+  const params = new URLSearchParams(window.location.search);
+  const codigo = params.get("id");
+
+  if(!codigo){
+    document.getElementById("cotizacion").innerHTML = "<h2>No se indicó una cotización.</h2>";
+    return;
+  }
+
+  const { data, error } = await supabaseClient
+    .from("cotizaciones")
+    .select("*")
+    .eq("codigo", codigo)
+    .single();
+
+  if(error || !data){
+    document.getElementById("cotizacion").innerHTML = "<h2>No encontramos esta cotización.</h2>";
+    console.error(error);
+    return;
+  }
+
+  const datos = JSON.parse(data.datos_json);
+  document.getElementById("cotizacion").innerHTML = renderCotizacion(datos);
+}
+
+cargar();
+</script>
+
+</body>
+</html>
