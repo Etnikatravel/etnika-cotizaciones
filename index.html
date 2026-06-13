@@ -1,8 +1,9 @@
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ETNIKA TRAVEL | Cotización</title>
 
 <style>
@@ -11,7 +12,6 @@
   --turquesa:#00E5BF;
   --gris:#F2F2F2;
   --oscuro:#171717;
-  --blanco:#ffffff;
 }
 
 *{
@@ -28,24 +28,29 @@ body{
 
 .header{
   background:white;
-  padding:30px 20px 10px;
   text-align:center;
+  padding:25px 20px;
 }
 
-.logo-etnika{
-  max-width:450px;
+.logo{
+  max-width:360px;
   width:100%;
   height:auto;
-  display:block;
-  margin:0 auto;
 }
 
 .container{
   max-width:1100px;
-  margin:25px auto;
+  margin:30px auto;
   padding:0 20px;
 }
 
+.card{
+  background:white;
+  border-radius:18px;
+  padding:25px;
+  margin-bottom:22px;
+  box-shadow:0 6px 20px rgba(0,0,0,.08);
+}
 
 h2{
   color:var(--violeta);
@@ -116,7 +121,6 @@ h2{
   font-size:28px;
   font-weight:bold;
   margin:15px 0 5px;
-  color:var(--oscuro);
 }
 
 .price-detail{
@@ -166,13 +170,40 @@ h2{
 
 .footer{
   text-align:center;
-  padding:30px 20px;
-  color:#666;
+  padding:35px 20px;
+  color:#555;
+  border-top:1px solid #ddd;
+}
+
+.footer a{
+  color:var(--violeta);
+  font-weight:bold;
+  text-decoration:none;
+}
+
+.floating-whatsapp{
+  position:fixed;
+  left:20px;
+  bottom:20px;
+  background:var(--turquesa);
+  color:#000;
+  padding:14px 24px;
+  border-radius:30px;
+  text-decoration:none;
+  font-weight:bold;
+  box-shadow:0 6px 18px rgba(0,0,0,.18);
+  z-index:10;
 }
 
 @media(max-width:600px){
-  .header h1{
-    font-size:28px;
+  .logo{
+    max-width:280px;
+  }
+
+  .floating-whatsapp{
+    left:12px;
+    right:12px;
+    text-align:center;
   }
 }
 </style>
@@ -181,18 +212,15 @@ h2{
 <body>
 
 <header class="header">
-  <img
-    src="DEGRADADO CON LEGAJO.png"
-    alt="ETNIKA TRAVEL"
-    class="logo-etnika"
-  >
+  <img src="DEGRADADO CON LEGAJO.png" alt="ETNIKA TRAVEL" class="logo">
 </header>
+
 <main class="container">
+
 <section class="card">
   <h2>Datos de la cotización</h2>
 
   <div class="grid">
-
     <div class="box">
       <div class="label">Cliente</div>
       Familia Rodríguez
@@ -201,27 +229,6 @@ h2{
     <div class="box">
       <div class="label">Destino</div>
       Punta Cana / Bayahibe
-    </div>
-
-    <div class="box">
-      <div class="label">Fecha de viaje</div>
-      19/03 al 27/03
-    </div>
-
-    <div class="box">
-      <div class="label">Fecha de cotización</div>
-      12/06/2026
-    </div>
-
-  </div>
-</section>
-<section class="card">
-  <h2>PUNTA CANA / BAYAHIBE</h2>
-
-  <div class="grid">
-    <div class="box">
-      <div class="label">Cliente</div>
-      Familia Rodríguez
     </div>
 
     <div class="box">
@@ -237,6 +244,11 @@ h2{
     <div class="box">
       <div class="label">Fecha de cotización</div>
       12/06/2026
+    </div>
+
+    <div class="box">
+      <div class="label">Cotización</div>
+      ETK-2026-001
     </div>
   </div>
 </section>
@@ -286,12 +298,8 @@ h2{
       <div class="price-detail">Precio final grupo familiar</div>
 
       <div class="buttons">
-        <a class="btn btn-google" href="https://www.google.com/maps/search/Catalonia+Bavaro+Beach+Golf+Casino+Resort" target="_blank">
-          Ver hotel en Google
-        </a>
-        <a class="btn btn-whatsapp" href="https://wa.me/5493410000000?text=Hola%20ETNIKA,%20quiero%20avanzar%20con%20la%20opci%C3%B3n%20Catalonia%20Bavaro." target="_blank">
-          Quiero esta opción
-        </a>
+        <a class="btn btn-google" href="https://www.google.com/maps/search/Catalonia+Bavaro+Beach+Golf+Casino+Resort" target="_blank">Ver hotel en Google</a>
+        <a class="btn btn-whatsapp" href="https://wa.me/5493412177311?text=Hola%20ETNIKA,%20quiero%20avanzar%20con%20la%20opci%C3%B3n%20Catalonia%20Bavaro." target="_blank">Quiero esta opción</a>
       </div>
     </div>
 
@@ -302,12 +310,8 @@ h2{
       <div class="price-detail">Precio final grupo familiar</div>
 
       <div class="buttons">
-        <a class="btn btn-google" href="https://www.google.com/maps/search/Vista+Sol+Punta+Cana+Beach+Resort+Spa" target="_blank">
-          Ver hotel en Google
-        </a>
-        <a class="btn btn-whatsapp" href="https://wa.me/5493410000000?text=Hola%20ETNIKA,%20quiero%20avanzar%20con%20la%20opci%C3%B3n%20Vista%20Sol%20Punta%20Cana." target="_blank">
-          Quiero esta opción
-        </a>
+        <a class="btn btn-google" href="https://www.google.com/maps/search/Vista+Sol+Punta+Cana+Beach+Resort+Spa" target="_blank">Ver hotel en Google</a>
+        <a class="btn btn-whatsapp" href="https://wa.me/5493412177311?text=Hola%20ETNIKA,%20quiero%20avanzar%20con%20la%20opci%C3%B3n%20Vista%20Sol%20Punta%20Cana." target="_blank">Quiero esta opción</a>
       </div>
     </div>
 
@@ -318,12 +322,8 @@ h2{
       <div class="price-detail">Precio final grupo familiar</div>
 
       <div class="buttons">
-        <a class="btn btn-google" href="https://www.google.com/maps/search/Sunscape+Dominicus" target="_blank">
-          Ver hotel en Google
-        </a>
-        <a class="btn btn-whatsapp" href="https://wa.me/5493410000000?text=Hola%20ETNIKA,%20quiero%20avanzar%20con%20la%20opci%C3%B3n%20Sunscape%20Dominicus." target="_blank">
-          Quiero esta opción
-        </a>
+        <a class="btn btn-google" href="https://www.google.com/maps/search/Sunscape+Dominicus" target="_blank">Ver hotel en Google</a>
+        <a class="btn btn-whatsapp" href="https://wa.me/5493412177311?text=Hola%20ETNIKA,%20quiero%20avanzar%20con%20la%20opci%C3%B3n%20Sunscape%20Dominicus." target="_blank">Quiero esta opción</a>
       </div>
     </div>
 
@@ -334,47 +334,29 @@ h2{
       <div class="price-detail">Precio final grupo familiar</div>
 
       <div class="buttons">
-        <a class="btn btn-google" href="https://www.google.com/maps/search/Viva+Dominicus+Beach+by+Wyndham" target="_blank">
-          Ver hotel en Google
-        </a>
-        <a class="btn btn-whatsapp" href="https://wa.me/5493410000000?text=Hola%20ETNIKA,%20quiero%20avanzar%20con%20la%20opci%C3%B3n%20Viva%20Dominicus." target="_blank">
-          Quiero esta opción
-        </a>
+        <a class="btn btn-google" href="https://www.google.com/maps/search/Viva+Dominicus+Beach+by+Wyndham" target="_blank">Ver hotel en Google</a>
+        <a class="btn btn-whatsapp" href="https://wa.me/5493412177311?text=Hola%20ETNIKA,%20quiero%20avanzar%20con%20la%20opci%C3%B3n%20Viva%20Dominicus." target="_blank">Quiero esta opción</a>
       </div>
     </div>
 
   </div>
 </section>
+
 <section class="card">
   <h2>👩‍💼 Tu asesora de viajes</h2>
 
   <div class="box" style="text-align:center;">
     <h3>Equipo Comercial ETNIKA TRAVEL</h3>
-
-    <p>
-      Tu consulta será atendida por la asesora que generó esta cotización.
-    </p>
+    <p>Tu consulta será atendida por la asesora que generó esta cotización.</p>
 
     <div style="margin-top:20px;">
-      <a
-        href="https://wa.me/549341XXXXXXXX"
-        target="_blank"
-        style="
-          background:#00E5BF;
-          color:#111;
-          text-decoration:none;
-          padding:14px 28px;
-          border-radius:30px;
-          font-weight:bold;
-          display:inline-block;
-        "
-      >
+      <a class="btn btn-whatsapp" href="https://wa.me/5493412177311" target="_blank">
         📲 Contactar a ETNIKA TRAVEL
       </a>
     </div>
-
   </div>
 </section>
+
 <section class="card payment">
   <h2>Forma de pago</h2>
   <p>50% al momento de la reserva.</p>
@@ -383,9 +365,7 @@ h2{
 
 <section class="card conditions">
   <h2>Condiciones importantes</h2>
-  <p>
-    Tarifas sujetas a disponibilidad y modificación sin previo aviso hasta el momento de la reserva y emisión.
-  </p>
+  <p>Tarifas sujetas a disponibilidad y modificación sin previo aviso hasta el momento de la reserva y emisión.</p>
   <br>
   <p>
     La contratación de cualquiera de los servicios implica la aceptación de las
@@ -397,31 +377,11 @@ h2{
 
 </main>
 
-<footer class="footer" style="border-top:1px solid #ddd; padding-top:30px;">
+<footer class="footer">
+  <strong>ETNIKA TRAVEL S.R.L.</strong><br><br>
+  Legajo EVT Nº 18418 | CUIT 30-71775467-7<br><br>
 
-  <strong style="font-size:20px;">
-    ETNIKA TRAVEL S.R.L.
-  </strong>
-
-  <br><br>
-
-  Legajo EVT Nº 18418 | CUIT 30-71775467-7
-
-  <br><br>
-
-  <a
-    href="https://maps.app.goo.gl/QGwE9kNAV4aiuszz9"
-    target="_blank"
-    style="
-      display:inline-block;
-      background:#00E5BF;
-      color:#111;
-      text-decoration:none;
-      padding:12px 22px;
-      border-radius:30px;
-      font-weight:bold;
-    "
-  >
+  <a href="https://maps.app.goo.gl/QGwE9kNAV4aiuszz9" target="_blank">
     📍 Ver oficina en Google Maps
   </a>
 
@@ -431,35 +391,15 @@ h2{
 
   <br><br>
 
-  <a
-    href="https://etnikatravel.tur.ar"
-    target="_blank"
-    style="
-      color:#7700E0;
-      font-weight:bold;
-      text-decoration:none;
-    "
-  >
+  <a href="https://etnikatravel.tur.ar" target="_blank">
     🌐 etnikatravel.tur.ar
   </a>
-
 </footer>
-  <a
-    href="https://wa.me/5493412177311"
-    target="_blank"
-    style="
-      background:#00E5BF;
-      color:#000;
-      padding:12px 25px;
-      border-radius:30px;
-      text-decoration:none;
-      font-weight:bold;
-      display:inline-block;
-    "
-  >
-    📲 Contactar a ETNIKA por WhatsApp
-  </a>
-</div>
+
+<a class="floating-whatsapp" href="https://wa.me/5493412177311" target="_blank">
+  📲 Contactar a ETNIKA por WhatsApp
+</a>
+
 </body>
 </html>
-
+```
