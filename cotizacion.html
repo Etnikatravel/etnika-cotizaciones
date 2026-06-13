@@ -25,7 +25,7 @@ body{
     var(--gris-suave);
   color:var(--texto);
 }
-.container{max-width:1100px;margin:16px auto 32px;padding:0 20px}
+.container{max-width:1100px;margin:32px auto;padding:0 20px}
 .preview{
   background:white;
   border-radius:28px;
@@ -35,15 +35,11 @@ body{
 }
 .preview-logo{
   text-align:center;
-  padding:8px 20px;
+  padding:30px 20px;
   background:white;
   border-bottom:1px solid var(--borde);
 }
-.preview-logo img{
-  max-width:150px;
-  width:100%;
-  height:auto;
-}
+.preview-logo img{max-width:310px;width:100%}
 h2{
   color:var(--violeta);
   margin-bottom:18px;
@@ -54,8 +50,9 @@ h2{
   padding:14px 30px 4px;
   text-align:center;
   text-transform:uppercase;
-  font-size:32px;
+  font-size:38px;
   line-height:1.1;
+  font-weight:900;
 }
 .preview-section{
   border-left:6px solid var(--turquesa);
@@ -104,47 +101,54 @@ h2{
 .btn-whatsapp{background:var(--turquesa);color:#061b16}
 a{color:var(--violeta);font-weight:bold}
 
-.fecha-destino{
-  text-align:center;
-  color:#666672;
-  font-size:18px;
-  font-weight:800;
-  margin:0 30px 16px;
-  text-transform:uppercase;
-}
-.datos-principales{
+.hotel-main-row{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-  gap:14px;
-  margin:18px 30px;
+  grid-template-columns:1fr auto;
+  gap:20px;
+  align-items:start;
 }
-.dato-box{
-  background:#fbfbff;
-  border:1px solid #f0eff5;
-  border-radius:16px;
-  padding:16px;
+
+.hotel-info-left{
+  min-width:0;
 }
-.dato-label{
+
+.hotel-precio-right{
+  text-align:right;
+  min-width:180px;
+  align-self:center;
+}
+
+.hotel-precio-valor{
+  color:var(--violeta);
+  font-size:32px;
+  font-weight:900;
+  line-height:1;
+  white-space:nowrap;
+}
+
+.hotel-precio-label{
   color:#666672;
   font-size:13px;
   font-weight:800;
-  margin-bottom:6px;
-}
-.dato-value{
-  font-size:16px;
-  font-weight:800;
-}
-.legal-final{
-  text-align:center;
-  color:#777;
-  font-size:12px;
-  line-height:1.5;
-  margin:18px 30px 26px;
-}
-.validez-final{
-  color:#888;
-  font-size:11px;
   margin-top:8px;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+}
+
+@media(max-width:700px){
+  .hotel-main-row{
+    grid-template-columns:1fr;
+  }
+
+  .hotel-precio-right{
+    text-align:left;
+    min-width:0;
+    margin-top:12px;
+  }
+
+  .hotel-precio-valor{
+    font-size:28px;
+  }
 }
 
 @media(max-width:700px){
@@ -154,11 +158,12 @@ a{color:var(--violeta);font-weight:bold}
   padding:14px 30px 4px;
   text-align:center;
   text-transform:uppercase;
-  font-size:32px;
+  font-size:38px;
   line-height:1.1;
+  font-weight:900;
 }
   .preview-section,.hotel-card{margin:16px;padding:18px}
-  .preview-logo img{max-width:135px}
+  .preview-logo img{max-width:260px}
 }
 </style>
 </head>
@@ -194,18 +199,33 @@ function renderCotizacion(data){
     if(data.simple?.incluye){
       contenido += `<h2>Incluye</h2><div class="preview-section">${data.simple.incluye.split("\n").map(x=>x.trim()?`<p>✓ ${x}</p>`:"").join("")}</div>`;
     }
-let hotelesHtml = "";
+
+    if(data.simple?.noIncluye){
+      contenido += `<h2>No incluye</h2><div class="preview-section">${data.simple.noIncluye.split("\n").map(x=>x.trim()?`<p>✗ ${x}</p>`:"").join("")}</div>`;
+    }
+
+    let hotelesHtml = "";
     (data.hoteles || []).forEach(h=>{
       hotelesHtml += `
         <div class="hotel-card">
-          <h3>${h.nombre || "Hotel"}</h3>
-          ${h.etiqueta ? `<span class="badge">${h.etiqueta}</span>` : ""}
-          ${h.estado ? `<span class="badge">${h.estado}</span>` : ""}
-          ${h.categoria ? `<p><strong>Categoría:</strong> ${h.categoria}</p>` : ""}
-          ${h.habitacion ? `<p><strong>Habitación:</strong> ${h.habitacion}</p>` : ""}
-          ${h.regimen ? `<p><strong>Régimen:</strong> ${h.regimen}</p>` : ""}
-          ${h.precio ? `<p><strong>Precio:</strong> ${h.precio}</p>` : ""}
-          ${h.link ? `<p><a href="${h.link}" target="_blank">Ver hotel en Google</a></p>` : ""}
+          <div class="hotel-main-row">
+            <div class="hotel-info-left">
+              <h3>${h.nombre || "Hotel"}</h3>
+              ${h.etiqueta ? `<span class="badge">${h.etiqueta}</span>` : ""}
+              ${h.estado ? `<span class="badge">${h.estado}</span>` : ""}
+              ${h.categoria ? `<p><strong>Categoría:</strong> ${h.categoria}</p>` : ""}
+              ${h.habitacion ? `<p><strong>Habitación:</strong> ${h.habitacion}</p>` : ""}
+              ${h.regimen ? `<p><strong>Régimen:</strong> ${h.regimen}</p>` : ""}
+              ${h.link ? `<p><a href="${h.link}" target="_blank">Ver hotel en Google</a></p>` : ""}
+            </div>
+
+            ${h.precio ? `
+              <div class="hotel-precio-right">
+                <div class="hotel-precio-valor">${h.precio}</div>
+                <div class="hotel-precio-label">POR PERSONA</div>
+              </div>
+            ` : ""}
+          </div>
         </div>
       `;
     });
@@ -233,13 +253,14 @@ let hotelesHtml = "";
   return `
     <div class="preview-logo"><img src="DEGRADADO CON LEGAJO.png" alt="ETNIKA TRAVEL"></div>
     <h2>${data.destino || "Cotización de viaje"}</h2>
-    ${data.fechaViaje ? `<div class="fecha-destino">${data.fechaViaje}</div>` : ""}
-    <div class="datos-principales">
-      ${data.cliente ? `<div class="dato-box"><div class="dato-label">Cliente</div><div class="dato-value">${data.cliente}</div></div>` : ""}
-      ${data.pasajeros ? `<div class="dato-box"><div class="dato-label">Pasajeros</div><div class="dato-value">${data.pasajeros}</div></div>` : ""}
-      ${data.fechaCotizacion ? `<div class="dato-box"><div class="dato-label">Fecha de cotización</div><div class="dato-value">${data.fechaCotizacion}</div></div>` : ""}
-      ${data.codigo ? `<div class="dato-box"><div class="dato-label">Cotización</div><div class="dato-value">${data.codigo}</div></div>` : ""}
-      ${data.vendedora ? `<div class="dato-box"><div class="dato-label">Asesora</div><div class="dato-value">${data.vendedora}</div></div>` : ""}
+    <div class="preview-section">
+      ${data.cliente ? `<p><strong>Cliente:</strong> ${data.cliente}</p>` : ""}
+      ${data.pasajeros ? `<p><strong>Pasajeros:</strong> ${data.pasajeros}</p>` : ""}
+      ${data.fechaViaje ? `<p><strong>Fecha de viaje:</strong> ${data.fechaViaje}</p>` : ""}
+      ${data.fechaCotizacion ? `<p><strong>Fecha de cotización:</strong> ${data.fechaCotizacion}</p>` : ""}
+      ${data.codigo ? `<p><strong>Cotización:</strong> ${data.codigo}</p>` : ""}
+      ${data.vendedora ? `<p><strong>Asesora:</strong> ${data.vendedora}</p>` : ""}
+      ${data.validez ? `<p><strong>Validez:</strong> ${data.validez}</p>` : ""}
     </div>
     ${contenido}
     <div class="preview-section"><h3>Forma de pago</h3><p>${escapeLineas(data.formaPago || "")}</p></div>
@@ -255,10 +276,6 @@ let hotelesHtml = "";
       <p>🕒 Lunes a Viernes de 10:00 a 18:00 hs</p>
       <p><a href="https://etnikatravel.tur.ar" target="_blank">🌐 etnikatravel.tur.ar</a></p>
       ${data.whatsapp ? `<p><a class="btn btn-whatsapp" href="https://wa.me/${data.whatsapp}" target="_blank">📲 Contactar por WhatsApp</a></p>` : ""}
-    </div>
-    <div class="legal-final">
-      <p>Tarifas sujetas a disponibilidad y modificación sin previo aviso hasta el momento de la reserva y emisión.</p>
-      ${data.validez ? `<p class="validez-final">Validez de la cotización: ${data.validez}</p>` : ""}
     </div>
   `;
 }
