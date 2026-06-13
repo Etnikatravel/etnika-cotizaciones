@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ETNIKA TRAVEL | Panel de Cotizaciones</title>
+<style>
+:root{--violeta:#7700E0;--turquesa:#00E5BF;--gris:#F2F2F2;--oscuro:#171717}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,Helvetica,sans-serif}
+body{background:var(--gris);color:var(--oscuro)}
+.header{background:white;text-align:center;padding:22px 20px}
+.logo{max-width:330px;width:100%;height:auto}
+.container{max-width:1200px;margin:30px auto;padding:0 20px}
+.card{background:white;border-radius:20px;padding:25px;margin-bottom:22px;box-shadow:0 6px 20px rgba(0,0,0,.08)}
+h1,h2{color:var(--violeta);margin-bottom:18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.campo{display:flex;flex-direction:column}
+label{font-weight:bold;margin-bottom:6px;color:#555}
+input,textarea,select{padding:12px;border:1px solid #ddd;border-radius:12px;font-size:15px}
+textarea{min-height:90px}
+.btn{border:none;padding:14px 22px;border-radius:30px;font-weight:bold;cursor:pointer;text-decoration:none;display:inline-block;text-align:center}
+.btn-main{background:linear-gradient(135deg,var(--turquesa),var(--violeta));color:white}
+.btn-secondary{background:#eee;color:#333}
+.btn-whatsapp{background:var(--turquesa);color:#061b16}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}
+.modo-tabs{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.tab{padding:12px 18px;border-radius:30px;border:2px solid #ddd;background:white;cursor:pointer;font-weight:bold}
+.tab.active{border-color:var(--violeta);background:var(--violeta);color:white}
+.hidden{display:none}
+.item{border:1px solid #e5e5e5;border-radius:18px;padding:18px;margin-top:18px;background:#fafafa}
+.item-header{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:14px}
+.item-header strong{color:var(--violeta)}
+.preview{background:white;border-radius:20px;padding:25px;margin-top:30px;box-shadow:0 6px 20px rgba(0,0,0,.08)}
+.preview-logo{text-align:center;margin-bottom:25px}
+.preview-logo img{max-width:300px;width:100%}
+.preview-section{border-left:5px solid var(--turquesa);background:#fafafa;border-radius:14px;padding:18px;margin-bottom:16px}
+.preview-section h3{color:var(--violeta);margin-bottom:8px}
+.preview-img{max-width:100%;border-radius:12px;margin-top:12px}
+.small{font-size:13px;color:#666;margin-top:8px}
+.hotel-card{border:1px solid #eee;border-radius:16px;padding:16px;margin-bottom:12px;background:white}
+.badge{display:inline-block;background:#00E5BF;color:#111;border-radius:20px;padding:4px 10px;font-weight:bold;font-size:12px}
+@media(max-width:600px){.item-header{flex-direction:column;align-items:flex-start}.logo{max-width:280px}}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <img src="DEGRADADO CON LEGAJO.png" class="logo" alt="ETNIKA TRAVEL">
+</header>
+
+<div class="container">
+
+<section class="card">
+  <h1>Nueva cotización</h1>
+  <div class="modo-tabs">
+    <button class="tab active" id="tabSimple" onclick="setModo('simple')">Cotización simple</button>
+    <button class="tab" id="tabItinerario" onclick="setModo('itinerario')">Itinerario completo</button>
+  </div>
+
+  <div class="grid">
+    <div class="campo"><label>Cliente</label><input id="cliente" placeholder="Ej: Familia Rodríguez"></div>
+    <div class="campo"><label>Destino / Viaje</label><input id="destino" placeholder="Ej: Punta Cana / Europa 2026"></div>
+    <div class="campo"><label>Pasajeros</label><input id="pasajeros" placeholder="Ej: 2 adultos + 2 menores"></div>
+    <div class="campo"><label>Fecha de viaje</label><input id="fechaViaje" placeholder="Ej: 19/03 al 27/03"></div>
+    <div class="campo"><label>Fecha de cotización</label><input id="fechaCotizacion" placeholder="Ej: 12/06/2026"></div>
+    <div class="campo"><label>Vendedora / asesora</label><input id="vendedora" placeholder="Ej: Carla / Yamila"></div>
+    <div class="campo"><label>WhatsApp de contacto</label><input id="whatsapp" value="5493412177311"></div>
+    <div class="campo"><label>N° de cotización</label><input id="codigo" placeholder="Ej: ETK-2026-001"></div>
+  </div>
+</section>
+
+<section id="simpleBox" class="card">
+  <h2>Cotización simple</h2>
+  <div class="grid">
+    <div class="campo"><label>Vuelo de ida</label><textarea id="simpleVueloIda" placeholder="Ej: ROS → PTY → PUJ&#10;Copa Airlines&#10;Salida 01:38 / llegada 13:37"></textarea></div>
+    <div class="campo"><label>Vuelo de vuelta</label><textarea id="simpleVueloVuelta" placeholder="Ej: PUJ → PTY → ROS&#10;Copa Airlines&#10;Salida 14:39 / llegada 00:20"></textarea></div>
+    <div class="campo"><label>Equipaje incluido</label><input id="simpleEquipaje" placeholder="Ej: Mochila y carry on"></div>
+    <div class="campo"><label>Servicios incluidos</label><textarea id="simpleIncluye">Aéreo desde Rosario&#10;Traslados en destino&#10;8 noches de alojamiento&#10;Régimen All Inclusive</textarea></div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-main" onclick="agregarHotelSimple()">+ Agregar hotel / opción</button>
+    <button class="btn btn-secondary" onclick="generarVista()">Generar vista previa</button>
+  </div>
+  <div id="hotelesSimple"></div>
+</section>
+
+<section id="itinerarioBox" class="card hidden">
+  <h2>Itinerario completo</h2>
+  <p class="small">Usalo para Europa o viajes con varias ciudades, vuelos internos, trenes, autos y opcionales.</p>
+  <div class="actions">
+    <button class="btn btn-main" onclick="agregarTramo('Hotel')">+ Hotel</button>
+    <button class="btn btn-main" onclick="agregarTramo('Vuelo')">+ Vuelo</button>
+    <button class="btn btn-main" onclick="agregarTramo('Tren')">+ Tren</button>
+    <button class="btn btn-main" onclick="agregarTramo('Auto')">+ Auto</button>
+    <button class="btn btn-main" onclick="agregarTramo('Traslado')">+ Traslado</button>
+    <button class="btn btn-main" onclick="agregarTramo('Observación')">+ Observación</button>
+    <button class="btn btn-secondary" onclick="generarVista()">Generar vista previa</button>
+  </div>
+  <div id="tramos"></div>
+</section>
+
+<section class="card">
+  <h2>Forma de pago y condiciones</h2>
+  <div class="grid">
+    <div class="campo"><label>Forma de pago</label><textarea id="formaPago">50% al momento de la reserva. Saldo en entregas parciales hasta 30 días antes de viajar.</textarea></div>
+    <div class="campo"><label>Observaciones generales</label><textarea id="observaciones">Tarifas sujetas a disponibilidad y modificación sin previo aviso hasta el momento de la reserva y emisión.</textarea></div>
+  </div>
+</section>
+
+<section class="preview" id="preview">
+  <h2>Vista previa</h2>
+  <p>Completá los datos y tocá “Generar vista previa”.</p>
+</section>
+
+</div>
+
+<script>
+let modo = "simple";
+let contadorHoteles = 0;
+let contadorTramos = 0;
+
+function setModo(nuevo){
+  modo = nuevo;
+  document.getElementById("simpleBox").classList.toggle("hidden", modo !== "simple");
+  document.getElementById("itinerarioBox").classList.toggle("hidden", modo !== "itinerario");
+  document.getElementById("tabSimple").classList.toggle("active", modo === "simple");
+  document.getElementById("tabItinerario").classList.toggle("active", modo === "itinerario");
+}
+
+function agregarHotelSimple(){
+  contadorHoteles++;
+  const div = document.createElement("div");
+  div.className = "item hotel-simple";
+  div.id = "hotel-simple-" + contadorHoteles;
+  div.innerHTML = `
+    <div class="item-header">
+      <strong>Hotel / opción ${contadorHoteles}</strong>
+      <button class="btn btn-secondary" onclick="document.getElementById('hotel-simple-${contadorHoteles}').remove()">Eliminar</button>
+    </div>
+    <div class="grid">
+      <div class="campo"><label>Nombre del hotel</label><input class="hotelNombre" placeholder="Ej: Catalonia Bavaro Beach Golf & Casino Resort"></div>
+      <div class="campo"><label>Habitación</label><input class="hotelHab" placeholder="Ej: Junior Suite Doble"></div>
+      <div class="campo"><label>Régimen</label><input class="hotelRegimen" placeholder="Ej: All Inclusive / Desayuno"></div>
+      <div class="campo"><label>Precio</label><input class="hotelPrecio" placeholder="Ej: USD 6.900 grupo familiar"></div>
+      <div class="campo"><label>Link Google Maps / hotel</label><input class="hotelLink" placeholder="https://maps.app.goo.gl/..."></div>
+      <div class="campo"><label>Estado</label><select class="hotelEstado"><option></option><option>Incluido</option><option>Reservado</option><option>A elegir</option><option>Opcional</option></select></div>
+    </div>`;
+  document.getElementById("hotelesSimple").appendChild(div);
+}
+
+function agregarTramo(tipoInicial){
+  contadorTramos++;
+  const div = document.createElement("div");
+  div.className = "item tramo";
+  div.id = "tramo-" + contadorTramos;
+
+  const commonTop = `
+    <div class="item-header">
+      <strong>${tipoInicial} ${contadorTramos}</strong>
+      <button class="btn btn-secondary" onclick="document.getElementById('tramo-${contadorTramos}').remove()">Eliminar</button>
+    </div>
+    <input type="hidden" class="tipo" value="${tipoInicial}">
+  `;
+
+  let fields = "";
+  if(tipoInicial === "Hotel"){
+    fields = `
+      <div class="grid">
+        <div class="campo"><label>Ciudad</label><input class="titulo" placeholder="Ej: PARÍS"></div>
+        <div class="campo"><label>Fechas</label><input class="fechas" placeholder="Ej: 04/05 al 08/05"></div>
+        <div class="campo"><label>Noches</label><input class="duracion" placeholder="Ej: 4 noches"></div>
+        <div class="campo"><label>Hotel</label><input class="detalle" placeholder="Ej: Libertel Montmartre Opéra"></div>
+        <div class="campo"><label>Habitación / Régimen</label><input class="regimen" placeholder="Ej: Habitación familiar - Solo habitación"></div>
+        <div class="campo"><label>Precio / estado</label><input class="precio" placeholder="Ej: Reservado / USD 700"></div>
+        <div class="campo"><label>Link Google Maps</label><input class="link" placeholder="https://maps.app.goo.gl/..."></div>
+        <div class="campo"><label>Estado</label><select class="estado"><option></option><option>Reservado</option><option>A elegir</option><option>Opcional</option><option>Incluido</option></select></div>
+      </div>`;
+  } else if(tipoInicial === "Vuelo"){
+    fields = `
+      <div class="grid">
+        <div class="campo"><label>Ruta</label><input class="titulo" placeholder="Ej: Bari → Catania"></div>
+        <div class="campo"><label>Fecha</label><input class="fechas" placeholder="Ej: 26/05"></div>
+        <div class="campo"><label>Aerolínea</label><input class="regimen" placeholder="Ej: Ryanair / Copa"></div>
+        <div class="campo"><label>Horarios / detalle</label><textarea class="detalle" placeholder="Ej: Salida 17:25 BRI / llegada 18:40 CTA"></textarea></div>
+        <div class="campo"><label>Equipaje / incluye</label><input class="duracion" placeholder="Ej: Mochila y carry on"></div>
+        <div class="campo"><label>Precio</label><input class="precio" placeholder="Ej: USD 150 por persona"></div>
+        <div class="campo"><label>Link proveedor</label><input class="link" placeholder="https://..."></div>
+        <div class="campo"><label>Captura del vuelo</label><input type="file" class="imagen" accept="image/*"></div>
+      </div>`;
+  } else if(tipoInicial === "Tren"){
+    fields = `
+      <div class="grid">
+        <div class="campo"><label>Ruta</label><input class="titulo" placeholder="Ej: París → Milán / Venecia → Florencia"></div>
+        <div class="campo"><label>Fecha</label><input class="fechas" placeholder="Ej: 08/05"></div>
+        <div class="campo"><label>Empresa</label><input class="regimen" placeholder="Ej: SNCF / Italo / Trenitalia"></div>
+        <div class="campo"><label>Horarios / detalle</label><textarea class="detalle" placeholder="Ej: 06:46 Paris Gare de Lyon → 13:53 Milano Porta Garibaldi"></textarea></div>
+        <div class="campo"><label>Duración</label><input class="duracion" placeholder="Ej: 7h07"></div>
+        <div class="campo"><label>Precio</label><input class="precio" placeholder="Ej: USD 65 por persona"></div>
+        <div class="campo"><label>Link proveedor</label><input class="link" placeholder="https://..."></div>
+        <div class="campo"><label>Captura del tren</label><input type="file" class="imagen" accept="image/*"></div>
+      </div>`;
+  } else if(tipoInicial === "Auto"){
+    fields = `
+      <div class="grid">
+        <div class="campo"><label>Ruta / retiro y devolución</label><input class="titulo" placeholder="Ej: Sorrento → Bari"></div>
+        <div class="campo"><label>Fechas</label><input class="fechas" placeholder="Ej: 22/05 al 26/05"></div>
+        <div class="campo"><label>Vehículo</label><input class="regimen" placeholder="Ej: Peugeot 208 o similar"></div>
+        <div class="campo"><label>Detalle</label><textarea class="detalle" placeholder="Retiro, devolución, franquicia, condiciones"></textarea></div>
+        <div class="campo"><label>Duración</label><input class="duracion" placeholder="Ej: 4 días"></div>
+        <div class="campo"><label>Precio</label><input class="precio" placeholder="Ej: USD 630 / USD 800"></div>
+        <div class="campo"><label>Link proveedor</label><input class="link" placeholder="https://..."></div>
+        <div class="campo"><label>Imagen / captura</label><input type="file" class="imagen" accept="image/*"></div>
+      </div>`;
+  } else {
+    fields = `
+      <div class="grid">
+        <div class="campo"><label>Título</label><input class="titulo" placeholder="Ej: Traslado aeropuerto / Observación importante"></div>
+        <div class="campo"><label>Fecha</label><input class="fechas" placeholder="Opcional"></div>
+        <div class="campo"><label>Detalle</label><textarea class="detalle" placeholder="Escribí el detalle completo"></textarea></div>
+        <div class="campo"><label>Precio</label><input class="precio" placeholder="Opcional"></div>
+        <div class="campo"><label>Link</label><input class="link" placeholder="Opcional"></div>
+      </div>
+      <input type="hidden" class="regimen"><input type="hidden" class="duracion"><input type="hidden" class="estado">
+    `;
+  }
+
+  div.innerHTML = commonTop + fields;
+  document.getElementById("tramos").appendChild(div);
+}
+
+function leerImagen(input){
+  return new Promise(resolve=>{
+    if(!input || !input.files || !input.files[0]) return resolve("");
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.readAsDataURL(input.files[0]);
+  });
+}
+
+function valor(el, selector){
+  const item = el.querySelector(selector);
+  return item ? item.value : "";
+}
+
+async function generarVista(){
+  const cliente = document.getElementById("cliente").value;
+  const destino = document.getElementById("destino").value;
+  const pasajeros = document.getElementById("pasajeros").value;
+  const fechaViaje = document.getElementById("fechaViaje").value;
+  const fechaCotizacion = document.getElementById("fechaCotizacion").value;
+  const vendedora = document.getElementById("vendedora").value;
+  const whatsapp = document.getElementById("whatsapp").value;
+  const codigo = document.getElementById("codigo").value;
+  const formaPago = document.getElementById("formaPago").value;
+  const observaciones = document.getElementById("observaciones").value;
+
+  let contenido = "";
+
+  if(modo === "simple"){
+    const ida = document.getElementById("simpleVueloIda").value;
+    const vuelta = document.getElementById("simpleVueloVuelta").value;
+    const equipaje = document.getElementById("simpleEquipaje").value;
+    const incluye = document.getElementById("simpleIncluye").value;
+
+    contenido += `<h2>Vuelos</h2><div class="preview-section">
+      ${ida ? `<p><strong>Ida:</strong><br>${ida.replace(/\n/g,"<br>")}</p>` : ""}
+      ${vuelta ? `<p><strong>Vuelta:</strong><br>${vuelta.replace(/\n/g,"<br>")}</p>` : ""}
+      ${equipaje ? `<p><strong>Equipaje incluido:</strong> ${equipaje}</p>` : ""}
+    </div>`;
+
+    if(incluye){
+      contenido += `<h2>Tu viaje incluye</h2><div class="preview-section">${incluye.split("\n").map(x=>x.trim()?`<p>✓ ${x}</p>`:"").join("")}</div>`;
+    }
+
+    const hoteles = document.querySelectorAll(".hotel-simple");
+    let hotelesHtml = "";
+    hoteles.forEach(h=>{
+      const nombre = valor(h,".hotelNombre");
+      const hab = valor(h,".hotelHab");
+      const reg = valor(h,".hotelRegimen");
+      const precio = valor(h,".hotelPrecio");
+      const link = valor(h,".hotelLink");
+      const estado = valor(h,".hotelEstado");
+      hotelesHtml += `<div class="hotel-card">
+        <h3>${nombre || "Hotel"}</h3>
+        ${hab ? `<p><strong>Habitación:</strong> ${hab}</p>` : ""}
+        ${reg ? `<p><strong>Régimen:</strong> ${reg}</p>` : ""}
+        ${precio ? `<p><strong>Precio:</strong> ${precio}</p>` : ""}
+        ${estado ? `<p><span class="badge">${estado}</span></p>` : ""}
+        ${link ? `<p><a href="${link}" target="_blank">Ver hotel en Google</a></p>` : ""}
+      </div>`;
+    });
+    contenido += `<h2>Opciones de alojamiento</h2>${hotelesHtml || "<p>No se agregaron hoteles.</p>"}`;
+  } else {
+    const tramos = document.querySelectorAll(".tramo");
+    let tramosHtml = "";
+    for(const t of tramos){
+      const tipo = valor(t,".tipo");
+      const titulo = valor(t,".titulo");
+      const fechas = valor(t,".fechas");
+      const duracion = valor(t,".duracion");
+      const detalle = valor(t,".detalle");
+      const regimen = valor(t,".regimen");
+      const precio = valor(t,".precio");
+      const link = valor(t,".link");
+      const estado = valor(t,".estado");
+      const imagen = await leerImagen(t.querySelector(".imagen"));
+      tramosHtml += `<div class="preview-section">
+        <h3>${tipo}: ${titulo}</h3>
+        ${fechas ? `<p><strong>Fechas:</strong> ${fechas}</p>` : ""}
+        ${duracion ? `<p><strong>Duración / noches:</strong> ${duracion}</p>` : ""}
+        ${detalle ? `<p><strong>Detalle:</strong><br>${detalle.replace(/\n/g,"<br>")}</p>` : ""}
+        ${regimen ? `<p><strong>Incluye / empresa:</strong> ${regimen}</p>` : ""}
+        ${precio ? `<p><strong>Precio:</strong> ${precio}</p>` : ""}
+        ${estado ? `<p><span class="badge">${estado}</span></p>` : ""}
+        ${link ? `<p><a href="${link}" target="_blank">Ver link / ubicación</a></p>` : ""}
+        ${imagen ? `<img src="${imagen}" class="preview-img">` : ""}
+      </div>`;
+    }
+    contenido += `<h2>Itinerario y servicios</h2>${tramosHtml || "<p>No se agregaron tramos.</p>"}`;
+  }
+
+  document.getElementById("preview").innerHTML = `
+    <div class="preview-logo"><img src="DEGRADADO CON LEGAJO.png" alt="ETNIKA TRAVEL"></div>
+    <h2>${destino || "Cotización de viaje"}</h2>
+    <div class="preview-section">
+      ${cliente ? `<p><strong>Cliente:</strong> ${cliente}</p>` : ""}
+      ${pasajeros ? `<p><strong>Pasajeros:</strong> ${pasajeros}</p>` : ""}
+      ${fechaViaje ? `<p><strong>Fecha de viaje:</strong> ${fechaViaje}</p>` : ""}
+      ${fechaCotizacion ? `<p><strong>Fecha de cotización:</strong> ${fechaCotizacion}</p>` : ""}
+      ${codigo ? `<p><strong>Cotización:</strong> ${codigo}</p>` : ""}
+      ${vendedora ? `<p><strong>Asesora:</strong> ${vendedora}</p>` : ""}
+    </div>
+    ${contenido}
+    <div class="preview-section"><h3>Forma de pago</h3><p>${formaPago.replace(/\n/g,"<br>")}</p></div>
+    <div class="preview-section">
+      <h3>Condiciones importantes</h3>
+      <p>${observaciones.replace(/\n/g,"<br>")}</p>
+      <p>La contratación implica la aceptación de las <a href="https://etnikatravel.tur.ar/general-conditions" target="_blank">Condiciones Generales de ETNIKA TRAVEL</a>.</p>
+    </div>
+    <div class="preview-section" style="text-align:center;">
+      <h3>ETNIKA TRAVEL S.R.L.</h3>
+      <p>Legajo EVT Nº 18418 | CUIT 30-71775467-7</p>
+      <p><a href="https://maps.app.goo.gl/QGwE9kNAV4aiuszz9" target="_blank">📍 Ver oficina en Google Maps</a></p>
+      <p>🕒 Lunes a Viernes de 10:00 a 18:00 hs</p>
+      <p><a href="https://etnikatravel.tur.ar" target="_blank">🌐 etnikatravel.tur.ar</a></p>
+      ${whatsapp ? `<p><a class="btn btn-whatsapp" href="https://wa.me/${whatsapp}" target="_blank">📲 Contactar por WhatsApp</a></p>` : ""}
+    </div>`;
+}
+</script>
+</body>
+</html>
