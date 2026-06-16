@@ -184,6 +184,28 @@ textarea{min-height:92px;resize:vertical;}
   .mode-tabs{width:100%;}
   .mode-tabs button{flex:1;}
 }
+
+.combo-box{
+  border:1px solid var(--borde);
+  border-radius:20px;
+  padding:20px;
+  margin-top:16px;
+  background:#fffdf7;
+}
+.combo-servicio{
+  border:1px dashed #ded6ee;
+  border-radius:16px;
+  padding:16px;
+  margin-top:14px;
+  background:white;
+}
+.stars-preview{
+  color:var(--violeta);
+  font-size:18px;
+  font-weight:900;
+  letter-spacing:1px;
+}
+
 </style>
 </head>
 
@@ -328,10 +350,12 @@ Asesoramiento ETNIKA"></textarea>
     <div id="hotelesSection" style="margin-top:24px;">
       <h2>Hotelería</h2>
       <div class="actions">
-        <button class="btn btn-soft" type="button" onclick="agregarHotel()">+ Agregar hotel / opción</button>
+        <button class="btn btn-soft" type="button" onclick="agregarHotel()">+ Agregar hotel simple</button>
+        <button class="btn btn-soft" type="button" onclick="agregarCombo()">+ Agregar opción combinada</button>
       </div>
 
     <div id="hoteles"></div>
+    <div id="combos"></div>
     </div>
   </section>
 
@@ -412,6 +436,129 @@ async function getFileBase64(id){
   return await fileToBase64(el.files[0]);
 }
 
+function normalizarEstrellas(valor){
+  if(!valor) return "";
+  const v = String(valor).trim();
+  if(v.includes("★★★★★") || v.includes("5")) return "★★★★★";
+  if(v.includes("★★★★") || v.includes("4")) return "★★★★";
+  if(v.includes("★★★") || v.includes("3")) return "★★★";
+  if(v.includes("★★") || v.includes("2")) return "★★";
+  if(v.includes("★") || v.includes("1")) return "★";
+  return "";
+}
+
+function comboServicioTemplate(s = {}){
+  return `
+    <div class="combo-servicio">
+      <div class="form-grid">
+        <div>
+          <label>Destino / zona</label>
+          <input class="comboDestino" placeholder="Ej: Punta Cana" value="${s.destino || ""}">
+        </div>
+
+        <div>
+          <label>Noches</label>
+          <input class="comboNoches" placeholder="Ej: 5 noches" value="${s.noches || ""}">
+        </div>
+
+        <div>
+          <label>Hotel</label>
+          <input class="comboHotel" placeholder="Ej: Bahía Príncipe" value="${s.hotel || ""}">
+        </div>
+
+        <div>
+          <label>Categoría</label>
+          <select class="comboCategoria">
+            <option value="">Sin categoría</option>
+            <option value="★">★</option>
+            <option value="★★">★★</option>
+            <option value="★★★">★★★</option>
+            <option value="★★★★">★★★★</option>
+            <option value="★★★★★">★★★★★</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Régimen</label>
+          <input class="comboRegimen" placeholder="Ej: All Inclusive" value="${s.regimen || ""}">
+        </div>
+
+        <div>
+          <label>Habitación</label>
+          <input class="comboHabitacion" placeholder="Opcional" value="${s.habitacion || ""}">
+        </div>
+
+        <div>
+          <label>Link Google Maps / hotel</label>
+          <input class="comboLink" placeholder="Opcional" value="${s.link || ""}">
+        </div>
+
+        <div style="display:flex;align-items:end;">
+          <button class="btn btn-danger" type="button" onclick="this.closest('.combo-servicio').remove()">Eliminar tramo</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function agregarServicioCombo(btn, s = {}){
+  const cont = btn.closest(".combo-box").querySelector(".comboServicios");
+  const temp = document.createElement("div");
+  temp.innerHTML = comboServicioTemplate(s);
+  const node = temp.firstElementChild;
+  cont.appendChild(node);
+  if(s.categoria) node.querySelector(".comboCategoria").value = normalizarEstrellas(s.categoria);
+}
+
+function agregarCombo(c = {}){
+  const wrap = document.createElement("div");
+  wrap.className = "combo-box";
+  wrap.innerHTML = `
+    <div class="hotel-head">
+      <h3>Opción combinada</h3>
+      <button class="btn btn-danger" type="button" onclick="this.closest('.combo-box').remove()">Eliminar</button>
+    </div>
+
+    <div class="form-grid">
+      <div>
+        <label>Nombre de la opción</label>
+        <input class="comboTitulo" placeholder="Ej: Punta Cana + Bayahibe" value="${c.titulo || ""}">
+      </div>
+
+      <div>
+        <label>Precio total de la opción</label>
+        <input class="comboPrecio" placeholder="Ej: USD 5.080" value="${c.precio || ""}">
+      </div>
+
+      <div>
+        <label>Tipo de precio</label>
+        <select class="comboTipoPrecio">
+          <option value="grupo familiar">Grupo familiar</option>
+          <option value="por persona">Por persona</option>
+          <option value="precio total">Precio total</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Estado</label>
+        <input class="comboEstado" placeholder="Ej: Disponible / A confirmar" value="${c.estado || ""}">
+      </div>
+    </div>
+
+    <div class="comboServicios"></div>
+
+    <div class="actions">
+      <button class="btn btn-soft" type="button" onclick="agregarServicioCombo(this)">+ Agregar destino / hotel al combo</button>
+    </div>
+  `;
+
+  document.getElementById("combos").appendChild(wrap);
+  if(c.tipoPrecio) wrap.querySelector(".comboTipoPrecio").value = c.tipoPrecio;
+
+  const servicios = c.servicios && c.servicios.length ? c.servicios : [{}, {}];
+  servicios.forEach(s => agregarServicioCombo(wrap.querySelector("button[onclick^='agregarServicioCombo']"), s));
+}
+
 function initPasteVuelo(){
   const zone = document.getElementById("pasteVuelo");
   if(!zone) return;
@@ -458,7 +605,14 @@ function agregarHotel(h = {}){
 
       <div>
         <label>Categoría</label>
-        <input class="hotelCategoria" placeholder="Ej: 5 estrellas" value="${h.categoria || ""}">
+        <select class="hotelCategoria">
+          <option value="">Sin categoría</option>
+          <option value="★">★</option>
+          <option value="★★">★★</option>
+          <option value="★★★">★★★</option>
+          <option value="★★★★">★★★★</option>
+          <option value="★★★★★">★★★★★</option>
+        </select>
       </div>
 
       <div>
@@ -488,6 +642,7 @@ function agregarHotel(h = {}){
   `;
   document.getElementById("hoteles").appendChild(wrap);
   if(h.tipoPrecio) wrap.querySelector(".hotelTipoPrecio").value = h.tipoPrecio;
+  if(h.categoria) wrap.querySelector(".hotelCategoria").value = normalizarEstrellas(h.categoria);
 }
 
 function agregarTramo(t = {}){
@@ -570,9 +725,25 @@ function renderPreview(data){
   const hoteles = (data.hoteles || []).map(h=>`
     <div style="border:1px solid #eee;border-radius:14px;padding:14px;margin:10px 0;">
       <strong>${h.nombre || "Hotel"}</strong><br>
+      ${h.categoria ? `<div style="color:#7700E0;font-weight:900;">${h.categoria}</div>` : ""}
       ${h.habitacion || ""}<br>
       ${h.regimen || ""}<br>
       <strong style="color:#7700E0;">${h.precio || ""}</strong>
+    </div>
+  `).join("");
+
+  const combos = (data.combos || []).map(c=>`
+    <div style="border:1px solid #eee;border-radius:14px;padding:14px;margin:10px 0;background:#fffdf7;">
+      <strong style="color:#7700E0;">${c.titulo || "Opción combinada"}</strong><br>
+      ${(c.servicios || []).map(s=>`
+        <div style="margin-top:8px;">
+          <strong>${s.destino || ""}</strong> ${s.noches ? "· " + s.noches : ""}<br>
+          ${s.hotel || ""}<br>
+          ${s.categoria ? `<span style="color:#7700E0;font-weight:900;">${s.categoria}</span><br>` : ""}
+          ${s.habitacion || ""}${s.habitacion && s.regimen ? " · " : ""}${s.regimen || ""}
+        </div>
+      `).join("")}
+      <div style="margin-top:10px;"><strong style="color:#7700E0;">${c.precio || ""}</strong></div>
     </div>
   `).join("");
 
@@ -586,7 +757,7 @@ function renderPreview(data){
     <p><strong>Cliente:</strong> ${data.cliente || ""}</p>
     <p><strong>Agente:</strong> ${data.vendedora || ""}</p>
     ${data.modo === "simple" && data.tipoSimple !== "solo_hotel" && vuelos ? `<h3>Vuelos</h3>${vuelos}${data.simple?.precioVuelo ? `<p><strong style="color:#7700E0;">${data.simple.precioVuelo}</strong></p>` : ""}` : ""}
-    ${data.modo === "simple" && data.tipoSimple !== "solo_vuelos" ? `<h3>Hoteles</h3>${hoteles}` : ""}
+    ${data.modo === "simple" && data.tipoSimple !== "solo_vuelos" ? `<h3>Hotelería</h3>${hoteles}${combos}` : ""}
     ${data.comentariosInternos ? `<div style="background:#fff9e8;border:1px solid #f3d47c;border-radius:12px;padding:12px;margin-top:14px;"><strong>Comentarios internos:</strong><br>${escapeLineas(data.comentariosInternos)}</div>` : ""}
   `;
 }
@@ -603,6 +774,22 @@ async function construirData(){
     tipoPrecio: box.querySelector(".hotelTipoPrecio").value,
     estado: box.querySelector(".hotelEstado").value,
     link: box.querySelector(".hotelLink").value
+  }));
+
+  const combos = [...document.querySelectorAll(".combo-box")].map(box=>({
+    titulo: box.querySelector(".comboTitulo").value,
+    precio: box.querySelector(".comboPrecio").value,
+    tipoPrecio: box.querySelector(".comboTipoPrecio").value,
+    estado: box.querySelector(".comboEstado").value,
+    servicios: [...box.querySelectorAll(".combo-servicio")].map(s=>({
+      destino: s.querySelector(".comboDestino").value,
+      noches: s.querySelector(".comboNoches").value,
+      hotel: s.querySelector(".comboHotel").value,
+      categoria: s.querySelector(".comboCategoria").value,
+      regimen: s.querySelector(".comboRegimen").value,
+      habitacion: s.querySelector(".comboHabitacion").value,
+      link: s.querySelector(".comboLink").value
+    }))
   }));
 
   const tramos = [];
@@ -649,6 +836,7 @@ async function construirData(){
       capturaVuelo: capturaVueloNueva || capturaVueloPegada || (ultimaData?.simple?.capturaVuelo || "")
     },
     hoteles,
+    combos,
     tramos
   };
 
@@ -738,268 +926,14 @@ function mostrarLink(codigo){
   `;
 }
 
-
-function renderPDFCotizacion(data){
-  const incluye = data.incluyeItems && data.incluyeItems.length
-    ? data.incluyeItems
-    : ["Aéreo incluido","Equipaje incluido","Traslados en destino","Alojamiento según opción elegida","Asesoramiento ETNIKA"];
-
-  const tipo = data.tipoSimple || "paquete";
-  const mostrarVuelos = data.modo === "simple" && (tipo === "paquete" || tipo === "solo_vuelos");
-  const mostrarHoteles = data.modo === "simple" && (tipo === "paquete" || tipo === "solo_hotel");
-
-  const hotelesHtml = (data.hoteles || []).map(h => `
-    <div class="hotel-card">
-      <div>
-        <h3>${h.nombre || "Hotel"}</h3>
-        ${h.habitacion ? `<p><strong>Hab.</strong> ${h.habitacion}</p>` : ""}
-        ${h.regimen ? `<p><strong>Régimen:</strong> ${h.regimen}</p>` : ""}
-        ${h.categoria ? `<p><strong>Categoría:</strong> ${h.categoria}</p>` : ""}
-      </div>
-      <div class="hotel-price">
-        ${h.precio ? `<div class="price">${h.precio}</div>` : ""}
-        <div class="price-note">${h.tipoPrecio || "grupo familiar"}</div>
-      </div>
-    </div>
-  `).join("");
-
-  const vuelosHtml = `
-    ${data.simple?.detalleVuelos ? `<div class="flight-box">${escapeLineas(data.simple.detalleVuelos)}</div>` : ""}
-    ${data.simple?.capturaVuelo ? `<img class="flight-img" src="${data.simple.capturaVuelo}">` : ""}
-    ${data.simple?.precioVuelo ? `<div class="flight-price"><strong>${data.simple.precioVuelo}</strong><br>${data.simple.tipoPrecioVuelo || ""}</div>` : ""}
-  `;
-
-  return `
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<title>Cotización ETNIKA</title>
-<style>
-  @page { size: A4; margin: 12mm; }
-  body{
-    font-family: Arial, Helvetica, sans-serif;
-    background:white;
-    color:#222;
-    margin:0;
-    font-size:12px;
-  }
-  .page{
-    max-width:185mm;
-    margin:0 auto;
-  }
-  .logo{
-    text-align:center;
-    margin-bottom:12px;
-  }
-  .logo img{
-    max-width:145px;
-    height:auto;
-  }
-  h1,h2,h3{
-    color:#7700E0;
-  }
-  h1{
-    text-align:center;
-    font-size:30px;
-    line-height:1;
-    margin:10px 0 6px;
-    text-transform:uppercase;
-  }
-  h2{
-    font-size:18px;
-    margin:0 0 10px;
-  }
-  .fecha{
-    text-align:center;
-    color:#00E5BF;
-    font-size:17px;
-    font-weight:900;
-    margin-bottom:10px;
-  }
-  .section{
-    border:1px solid #e9e9ef;
-    border-radius:14px;
-    padding:14px;
-    margin:10px 0;
-    break-inside:avoid;
-  }
-  .grid{
-    display:grid;
-    grid-template-columns:repeat(5,1fr);
-    gap:7px;
-    margin-bottom:10px;
-  }
-  .box{
-    border:1px solid #e9e9ef;
-    border-radius:10px;
-    padding:8px;
-    background:#fbfbff;
-  }
-  .label{
-    font-size:10px;
-    color:#555;
-    font-weight:800;
-    margin-bottom:4px;
-  }
-  .value{
-    font-size:11px;
-    font-weight:700;
-  }
-  .includes{
-    display:grid;
-    grid-template-columns:repeat(5,1fr);
-    gap:7px;
-  }
-  .include{
-    border:1px solid #e9e9ef;
-    border-radius:10px;
-    padding:8px;
-    text-align:center;
-    background:#fbfbff;
-    font-weight:700;
-    font-size:10px;
-  }
-  .flight-box{
-    border:1px solid #e9e9ef;
-    border-left:4px solid #00E5BF;
-    border-radius:10px;
-    padding:10px;
-    line-height:1.35;
-  }
-  .flight-img{
-    max-width:100%;
-    border-radius:10px;
-    margin-top:10px;
-  }
-  .flight-price{
-    text-align:center;
-    color:#7700E0;
-    font-size:18px;
-    margin-top:10px;
-  }
-  .hotel-card{
-    display:grid;
-    grid-template-columns:1fr 150px;
-    gap:14px;
-    align-items:center;
-    border:1px solid #e9e9ef;
-    border-radius:12px;
-    padding:12px;
-    margin:8px 0;
-    break-inside:avoid;
-  }
-  .hotel-card h3{
-    font-size:16px;
-    margin:0 0 6px;
-    line-height:1.15;
-  }
-  .hotel-card p{
-    margin:4px 0;
-    font-size:12px;
-  }
-  .hotel-price{
-    text-align:center;
-  }
-  .price{
-    color:#7700E0;
-    font-size:20px;
-    font-weight:900;
-  }
-  .price-note{
-    color:#666;
-    font-size:10px;
-    margin-top:4px;
-    text-transform:uppercase;
-  }
-  .legal{
-    text-align:center;
-    color:#777;
-    font-size:9px;
-    margin-top:12px;
-    line-height:1.35;
-  }
-  a{ color:#7700E0; }
-</style>
-</head>
-<body>
-  <div class="page">
-    <div class="logo">
-      <img src="DEGRADADO CON LEGAJO.png">
-    </div>
-
-    <div class="section">
-      <h2>Datos de la cotización</h2>
-      <div class="grid">
-        <div class="box"><div class="label">Cliente</div><div class="value">${data.cliente || ""}</div></div>
-        <div class="box"><div class="label">Pasajeros</div><div class="value">${data.pasajeros || ""}</div></div>
-        <div class="box"><div class="label">Fecha cotización</div><div class="value">${data.fechaCotizacion || ""}</div></div>
-        <div class="box"><div class="label">Cotización</div><div class="value">${data.codigo || ""}</div></div>
-        <div class="box"><div class="label">Agente</div><div class="value">${data.vendedora || ""}</div></div>
-      </div>
-      <h1>${data.destino || "Cotización"}</h1>
-      <div class="fecha">${data.fechaViaje || ""}</div>
-    </div>
-
-    <div class="section">
-      <h2>Tu viaje incluye</h2>
-      <div class="includes">
-        ${incluye.map(x => `<div class="include">${x}</div>`).join("")}
-      </div>
-    </div>
-
-    ${mostrarVuelos && vuelosHtml.trim() ? `
-      <div class="section">
-        <h2>Vuelos</h2>
-        ${vuelosHtml}
-      </div>
-    ` : ""}
-
-    ${mostrarHoteles ? `
-      <div class="section">
-        <h2>Opciones de alojamiento</h2>
-        ${hotelesHtml || "<p>No se cargaron hoteles.</p>"}
-      </div>
-    ` : ""}
-
-    ${data.formaPago ? `<div class="section"><h2>Forma de pago</h2><p>${escapeLineas(data.formaPago)}</p></div>` : ""}
-    ${data.mostrarObservaciones && data.observaciones ? `<div class="section"><h2>Observaciones</h2><p>${escapeLineas(data.observaciones)}</p></div>` : ""}
-
-    <div class="legal">
-      ETNIKA TRAVEL S.R.L. | Legajo EVT Nº 18418 | CUIT 30-71775467-7<br>
-      Tarifas sujetas a disponibilidad y modificación sin previo aviso.<br>
-      Condiciones generales: <a href="https://etnikatravel.tur.ar/general-conditions">https://etnikatravel.tur.ar/general-conditions</a>
-      ${data.validez ? `<br>Validez de la cotización: ${data.validez}` : ""}
-    </div>
-  </div>
-</body>
-</html>`;
-}
-
-async function generarPDF(){
-  const data = await construirData();
-
-  if(!data.cliente && !data.destino){
-    alert("Primero completá los datos de la cotización.");
+function generarPDF(){
+  const element = document.getElementById("preview");
+  if(!element.innerHTML.trim()) {
+    alert("Primero generá la vista previa.");
     return;
   }
-
-  const win = window.open("", "_blank");
-  if(!win){
-    alert("El navegador bloqueó la ventana del PDF. Permití ventanas emergentes para este sitio.");
-    return;
-  }
-
-  win.document.open();
-  win.document.write(renderPDFCotizacion(data));
-  win.document.close();
-
-  setTimeout(() => {
-    win.focus();
-    win.print();
-  }, 800);
+  html2pdf().from(element).save("cotizacion-etnika.pdf");
 }
-
 
 async function cargarCotizacion(codigo, duplicando=false){
   const { data, error } = await supabaseClient
@@ -1047,7 +981,10 @@ async function cargarCotizacion(codigo, duplicando=false){
 
   document.getElementById("hoteles").innerHTML = "";
   (d.hoteles || []).forEach(agregarHotel);
-  if(!(d.hoteles || []).length) agregarHotel();
+  if(!(d.hoteles || []).length && !(d.combos || []).length) agregarHotel();
+
+  document.getElementById("combos").innerHTML = "";
+  (d.combos || []).forEach(agregarCombo);
 
   document.getElementById("tramos").innerHTML = "";
   (d.tramos || []).forEach(agregarTramo);
