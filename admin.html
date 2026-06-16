@@ -159,33 +159,6 @@ textarea{min-height:92px;resize:vertical;}
 
 .small-note{font-size:13px;color:#777;margin-top:6px;line-height:1.35;}
 
-
-.paste-zone{
-  border:2px dashed #cfc8df;
-  border-radius:16px;
-  background:#fbfbff;
-  padding:18px;
-  text-align:center;
-  color:#666;
-  min-height:88px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:text;
-}
-.paste-zone.has-image{
-  border-color:var(--turquesa);
-  color:#111;
-  font-weight:800;
-}
-.internal-box{
-  background:#fff9e8;
-  border:1px solid #f4d27b;
-  border-radius:18px;
-  padding:18px;
-}
-.mode-tabs{display:none;}
-
 @media(max-width:900px){.form-grid{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:560px){
   .form-grid{grid-template-columns:1fr;}
@@ -212,16 +185,6 @@ textarea{min-height:92px;resize:vertical;}
     </div>
 
     <div class="form-grid">
-      <div>
-        <label>Tipo de cotización</label>
-        <select id="tipoCotizacion" onchange="actualizarSecciones()">
-          <option value="paquete">Paquete completo</option>
-          <option value="solo_vuelos">Solo vuelos</option>
-          <option value="solo_hotel">Solo hotelería</option>
-          <option value="completo">Itinerario completo</option>
-        </select>
-      </div>
-
       <div>
         <label>Cliente</label>
         <input id="cliente" placeholder="Ej: Familia Rodríguez">
@@ -285,12 +248,6 @@ Asesoramiento ETNIKA"></textarea>
         </label>
         <textarea id="observaciones" placeholder="Observaciones opcionales"></textarea>
       </div>
-
-      <div class="full internal-box">
-        <label>Comentarios internos</label>
-        <textarea id="comentariosInternos" placeholder="Solo visible para ETNIKA. Ej: cliente sensible al precio, margen bajo, no mostrar al pasajero, etc."></textarea>
-        <div class="small-note">Este campo se guarda, pero NO aparece en el link público ni en el PDF del cliente.</div>
-      </div>
     </div>
   </section>
 
@@ -319,8 +276,7 @@ Asesoramiento ETNIKA"></textarea>
       <div class="full" id="vueloCapturaBox">
         <label>Captura del vuelo / Amadeus</label>
         <input type="file" id="capturaVuelo" accept="image/*">
-        <div id="pasteVuelo" class="paste-zone" tabindex="0" style="margin-top:10px;">Hacé click acá y pegá la captura con Ctrl+V</div>
-        <div class="small-note">Opcional. Podés escribir el vuelo, subir archivo o pegar la captura directamente sin guardarla.</div>
+        <div class="small-note">Opcional. Si usás captura solamente, dejá vacíos los textos de ida y regreso.</div>
       </div>
     </div>
 
@@ -362,7 +318,6 @@ let modo = "simple";
 let ultimaData = null;
 let editCodigo = null;
 let duplicarCodigo = null;
-let capturaVueloPegada = "";
 
 function setModo(nuevoModo){
   modo = nuevoModo;
@@ -380,56 +335,6 @@ function setValue(id, value){
 function getValue(id){
   const el = document.getElementById(id);
   return el ? el.value : "";
-}
-
-
-function actualizarSecciones(){
-  const tipo = getValue("tipoCotizacion") || "paquete";
-  modo = tipo === "completo" ? "completo" : "simple";
-  const simpleSection = document.getElementById("simpleSection");
-  const completoSection = document.getElementById("completoSection");
-  const vueloGrid = simpleSection ? simpleSection.querySelector(".form-grid") : null;
-  const addHotelActions = simpleSection ? simpleSection.querySelector(".actions") : null;
-  const hotelesDiv = document.getElementById("hoteles");
-  const simpleTitle = simpleSection ? simpleSection.querySelector("h2") : null;
-
-  if(simpleSection) simpleSection.classList.toggle("hidden", tipo === "completo");
-  if(completoSection) completoSection.classList.toggle("hidden", tipo !== "completo");
-
-  if(tipo === "solo_vuelos"){
-    if(simpleTitle) simpleTitle.textContent = "Vuelos";
-    if(vueloGrid) vueloGrid.classList.remove("hidden");
-    if(addHotelActions) addHotelActions.classList.add("hidden");
-    if(hotelesDiv) hotelesDiv.classList.add("hidden");
-  }else if(tipo === "solo_hotel"){
-    if(simpleTitle) simpleTitle.textContent = "Hotelería";
-    if(vueloGrid) vueloGrid.classList.add("hidden");
-    if(addHotelActions) addHotelActions.classList.remove("hidden");
-    if(hotelesDiv) hotelesDiv.classList.remove("hidden");
-  }else if(tipo === "paquete"){
-    if(simpleTitle) simpleTitle.textContent = "Vuelos y hotelería";
-    if(vueloGrid) vueloGrid.classList.remove("hidden");
-    if(addHotelActions) addHotelActions.classList.remove("hidden");
-    if(hotelesDiv) hotelesDiv.classList.remove("hidden");
-  }
-}
-
-function initPasteVuelo(){
-  const zone = document.getElementById("pasteVuelo");
-  if(!zone) return;
-  zone.addEventListener("paste", async (e) => {
-    const items = e.clipboardData && e.clipboardData.items ? e.clipboardData.items : [];
-    for(const item of items){
-      if(item.type && item.type.indexOf("image") !== -1){
-        const file = item.getAsFile();
-        capturaVueloPegada = await fileToBase64(file);
-        zone.textContent = "Captura pegada correctamente";
-        zone.classList.add("has-image");
-        e.preventDefault();
-        return;
-      }
-    }
-  });
 }
 
 function fileToBase64(file){
@@ -605,15 +510,14 @@ function renderPreview(data){
     <p><strong>Fecha:</strong> ${data.fechaViaje || ""}</p>
     <p><strong>Cliente:</strong> ${data.cliente || ""}</p>
     <p><strong>Agente:</strong> ${data.vendedora || ""}</p>
-    ${((data.tipoCotizacion || "paquete") === "paquete" || data.tipoCotizacion === "solo_vuelos") && vuelos ? `<h3>Vuelos</h3>${vuelos}` : ""}
-    ${((data.tipoCotizacion || "paquete") === "paquete" || data.tipoCotizacion === "solo_hotel") ? `<h3>Hoteles</h3>${hoteles}` : ""}
-    ${data.comentariosInternos ? `<div class="internal-box" style="padding:12px;border-radius:12px;margin-top:16px;"><strong>Comentarios internos:</strong><br>${escapeLineas(data.comentariosInternos)}</div>` : ""}
+    ${vuelos ? `<h3>Vuelos</h3>${vuelos}` : ""}
+    <h3>Hoteles</h3>
+    ${hoteles}
   `;
 }
 
 async function construirData(){
   const capturaVueloNueva = await getFileBase64("capturaVuelo");
-  const tipoCotizacion = getValue("tipoCotizacion") || "paquete";
 
   const hoteles = [...document.querySelectorAll(".hotel-box")].map(box=>({
     nombre: box.querySelector(".hotelNombre").value,
@@ -647,8 +551,7 @@ async function construirData(){
   }
 
   const data = {
-    tipoCotizacion,
-    modo: tipoCotizacion === "completo" ? "completo" : "simple",
+    modo,
     cliente: getValue("cliente"),
     destino: getValue("destino"),
     pasajeros: getValue("pasajeros"),
@@ -660,13 +563,12 @@ async function construirData(){
     formaPago: getValue("formaPago"),
     observaciones: getValue("observaciones"),
     mostrarObservaciones: document.getElementById("mostrarObservaciones").checked,
-    comentariosInternos: getValue("comentariosInternos"),
     incluyeItems: getValue("incluyeItems").split("\n").map(x=>x.trim()).filter(Boolean),
     simple: {
       modoVuelo: getValue("modoVuelo"),
       vueloIda: getValue("vueloIda"),
       vueloVuelta: getValue("vueloVuelta"),
-      capturaVuelo: capturaVueloNueva || capturaVueloPegada || (ultimaData?.simple?.capturaVuelo || "")
+      capturaVuelo: capturaVueloNueva || (ultimaData?.simple?.capturaVuelo || "")
     },
     hoteles,
     tramos
@@ -758,15 +660,19 @@ function mostrarLink(codigo){
   `;
 }
 
+
 function renderPDFCotizacion(data){
-  const incluye = data.incluyeItems && data.incluyeItems.length ? data.incluyeItems : ["Aéreo incluido","Equipaje incluido","Traslados en destino","Alojamiento según opción elegida","Asesoramiento ETNIKA"];
-  const tipo = data.tipoCotizacion || "paquete";
-  const mostrarVuelos = tipo === "paquete" || tipo === "solo_vuelos";
-  const mostrarHoteles = tipo === "paquete" || tipo === "solo_hotel";
+  const incluye = (data.incluyeItems && data.incluyeItems.length ? data.incluyeItems : [
+    "Aéreo incluido",
+    "Equipaje incluido",
+    "Traslados en destino",
+    "Alojamiento según opción elegida",
+    "Asesoramiento ETNIKA"
+  ]);
 
   const hotelesHtml = (data.hoteles || []).map(h => `
     <div class="hotel-card">
-      <div>
+      <div class="hotel-left">
         <h3>${h.nombre || "Hotel"}</h3>
         ${h.habitacion ? `<p><strong>Hab.</strong> ${h.habitacion}</p>` : ""}
         ${h.regimen ? `<p><strong>Régimen:</strong> ${h.regimen}</p>` : ""}
@@ -784,25 +690,116 @@ function renderPDFCotizacion(data){
     ${data.simple?.vueloVuelta ? `<div class="flight"><strong>Regreso</strong><br>${escapeLineas(data.simple.vueloVuelta)}</div>` : ""}
   `;
 
-  return `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Cotización ETNIKA</title>
+  return `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Cotización ETNIKA</title>
 <style>
-@page{size:A4;margin:12mm;}body{font-family:Arial, Helvetica, sans-serif;background:white;color:#222;margin:0;font-size:12px;}.page{max-width:185mm;margin:0 auto;background:white;}.logo{text-align:center;margin-bottom:14px;}.logo img{max-width:145px;height:auto;}h1,h2{color:#7700E0;}h1{text-align:center;font-size:28px;margin:10px 0 6px;text-transform:uppercase;line-height:1;}.date{text-align:center;color:#00E5BF;font-size:17px;font-weight:900;margin-bottom:12px;}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:10px;}.box{border:1px solid #e9e9ef;border-radius:10px;padding:8px;background:#fbfbff;}.label{font-size:10px;color:#555;font-weight:800;margin-bottom:4px;}.value{font-size:11px;font-weight:700;}.section{border:1px solid #e9e9ef;border-radius:14px;padding:14px;margin:10px 0;break-inside:avoid;}h2{font-size:18px;margin:0 0 12px;}.includes{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;}.include{border:1px solid #e9e9ef;border-radius:10px;padding:8px;text-align:center;background:#fbfbff;font-weight:700;font-size:10px;}.flights{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}.flight{border:1px solid #e9e9ef;border-left:4px solid #00E5BF;border-radius:10px;padding:9px;line-height:1.35;}.flight-img{max-width:100%;border-radius:10px;margin-top:10px;}.hotel-card{display:grid;grid-template-columns:1fr 150px;gap:14px;align-items:center;border:1px solid #e9e9ef;border-radius:12px;padding:12px;margin:8px 0;break-inside:avoid;}.hotel-card h3{color:#7700E0;font-size:16px;margin:0 0 6px;line-height:1.15;}.hotel-card p{margin:4px 0;font-size:12px;}.hotel-right{text-align:center;}.price{color:#7700E0;font-size:20px;font-weight:900;}.price-note{color:#666;font-size:10px;margin-top:4px;text-transform:uppercase;}.legal{text-align:center;color:#777;font-size:9px;margin-top:12px;line-height:1.35;}a{color:#7700E0;}
-</style></head><body><div class="page"><div class="logo"><img src="DEGRADADO CON LEGAJO.png"></div>
-<div class="section"><h2>Datos de la cotización</h2><div class="grid"><div class="box"><div class="label">Cliente</div><div class="value">${data.cliente || ""}</div></div><div class="box"><div class="label">Pasajeros</div><div class="value">${data.pasajeros || ""}</div></div><div class="box"><div class="label">Fecha cotización</div><div class="value">${data.fechaCotizacion || ""}</div></div><div class="box"><div class="label">Cotización</div><div class="value">${data.codigo || ""}</div></div><div class="box"><div class="label">Agente</div><div class="value">${data.vendedora || ""}</div></div></div><h1>${data.destino || "Cotización"}</h1><div class="date">${data.fechaViaje || ""}</div></div>
-<div class="section"><h2>Tu viaje incluye</h2><div class="includes">${incluye.map(x => `<div class="include">${x}</div>`).join("")}</div></div>
-${mostrarVuelos && (data.simple?.vueloIda || data.simple?.vueloVuelta || data.simple?.capturaVuelo) ? `<div class="section"><h2>Vuelos</h2><div class="flights">${vuelosTexto}</div>${data.simple?.capturaVuelo ? `<img class="flight-img" src="${data.simple.capturaVuelo}">` : ""}</div>` : ""}
-${mostrarHoteles ? `<div class="section"><h2>Opciones de alojamiento</h2>${hotelesHtml || "<p>No se cargaron hoteles.</p>"}</div>` : ""}
-${data.formaPago ? `<div class="section"><h2>Forma de pago</h2><p>${escapeLineas(data.formaPago)}</p></div>` : ""}${data.mostrarObservaciones && data.observaciones ? `<div class="section"><h2>Observaciones</h2><p>${escapeLineas(data.observaciones)}</p></div>` : ""}
-<div class="legal">ETNIKA TRAVEL S.R.L. | Legajo EVT Nº 18418 | CUIT 30-71775467-7<br>Tarifas sujetas a disponibilidad y modificación sin previo aviso.<br>Condiciones generales: <a href="https://etnikatravel.tur.ar/general-conditions">https://etnikatravel.tur.ar/general-conditions</a>${data.validez ? `<br>Validez de la cotización: ${data.validez}` : ""}</div></div></body></html>`;
+  body{font-family:Arial, Helvetica, sans-serif;background:#f7f7fb;color:#222;margin:0;padding:24px;}
+  .page{max-width:1050px;margin:0 auto;background:white;border-radius:24px;padding:28px;}
+  .logo{text-align:center;margin-bottom:24px;}
+  .logo img{max-width:230px;height:auto;}
+  h1,h2{color:#7700E0;}
+  h1{text-align:center;font-size:48px;margin:18px 0 8px;text-transform:uppercase;}
+  .date{text-align:center;color:#00A98D;font-size:24px;font-weight:900;margin-bottom:24px;}
+  .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:22px;}
+  .box{border:1px solid #e9e9ef;border-radius:14px;padding:14px;background:#fbfbff;}
+  .label{font-size:12px;color:#555;font-weight:800;margin-bottom:6px;}
+  .value{font-size:15px;font-weight:700;}
+  .section{background:white;border:1px solid #e9e9ef;border-radius:18px;padding:22px;margin:18px 0;}
+  .includes{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+  .include{border:1px solid #e9e9ef;border-radius:14px;padding:14px;text-align:center;background:#fbfbff;font-weight:700;}
+  .flights{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+  .flight{border:1px solid #e9e9ef;border-left:6px solid #00E5BF;border-radius:14px;padding:14px;line-height:1.4;}
+  .flight-img{max-width:100%;border-radius:14px;margin-top:14px;}
+  .hotel-card{display:grid;grid-template-columns:1fr 240px;gap:20px;align-items:center;border:1px solid #e9e9ef;border-radius:18px;padding:18px;margin:12px 0;}
+  .hotel-card h3{color:#7700E0;font-size:24px;margin:0 0 10px;}
+  .hotel-card p{margin:6px 0;font-size:16px;}
+  .hotel-right{text-align:center;}
+  .price{color:#7700E0;font-size:32px;font-weight:900;}
+  .price-note{color:#666;font-size:14px;margin-top:6px;text-transform:uppercase;}
+  .legal{text-align:center;color:#777;font-size:12px;margin-top:18px;}
+  @media print{
+    body{background:white;padding:0;}
+    .page{box-shadow:none;border-radius:0;}
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="logo"><img src="DEGRADADO CON LEGAJO.png"></div>
+
+    <div class="section">
+      <h2>Datos de la cotización</h2>
+      <div class="grid">
+        <div class="box"><div class="label">Cliente</div><div class="value">${data.cliente || ""}</div></div>
+        <div class="box"><div class="label">Pasajeros</div><div class="value">${data.pasajeros || ""}</div></div>
+        <div class="box"><div class="label">Fecha cotización</div><div class="value">${data.fechaCotizacion || ""}</div></div>
+        <div class="box"><div class="label">Cotización</div><div class="value">${data.codigo || ""}</div></div>
+        <div class="box"><div class="label">Agente</div><div class="value">${data.vendedora || ""}</div></div>
+      </div>
+      <h1>${data.destino || "Cotización"}</h1>
+      <div class="date">${data.fechaViaje || ""}</div>
+    </div>
+
+    <div class="section">
+      <h2>Tu viaje incluye</h2>
+      <div class="includes">
+        ${incluye.map(x => `<div class="include">${x}</div>`).join("")}
+      </div>
+    </div>
+
+    ${(data.simple?.vueloIda || data.simple?.vueloVuelta || data.simple?.capturaVuelo) ? `
+      <div class="section">
+        <h2>Vuelos</h2>
+        <div class="flights">${vuelosTexto}</div>
+        ${data.simple?.capturaVuelo ? `<img class="flight-img" src="${data.simple.capturaVuelo}">` : ""}
+      </div>
+    ` : ""}
+
+    <div class="section">
+      <h2>Opciones de alojamiento</h2>
+      ${hotelesHtml || "<p>No se cargaron hoteles.</p>"}
+    </div>
+
+    ${data.formaPago ? `<div class="section"><h2>Forma de pago</h2><p>${escapeLineas(data.formaPago)}</p></div>` : ""}
+    ${data.mostrarObservaciones && data.observaciones ? `<div class="section"><h2>Observaciones</h2><p>${escapeLineas(data.observaciones)}</p></div>` : ""}
+
+    <div class="legal">
+      ETNIKA TRAVEL S.R.L. | Legajo EVT Nº 18418 | CUIT 30-71775467-7<br>
+      Tarifas sujetas a disponibilidad y modificación sin previo aviso.
+      ${data.validez ? `<br>Validez de la cotización: ${data.validez}` : ""}
+    </div>
+  </div>
+</body>
+</html>`;
 }
 
 async function generarPDF(){
   const data = await construirData();
-  if(!data.cliente && !data.destino){alert("Primero completá los datos de la cotización.");return;}
+
+  if(!data.cliente && !data.destino){
+    alert("Primero completá los datos de la cotización.");
+    return;
+  }
+
   const win = window.open("", "_blank");
-  if(!win){alert("El navegador bloqueó la ventana del PDF. Permití ventanas emergentes para este sitio.");return;}
-  win.document.open();win.document.write(renderPDFCotizacion(data));win.document.close();
-  setTimeout(()=>{win.focus();win.print();},700);
+
+  if(!win){
+    alert("El navegador bloqueó la ventana del PDF. Permití ventanas emergentes para este sitio.");
+    return;
+  }
+
+  win.document.open();
+  win.document.write(renderPDFCotizacion(data));
+  win.document.close();
+
+  setTimeout(() => {
+    win.focus();
+    win.print();
+  }, 900);
 }
 
 
@@ -822,9 +819,7 @@ async function cargarCotizacion(codigo, duplicando=false){
   const d = JSON.parse(data.datos_json);
   ultimaData = d;
 
-  setValue("tipoCotizacion", d.tipoCotizacion || (d.modo === "completo" ? "completo" : "paquete"));
-  actualizarSecciones();
-  setModo((d.tipoCotizacion || d.modo) === "completo" ? "completo" : "simple");
+  setModo(d.modo || "simple");
   setValue("cliente", d.cliente);
   setValue("destino", d.destino);
   setValue("pasajeros", d.pasajeros);
@@ -835,7 +830,6 @@ async function cargarCotizacion(codigo, duplicando=false){
   setValue("validez", d.validez);
   setValue("formaPago", d.formaPago);
   setValue("observaciones", d.observaciones);
-  setValue("comentariosInternos", d.comentariosInternos);
   setValue("incluyeItems", (d.incluyeItems || []).join("\n"));
   document.getElementById("mostrarObservaciones").checked = d.mostrarObservaciones !== false;
 
@@ -843,10 +837,6 @@ async function cargarCotizacion(codigo, duplicando=false){
     setValue("modoVuelo", d.simple.modoVuelo || "texto");
     setValue("vueloIda", d.simple.vueloIda);
     setValue("vueloVuelta", d.simple.vueloVuelta);
-    if(d.simple.capturaVuelo){
-      const zone = document.getElementById("pasteVuelo");
-      if(zone){ zone.textContent = "La cotización ya tiene una captura guardada"; zone.classList.add("has-image"); }
-    }
   }
 
   document.getElementById("hoteles").innerHTML = "";
@@ -868,7 +858,6 @@ async function cargarCotizacion(codigo, duplicando=false){
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-  initPasteVuelo();
   const hoy = new Date();
   if(!getValue("fechaCotizacion")){
     setValue("fechaCotizacion", hoy.toLocaleDateString("es-AR"));
