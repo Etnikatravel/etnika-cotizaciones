@@ -159,6 +159,23 @@ textarea{min-height:92px;resize:vertical;}
 
 .small-note{font-size:13px;color:#777;margin-top:6px;line-height:1.35;}
 
+
+.paste-zone{
+  border:2px dashed #cfc8df;
+  border-radius:16px;
+  background:#fbfbff;
+  padding:16px;
+  text-align:center;
+  color:#666;
+  margin-top:10px;
+  cursor:text;
+}
+.paste-zone.has-image{
+  border-color:var(--turquesa);
+  color:#111;
+  font-weight:800;
+}
+
 @media(max-width:900px){.form-grid{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:560px){
   .form-grid{grid-template-columns:1fr;}
@@ -302,6 +319,7 @@ Asesoramiento ETNIKA"></textarea>
         <div class="full">
           <label>Captura del vuelo / Amadeus</label>
           <input type="file" id="capturaVuelo" accept="image/*">
+          <div id="pasteVuelo" class="paste-zone" tabindex="0">Hacé click acá y pegá la captura con Ctrl+V</div>
           <div class="small-note">Opcional. Si usás captura solamente, podés dejar vacío el detalle de vuelos.</div>
         </div>
       </div>
@@ -348,6 +366,7 @@ let modo = "simple";
 let ultimaData = null;
 let editCodigo = null;
 let duplicarCodigo = null;
+let capturaVueloPegada = "";
 
 function setModo(nuevoModo){
   modo = nuevoModo;
@@ -392,6 +411,25 @@ async function getFileBase64(id){
   if(!el || !el.files || !el.files[0]) return "";
   return await fileToBase64(el.files[0]);
 }
+
+function initPasteVuelo(){
+  const zone = document.getElementById("pasteVuelo");
+  if(!zone) return;
+  zone.addEventListener("paste", async (e) => {
+    const items = e.clipboardData && e.clipboardData.items ? e.clipboardData.items : [];
+    for(const item of items){
+      if(item.type && item.type.indexOf("image") !== -1){
+        const file = item.getAsFile();
+        capturaVueloPegada = await fileToBase64(file);
+        zone.textContent = "Captura pegada correctamente";
+        zone.classList.add("has-image");
+        e.preventDefault();
+        return;
+      }
+    }
+  });
+}
+
 
 function agregarHotel(h = {}){
   const wrap = document.createElement("div");
@@ -608,7 +646,7 @@ async function construirData(){
       detalleVuelos: getValue("detalleVuelos"),
       precioVuelo: getValue("precioVuelo"),
       tipoPrecioVuelo: getValue("tipoPrecioVuelo"),
-      capturaVuelo: capturaVueloNueva || (ultimaData?.simple?.capturaVuelo || "")
+      capturaVuelo: capturaVueloNueva || capturaVueloPegada || (ultimaData?.simple?.capturaVuelo || "")
     },
     hoteles,
     tramos
@@ -747,6 +785,10 @@ async function cargarCotizacion(codigo, duplicando=false){
     setValue("detalleVuelos", d.simple.detalleVuelos || d.simple.vueloIda || "");
     setValue("precioVuelo", d.simple.precioVuelo);
     setValue("tipoPrecioVuelo", d.simple.tipoPrecioVuelo || "por persona");
+    if(d.simple.capturaVuelo && document.getElementById("pasteVuelo")){
+      document.getElementById("pasteVuelo").textContent = "La cotización ya tiene una captura guardada";
+      document.getElementById("pasteVuelo").classList.add("has-image");
+    }
   }
 
   document.getElementById("hoteles").innerHTML = "";
@@ -768,6 +810,7 @@ async function cargarCotizacion(codigo, duplicando=false){
 }
 
 window.addEventListener("DOMContentLoaded", () => {
+  initPasteVuelo();
   const hoy = new Date();
   if(!getValue("fechaCotizacion")){
     setValue("fechaCotizacion", hoy.toLocaleDateString("es-AR"));
