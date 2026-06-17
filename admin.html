@@ -206,6 +206,43 @@ textarea{min-height:92px;resize:vertical;}
   letter-spacing:1px;
 }
 
+
+.composiciones-box{
+  border-top:1px solid var(--borde);
+  margin-top:18px;
+  padding-top:16px;
+}
+.composicion-row{
+  display:grid;
+  grid-template-columns:1fr 180px 180px auto;
+  gap:12px;
+  align-items:end;
+  margin-top:10px;
+}
+.paste-zone{
+  border:2px dashed #cfc8df;
+  border-radius:16px;
+  background:#fbfbff;
+  padding:14px;
+  text-align:center;
+  color:#666;
+  min-height:70px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:text;
+}
+.paste-zone.has-image{
+  border-color:var(--turquesa);
+  color:#111;
+  font-weight:800;
+}
+@media(max-width:900px){
+  .composicion-row{
+    grid-template-columns:1fr;
+  }
+}
+
 </style>
 </head>
 
@@ -447,6 +484,73 @@ function normalizarEstrellas(valor){
   return "";
 }
 
+function composicionTemplate(p = {}){
+  return `
+    <div class="composicion-row">
+      <div>
+        <label>Composición familiar</label>
+        <input class="precioComposicion" placeholder="Ej: 2 adultos + 2 menores" value="${p.composicion || ""}">
+      </div>
+
+      <div>
+        <label>Precio</label>
+        <input class="precioValor" placeholder="Ej: USD 5.080" value="${p.precio || ""}">
+      </div>
+
+      <div>
+        <label>Tipo de precio</label>
+        <select class="precioTipo">
+          <option value="grupo familiar">Grupo familiar</option>
+          <option value="por persona">Por persona</option>
+          <option value="precio total">Precio total</option>
+        </select>
+      </div>
+
+      <div>
+        <button class="btn btn-danger" type="button" onclick="this.closest('.composicion-row').remove()">Eliminar</button>
+      </div>
+    </div>
+  `;
+}
+
+function agregarComposicion(btn, p = {}){
+  const cont = btn.closest(".hotel-box, .combo-box").querySelector(".composicionesLista");
+  const temp = document.createElement("div");
+  temp.innerHTML = composicionTemplate(p);
+  const node = temp.firstElementChild;
+  cont.appendChild(node);
+  if(p.tipoPrecio) node.querySelector(".precioTipo").value = p.tipoPrecio;
+}
+
+function leerComposiciones(box){
+  return [...box.querySelectorAll(".composicion-row")].map(row=>({
+    composicion: row.querySelector(".precioComposicion").value,
+    precio: row.querySelector(".precioValor").value,
+    tipoPrecio: row.querySelector(".precioTipo").value
+  })).filter(x => x.composicion || x.precio);
+}
+
+function initPasteZones(scope=document){
+  scope.querySelectorAll(".paste-zone").forEach(zone=>{
+    if(zone.dataset.ready === "1") return;
+    zone.dataset.ready = "1";
+    zone.addEventListener("paste", async (e)=>{
+      const items = e.clipboardData && e.clipboardData.items ? e.clipboardData.items : [];
+      for(const item of items){
+        if(item.type.indexOf("image") !== -1){
+          const file = item.getAsFile();
+          const base64 = await fileToBase64(file);
+          zone.dataset.imagen = base64;
+          zone.textContent = "Captura pegada correctamente";
+          zone.classList.add("has-image");
+          e.preventDefault();
+          return;
+        }
+      }
+    });
+  });
+}
+
 function comboServicioTemplate(s = {}){
   return `
     <div class="combo-servicio">
@@ -554,6 +658,7 @@ function agregarCombo(c = {}){
 
   document.getElementById("combos").appendChild(wrap);
   if(c.tipoPrecio) wrap.querySelector(".comboTipoPrecio").value = c.tipoPrecio;
+  (c.precios || []).forEach(p => agregarComposicion(wrap.querySelector("button[onclick^='agregarComposicion']"), p));
 
   const servicios = c.servicios && c.servicios.length ? c.servicios : [{}, {}];
   servicios.forEach(s => agregarServicioCombo(wrap.querySelector("button[onclick^='agregarServicioCombo']"), s));
@@ -639,10 +744,20 @@ function agregarHotel(h = {}){
         <input class="hotelLink" placeholder="https://maps.app.goo.gl/..." value="${h.link || ""}">
       </div>
     </div>
+
+    <div class="composiciones-box">
+      <h3>Precios por composición familiar</h3>
+      <div class="small-note">Opcional. Si cargás composiciones, se muestran en tabla y reemplazan el precio único.</div>
+      <div class="composicionesLista"></div>
+      <div class="actions">
+        <button class="btn btn-soft" type="button" onclick="agregarComposicion(this)">+ Agregar composición familiar</button>
+      </div>
+    </div>
   `;
   document.getElementById("hoteles").appendChild(wrap);
   if(h.tipoPrecio) wrap.querySelector(".hotelTipoPrecio").value = h.tipoPrecio;
   if(h.categoria) wrap.querySelector(".hotelCategoria").value = normalizarEstrellas(h.categoria);
+  (h.precios || []).forEach(p => agregarComposicion(wrap.querySelector("button[onclick^='agregarComposicion']"), p));
 }
 
 function agregarTramo(t = {}){
@@ -707,6 +822,20 @@ function agregarTramo(t = {}){
         <input class="tramoEstado" value="${t.estado || ""}">
       </div>
 
+      <div class="full">
+        <label>Detalle escrito / información del tramo</label>
+        <textarea class="tramoDetalleExtra" placeholder="Opcional: pegá acá el detalle completo del vuelo, tren, auto, traslado o servicio.">${t.detalleExtra || ""}</textarea>
+      </div>
+
+      <div class="full">
+        <label>Captura del tramo</label>
+        <input type="file" class="tramoImagenFile" accept="image/*">
+        <div class="paste-zone tramoPasteZone" tabindex="0" style="margin-top:10px;">
+          Hacé click acá y pegá la captura con Ctrl+V
+        </div>
+        <div class="small-note">Opcional. Sirve para vuelos, trenes, autos, traslados o servicios.</div>
+      </div>
+
       <div>
         <label>Imagen / captura opcional</label>
         <input type="file" class="tramoImagenFile" accept="image/*">
@@ -715,6 +844,13 @@ function agregarTramo(t = {}){
   `;
   document.getElementById("tramos").appendChild(wrap);
   if(t.tipo) wrap.querySelector(".tramoTipo").value = t.tipo;
+  if(t.imagen){
+    const zone = wrap.querySelector(".tramoPasteZone");
+    zone.dataset.imagen = t.imagen;
+    zone.textContent = "La cotización ya tiene una captura guardada";
+    zone.classList.add("has-image");
+  }
+  initPasteZones(wrap);
 }
 
 function escapeLineas(texto){
@@ -728,7 +864,11 @@ function renderPreview(data){
       ${h.categoria ? `<div style="color:#7700E0;font-weight:900;">${h.categoria}</div>` : ""}
       ${h.habitacion || ""}<br>
       ${h.regimen || ""}<br>
-      <strong style="color:#7700E0;">${h.precio || ""}</strong>
+      ${(h.precios || []).length ? `
+        <div style="margin-top:10px;">
+          ${h.precios.map(p=>`<div style="display:flex;justify-content:space-between;gap:12px;border-top:1px solid #eee;padding:6px 0;"><span>${p.composicion}</span><strong style="color:#7700E0;">${p.precio}</strong></div>`).join("")}
+        </div>
+      ` : `<strong style="color:#7700E0;">${h.precio || ""}</strong>`}
     </div>
   `).join("");
 
@@ -743,7 +883,11 @@ function renderPreview(data){
           ${s.habitacion || ""}${s.habitacion && s.regimen ? " · " : ""}${s.regimen || ""}
         </div>
       `).join("")}
-      <div style="margin-top:10px;"><strong style="color:#7700E0;">${c.precio || ""}</strong></div>
+      ${(c.precios || []).length ? `
+        <div style="margin-top:10px;">
+          ${c.precios.map(p=>`<div style="display:flex;justify-content:space-between;gap:12px;border-top:1px solid #eee;padding:6px 0;"><span>${p.composicion}</span><strong style="color:#7700E0;">${p.precio}</strong></div>`).join("")}
+        </div>
+      ` : `<div style="margin-top:10px;"><strong style="color:#7700E0;">${c.precio || ""}</strong></div>`}
     </div>
   `).join("");
 
@@ -773,7 +917,8 @@ async function construirData(){
     precio: box.querySelector(".hotelPrecio").value,
     tipoPrecio: box.querySelector(".hotelTipoPrecio").value,
     estado: box.querySelector(".hotelEstado").value,
-    link: box.querySelector(".hotelLink").value
+    link: box.querySelector(".hotelLink").value,
+    precios: leerComposiciones(box)
   }));
 
   const combos = [...document.querySelectorAll(".combo-box")].map(box=>({
@@ -781,6 +926,7 @@ async function construirData(){
     precio: box.querySelector(".comboPrecio").value,
     tipoPrecio: box.querySelector(".comboTipoPrecio").value,
     estado: box.querySelector(".comboEstado").value,
+    precios: leerComposiciones(box),
     servicios: [...box.querySelectorAll(".combo-servicio")].map(s=>({
       destino: s.querySelector(".comboDestino").value,
       noches: s.querySelector(".comboNoches").value,
@@ -795,8 +941,11 @@ async function construirData(){
   const tramos = [];
   for(const box of document.querySelectorAll(".tramo-box")){
     let imagen = "";
-    const file = box.querySelector(".tramoImagenFile").files[0];
+    const fileInput = box.querySelector(".tramoImagenFile");
+    const file = fileInput && fileInput.files ? fileInput.files[0] : null;
     if(file) imagen = await fileToBase64(file);
+
+    const pasteZone = box.querySelector(".tramoPasteZone");
 
     tramos.push({
       tipo: box.querySelector(".tramoTipo").value,
@@ -804,11 +953,12 @@ async function construirData(){
       fechas: box.querySelector(".tramoFechas").value,
       duracion: box.querySelector(".tramoDuracion").value,
       detalle: box.querySelector(".tramoDetalle").value,
+      detalleExtra: box.querySelector(".tramoDetalleExtra") ? box.querySelector(".tramoDetalleExtra").value : "",
       regimen: box.querySelector(".tramoRegimen").value,
       precio: box.querySelector(".tramoPrecio").value,
       link: box.querySelector(".tramoLink").value,
       estado: box.querySelector(".tramoEstado").value,
-      imagen: imagen || box.dataset.imagen || ""
+      imagen: imagen || (pasteZone ? pasteZone.dataset.imagen : "") || box.dataset.imagen || ""
     });
   }
 
@@ -1001,6 +1151,7 @@ async function cargarCotizacion(codigo, duplicando=false){
 }
 
 window.addEventListener("DOMContentLoaded", () => {
+  initPasteZones();
   initPasteVuelo();
   const hoy = new Date();
   if(!getValue("fechaCotizacion")){
