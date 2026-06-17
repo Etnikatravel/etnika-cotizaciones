@@ -654,6 +654,15 @@ function agregarCombo(c = {}){
     <div class="actions">
       <button class="btn btn-soft" type="button" onclick="agregarServicioCombo(this)">+ Agregar destino / hotel al combo</button>
     </div>
+
+    <div class="composiciones-box comboPreciosTitulo">
+      <h3>Precios por composición familiar</h3>
+      <div class="small-note">Opcional. Si cargás composiciones, se muestran en tabla y reemplazan el precio único.</div>
+      <div class="composicionesLista"></div>
+      <div class="actions">
+        <button class="btn btn-soft" type="button" onclick="agregarComposicion(this)">+ Agregar composición familiar</button>
+      </div>
+    </div>
   `;
 
   document.getElementById("combos").appendChild(wrap);
