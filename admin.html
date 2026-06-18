@@ -243,6 +243,10 @@ textarea{min-height:92px;resize:vertical;}
   }
 }
 
+
+.incluye-editor{display:flex;flex-direction:column;gap:12px;}
+.incluye-row{display:grid;grid-template-columns:220px 1fr auto;gap:12px;align-items:end;border:1px solid var(--borde);border-radius:16px;padding:14px;background:#fbfbff;}
+@media(max-width:900px){.incluye-row{grid-template-columns:1fr;}}
 </style>
 </head>
 
@@ -313,13 +317,11 @@ textarea{min-height:92px;resize:vertical;}
 
       <div class="full">
         <label>Tu viaje incluye</label>
-        <textarea id="incluyeItems" placeholder="Una línea por ítem. Ej:
-Aéreo incluido
-Equipaje incluido
-Traslados en destino
-Alojamiento según opción elegida
-Asesoramiento ETNIKA"></textarea>
-        <div class="small-note">Esto aparece en la sección de íconos. El régimen del hotel se carga dentro de cada hotel.</div>
+        <div id="incluyeEditor" class="incluye-editor"></div>
+        <div class="actions" style="margin-top:12px;">
+          <button class="btn btn-soft" type="button" onclick="agregarIncluye()">+ Agregar ítem</button>
+        </div>
+        <div class="small-note">Elegí el ícono y editá el texto que verá el cliente.</div>
       </div>
 
       <div class="full">
@@ -428,6 +430,87 @@ let ultimaData = null;
 let editCodigo = null;
 let duplicarCodigo = null;
 let capturaVueloPegada = "";
+
+
+const ICONOS_INCLUYE = [
+  { value:"icon_avion.png", label:"Aéreo" },
+  { value:"icon_valija.png", label:"Equipaje" },
+  { value:"icon_bus.png", label:"Traslados" },
+  { value:"icon_hotel.png", label:"Hotel / alojamiento" },
+  { value:"icon_medico.png", label:"Asistencia médica" },
+  { value:"icon_agente.png", label:"Asesoramiento ETNIKA" },
+  { value:"icon_comida.png", label:"Comidas / régimen" },
+  { value:"icon_crucero.png", label:"Crucero" },
+  { value:"icon_checklist.png", label:"Checklist / servicios" },
+  { value:"icon_cafe.png", label:"Bebidas / café" },
+  { value:"icon_luna.png", label:"Noches" },
+  { value:"icon_calendario.png", label:"Fecha" }
+];
+
+function sugerirIconoIncluye(texto){
+  const t = String(texto || "").toLowerCase();
+  if(t.includes("aéreo") || t.includes("aereo") || t.includes("vuelo") || t.includes("pasaje")) return "icon_avion.png";
+  if(t.includes("equipaje") || t.includes("valija") || t.includes("mochila") || t.includes("carry")) return "icon_valija.png";
+  if(t.includes("traslado") || t.includes("bus") || t.includes("transfer")) return "icon_bus.png";
+  if(t.includes("alojamiento") || t.includes("hotel") || t.includes("noche")) return "icon_hotel.png";
+  if(t.includes("asistencia") || t.includes("seguro") || t.includes("médica") || t.includes("medica")) return "icon_medico.png";
+  if(t.includes("asesor") || t.includes("coordinación") || t.includes("coordinacion") || t.includes("etnika")) return "icon_agente.png";
+  if(t.includes("régimen") || t.includes("regimen") || t.includes("all inclusive") || t.includes("desayuno") || t.includes("comida") || t.includes("pensión") || t.includes("pension")) return "icon_comida.png";
+  if(t.includes("crucero") || t.includes("barco")) return "icon_crucero.png";
+  return "icon_checklist.png";
+}
+
+function agregarIncluye(item = {}){
+  const editor = document.getElementById("incluyeEditor");
+  if(!editor) return;
+
+  const texto = typeof item === "string" ? item : (item.texto || item.detalle || "");
+  const icono = typeof item === "object" && item.icono ? item.icono : sugerirIconoIncluye(texto);
+
+  const row = document.createElement("div");
+  row.className = "incluye-row";
+  row.innerHTML = `
+    <div>
+      <label>Ícono</label>
+      <select class="incluyeIcono">
+        ${ICONOS_INCLUYE.map(i => `<option value="${i.value}">${i.label}</option>`).join("")}
+      </select>
+    </div>
+    <div>
+      <label>Detalle</label>
+      <input class="incluyeTexto" placeholder="Ej: Aéreo con mochila y carry on" value="${texto}">
+    </div>
+    <div>
+      <button class="btn btn-danger" type="button" onclick="this.closest('.incluye-row').remove()">Eliminar</button>
+    </div>
+  `;
+  editor.appendChild(row);
+  row.querySelector(".incluyeIcono").value = icono;
+}
+
+function leerIncluyeItems(){
+  return [...document.querySelectorAll(".incluye-row")].map(row => ({
+    icono: row.querySelector(".incluyeIcono").value,
+    texto: row.querySelector(".incluyeTexto").value
+  })).filter(x => x.texto);
+}
+
+function cargarIncluyeItems(items){
+  const editor = document.getElementById("incluyeEditor");
+  if(!editor) return;
+  editor.innerHTML = "";
+  if(items && items.length){
+    items.forEach(agregarIncluye);
+  }else{
+    [
+      {icono:"icon_avion.png", texto:"Aéreo incluido"},
+      {icono:"icon_valija.png", texto:"Equipaje incluido"},
+      {icono:"icon_bus.png", texto:"Traslados en destino"},
+      {icono:"icon_hotel.png", texto:"Alojamiento según opción elegida"},
+      {icono:"icon_agente.png", texto:"Asesoramiento ETNIKA"}
+    ].forEach(agregarIncluye);
+  }
+}
 
 function setModo(nuevoModo){
   modo = nuevoModo;
@@ -981,7 +1064,7 @@ async function construirData(){
     observaciones: getValue("observaciones"),
     mostrarObservaciones: document.getElementById("mostrarObservaciones").checked,
     comentariosInternos: getValue("comentariosInternos"),
-    incluyeItems: getValue("incluyeItems").split("\n").map(x=>x.trim()).filter(Boolean),
+    incluyeItems: leerIncluyeItems(),
     simple: {
       modoVuelo: getValue("modoVuelo"),
       detalleVuelos: getValue("detalleVuelos"),
@@ -1119,7 +1202,7 @@ async function cargarCotizacion(codigo, duplicando=false){
   setValue("formaPago", d.formaPago);
   setValue("observaciones", d.observaciones);
   setValue("comentariosInternos", d.comentariosInternos);
-  setValue("incluyeItems", (d.incluyeItems || []).join("\n"));
+  cargarIncluyeItems(d.incluyeItems || []);
   document.getElementById("mostrarObservaciones").checked = d.mostrarObservaciones !== false;
 
   if(d.simple){
@@ -1172,7 +1255,7 @@ window.addEventListener("DOMContentLoaded", () => {
     cargarCotizacion(duplicarCodigo, true);
   }else{
     agregarHotel();
-    setValue("incluyeItems", "Aéreo incluido\nEquipaje incluido\nTraslados en destino\nAlojamiento según opción elegida\nAsesoramiento ETNIKA");
+    cargarIncluyeItems();
     actualizarSimple();
   }
 });
