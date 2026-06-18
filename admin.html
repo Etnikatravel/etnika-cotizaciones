@@ -3,108 +3,1262 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ETNIKA TRAVEL | Admin Cotizaciones</title>
+<title>ETNIKA TRAVEL | Panel de Cotizaciones</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
 <style>
-:root{--violeta:#7700E0;--turquesa:#00E5BF;--gris:#F2F2F2;--oscuro:#171717;--blanco:#fff;}
-*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;}
-body{background:var(--gris);color:var(--oscuro);}
-.header{background:white;text-align:center;padding:25px 20px;box-shadow:0 3px 12px rgba(0,0,0,.05);}
-.logo{max-width:330px;width:100%;height:auto;}
-.container{max-width:1200px;margin:30px auto;padding:0 20px;}
-.card,.preview{background:white;border-radius:20px;padding:25px;margin-bottom:22px;box-shadow:0 6px 20px rgba(0,0,0,.08);}
-h1,h2{color:var(--violeta);margin-bottom:18px;} h3{color:var(--violeta);margin-bottom:8px;}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;}
-.campo{display:flex;flex-direction:column;} label{font-weight:bold;margin-bottom:6px;color:#555;}
-input,textarea,select{padding:12px;border:1px solid #ddd;border-radius:12px;font-size:15px;background:white;} textarea{min-height:90px;}
-.btn{border:none;padding:14px 22px;border-radius:30px;font-weight:bold;cursor:pointer;text-decoration:none;display:inline-block;text-align:center;font-size:15px;}
-.btn-main{background:linear-gradient(135deg,var(--turquesa),var(--violeta));color:white;}.btn-secondary{background:#eee;color:#333;}.btn-whatsapp{background:var(--turquesa);color:#061b16;}
-.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px;}.small{font-size:13px;color:#666;margin-top:8px;line-height:1.4;}
-.tramo{border:1px solid #e5e5e5;border-radius:18px;padding:18px;margin-top:18px;background:#fafafa;}
-.tramo-header{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:14px;}.tramo-header strong{color:var(--violeta);}
-.preview-logo{text-align:center;margin-bottom:25px;}.preview-logo img{max-width:300px;width:100%;height:auto;}
-.preview-section{border-left:5px solid var(--turquesa);background:#fafafa;border-radius:14px;padding:18px;margin-bottom:16px;}
-.preview-img{max-width:100%;border-radius:12px;margin-top:12px;border:1px solid #ddd;}
-.footer-preview{text-align:center;border-left:none;background:white;border-top:1px solid #ddd;}
-.link-output{background:#f7f7f7;border:1px dashed #bbb;padding:14px;border-radius:12px;margin-top:14px;word-break:break-all;}
-@media(max-width:600px){.tramo-header{flex-direction:column;align-items:flex-start}.actions .btn{width:100%;}.logo{max-width:280px;}}
+:root{
+  --violeta:#7700E0;
+  --turquesa:#00E5BF;
+  --gris:#F2F2F2;
+  --oscuro:#171717;
+  --borde:#e9e9ef;
+  --sombra:0 14px 38px rgba(32,18,54,.09);
+}
+
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial, Helvetica, sans-serif;}
+
+body{
+  background:
+    radial-gradient(circle at top left, rgba(0,229,191,.16), transparent 32%),
+    radial-gradient(circle at top right, rgba(119,0,224,.14), transparent 32%),
+    #f7f7fb;
+  color:var(--oscuro);
+}
+
+.header{
+  background:white;
+  text-align:center;
+  padding:18px 20px 14px;
+  border-bottom:1px solid var(--borde);
+}
+
+.logo{max-width:260px;width:100%;height:auto;}
+
+.container{max-width:1180px;margin:28px auto 42px;padding:0 20px;}
+
+.card{
+  background:white;
+  border-radius:24px;
+  padding:28px;
+  margin-bottom:24px;
+  box-shadow:var(--sombra);
+}
+
+h1,h2,h3{color:var(--violeta);}
+
+h1{font-size:34px;margin-bottom:22px;}
+
+h2{font-size:26px;margin-bottom:16px;}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+}
+
+label{display:block;font-weight:800;color:#555;margin-bottom:8px;}
+
+input, textarea, select{
+  width:100%;
+  padding:13px 14px;
+  border:1px solid var(--borde);
+  border-radius:14px;
+  font-size:15px;
+  background:white;
+}
+
+textarea{min-height:92px;resize:vertical;}
+
+.full{grid-column:1/-1;}
+
+.actions{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:20px;
+}
+
+.btn{
+  border:none;
+  border-radius:999px;
+  padding:13px 20px;
+  font-weight:900;
+  cursor:pointer;
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  color:#111;
+}
+
+.btn-main{background:linear-gradient(135deg,var(--turquesa),var(--violeta));color:white;}
+.btn-soft{background:#eeeeef;color:#222;}
+.btn-danger{background:#f4eeee;color:#7a1616;}
+.btn-green{background:linear-gradient(135deg,var(--turquesa),#7be2c4);color:#061b16;}
+
+.mode-tabs{
+  display:flex;
+  gap:8px;
+  background:#f2f0f7;
+  padding:8px;
+  border-radius:999px;
+  width:max-content;
+  margin-bottom:22px;
+}
+
+.mode-tabs button{
+  border:none;
+  background:transparent;
+  padding:12px 20px;
+  border-radius:999px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.mode-tabs button.active{
+  background:var(--violeta);
+  color:white;
+  box-shadow:0 8px 20px rgba(119,0,224,.25);
+}
+
+.hotel-box,.tramo-box{
+  border:1px solid var(--borde);
+  border-radius:20px;
+  padding:20px;
+  margin-top:16px;
+  background:#fbfbff;
+}
+
+.hotel-head,.tramo-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:16px;
+  gap:10px;
+}
+
+.hidden{display:none!important;}
+
+.link-box{
+  background:#fbfbff;
+  border:1px solid var(--borde);
+  border-radius:16px;
+  padding:16px;
+  overflow-wrap:anywhere;
+}
+
+.preview{
+  border:1px dashed #ccc;
+  border-radius:20px;
+  padding:20px;
+  background:white;
+  margin-top:20px;
+}
+
+.small-note{font-size:13px;color:#777;margin-top:6px;line-height:1.35;}
+
+
+.paste-zone{
+  border:2px dashed #cfc8df;
+  border-radius:16px;
+  background:#fbfbff;
+  padding:16px;
+  text-align:center;
+  color:#666;
+  margin-top:10px;
+  cursor:text;
+}
+.paste-zone.has-image{
+  border-color:var(--turquesa);
+  color:#111;
+  font-weight:800;
+}
+
+@media(max-width:900px){.form-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:560px){
+  .form-grid{grid-template-columns:1fr;}
+  .card{padding:20px;}
+  .container{padding:0 12px;}
+  .mode-tabs{width:100%;}
+  .mode-tabs button{flex:1;}
+}
+
+.combo-box{
+  border:1px solid var(--borde);
+  border-radius:20px;
+  padding:20px;
+  margin-top:16px;
+  background:#fffdf7;
+}
+.combo-servicio{
+  border:1px dashed #ded6ee;
+  border-radius:16px;
+  padding:16px;
+  margin-top:14px;
+  background:white;
+}
+.stars-preview{
+  color:var(--violeta);
+  font-size:18px;
+  font-weight:900;
+  letter-spacing:1px;
+}
+
+
+.composiciones-box{
+  border-top:1px solid var(--borde);
+  margin-top:18px;
+  padding-top:16px;
+}
+.composicion-row{
+  display:grid;
+  grid-template-columns:1fr 1fr 180px auto;
+  gap:12px;
+  align-items:end;
+  margin-top:10px;
+}
+.paste-zone{
+  border:2px dashed #cfc8df;
+  border-radius:16px;
+  background:#fbfbff;
+  padding:14px;
+  text-align:center;
+  color:#666;
+  min-height:70px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:text;
+}
+.paste-zone.has-image{
+  border-color:var(--turquesa);
+  color:#111;
+  font-weight:800;
+}
+@media(max-width:900px){
+  .composicion-row{
+    grid-template-columns:1fr;
+  }
+}
+
+
+.incluye-editor{display:flex;flex-direction:column;gap:12px;}
+.incluye-row{display:grid;grid-template-columns:220px 1fr auto;gap:12px;align-items:end;border:1px solid var(--borde);border-radius:16px;padding:14px;background:#fbfbff;}
+@media(max-width:900px){.incluye-row{grid-template-columns:1fr;}}
 </style>
 </head>
+
 <body>
-<header class="header"><img src="DEGRADADO CON LEGAJO.png" class="logo" alt="ETNIKA TRAVEL"></header>
-<div class="container">
-<section class="card">
-<h1>Nueva cotización</h1>
-<div class="grid">
-<div class="campo"><label>Cliente</label><input id="cliente" placeholder="Ej: Familia Rodríguez"></div>
-<div class="campo"><label>Destino / Viaje</label><input id="destino" placeholder="Ej: Europa 2026 / Punta Cana"></div>
-<div class="campo"><label>Pasajeros</label><input id="pasajeros" placeholder="Ej: 2 adultos + 2 menores"></div>
-<div class="campo"><label>Fecha de viaje</label><input id="fechaViaje" placeholder="Ej: 04/05 al 03/06"></div>
-<div class="campo"><label>Fecha de cotización</label><input id="fechaCotizacion" placeholder="Ej: 12/06/2026"></div>
-<div class="campo"><label>Vendedora / asesora</label><input id="vendedora" placeholder="Ej: Yamila / Carla"></div>
-<div class="campo"><label>WhatsApp de contacto</label><input id="whatsapp" value="5493412177311"></div>
-<div class="campo"><label>N° de cotización</label><input id="codigo" placeholder="Ej: ETK-2026-001"></div>
-</div>
-</section>
-<section class="card">
-<h2>Itinerario / servicios</h2>
-<p class="small">Agregá todos los tramos necesarios: hoteles, vuelos, trenes, autos, traslados, excursiones u observaciones.</p>
-<div class="actions">
-<button class="btn btn-main" onclick="agregarTramo('Hotel')">+ Hotel</button>
-<button class="btn btn-main" onclick="agregarTramo('Vuelo')">+ Vuelo</button>
-<button class="btn btn-main" onclick="agregarTramo('Tren')">+ Tren</button>
-<button class="btn btn-main" onclick="agregarTramo('Auto')">+ Auto</button>
-<button class="btn btn-main" onclick="agregarTramo('Traslado')">+ Traslado</button>
-<button class="btn btn-secondary" onclick="agregarTramo('Observación')">+ Observación</button>
-</div>
-<div id="tramos"></div>
-</section>
-<section class="card">
-<h2>Forma de pago y condiciones</h2>
-<div class="grid">
-<div class="campo"><label>Forma de pago</label><textarea id="formaPago">50% al momento de la reserva. Saldo en entregas parciales hasta 30 días antes de viajar.</textarea></div>
-<div class="campo"><label>Observaciones generales</label><textarea id="observaciones">Tarifas sujetas a disponibilidad y modificación sin previo aviso hasta el momento de la reserva y emisión.</textarea></div>
-</div>
-<div class="actions"><button class="btn btn-main" onclick="generarVista()">Generar vista previa</button><button class="btn btn-secondary" onclick="window.print()">Imprimir / guardar PDF</button></div>
-</section>
-<section class="preview" id="preview"><h2>Vista previa</h2><p>Completá los datos y tocá “Generar vista previa”.</p></section>
-</div>
+<header class="header">
+  <img src="DEGRADADO CON LEGAJO.png" class="logo" alt="ETNIKA TRAVEL">
+</header>
+
+<main class="container">
+  <section class="card">
+    <h1 id="tituloPanel">Nueva cotización</h1>
+
+    <div class="mode-tabs">
+      <button id="btnSimple" class="active" type="button" onclick="setModo('simple')">Cotización simple</button>
+      <button id="btnCompleto" type="button" onclick="setModo('completo')">Itinerario completo</button>
+    </div>
+    <div class="form-grid" style="margin-bottom:20px;">
+      <div>
+        <label>Tipo dentro de cotización simple</label>
+        <select id="tipoSimple" onchange="actualizarSimple()">
+          <option value="paquete">Paquete completo</option>
+          <option value="solo_vuelos">Solo vuelos</option>
+          <option value="solo_hotel">Solo hotelería</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div>
+        <label>Cliente</label>
+        <input id="cliente" placeholder="Ej: Familia Rodríguez">
+      </div>
+
+      <div>
+        <label>Destino / Viaje</label>
+        <input id="destino" placeholder="Ej: Punta Cana">
+      </div>
+
+      <div>
+        <label>Pasajeros</label>
+        <input id="pasajeros" placeholder="Ej: 2 adultos + 2 menores">
+      </div>
+
+      <div>
+        <label>Fecha de viaje</label>
+        <input id="fechaViaje" placeholder="Ej: 19/03 al 27/03">
+      </div>
+
+      <div>
+        <label>Fecha de cotización</label>
+        <input id="fechaCotizacion" placeholder="Ej: 12/06/2026">
+      </div>
+
+      <div>
+        <label>Vendedora / agente</label>
+        <input id="vendedora" placeholder="Ej: Carla">
+      </div>
+
+      <div>
+        <label>WhatsApp de contacto</label>
+        <input id="whatsapp" placeholder="Ej: 5493412177311">
+      </div>
+
+      <div>
+        <label>Validez de la cotización</label>
+        <input id="validez" placeholder="Ej: 48 hs o hasta agotar disponibilidad">
+      </div>
+
+      <div class="full">
+        <label>Tu viaje incluye</label>
+        <div id="incluyeEditor" class="incluye-editor"></div>
+        <div class="actions" style="margin-top:12px;">
+          <button class="btn btn-soft" type="button" onclick="agregarIncluye()">+ Agregar ítem</button>
+        </div>
+        <div class="small-note">Elegí el ícono y editá el texto que verá el cliente.</div>
+      </div>
+
+      <div class="full">
+        <label>Forma de pago</label>
+        <textarea id="formaPago" placeholder="Ej: Anticipo 50% y saldo hasta 30 días antes de viajar"></textarea>
+      </div>
+
+      <div class="full">
+        <label>
+          <input type="checkbox" id="mostrarObservaciones" checked style="width:auto;margin-right:8px;">
+          Mostrar observaciones en el link público
+        </label>
+        <textarea id="observaciones" placeholder="Observaciones opcionales"></textarea>
+      </div>
+
+      <div class="full" style="background:#fff9e8;border:1px solid #f3d47c;border-radius:18px;padding:18px;">
+        <label>Comentarios internos</label>
+        <textarea id="comentariosInternos" placeholder="Solo visible para ETNIKA. No aparece en el link público ni PDF."></textarea>
+        <div class="small-note">Este campo queda guardado para ustedes.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" id="simpleSection">
+    <div id="vuelosSection">
+      <h2>Vuelos</h2>
+      <div class="form-grid">
+        <div>
+          <label>Cómo querés cargar el vuelo</label>
+          <select id="modoVuelo">
+            <option value="texto">Escribir detalle del vuelo</option>
+            <option value="captura">Subir captura de Amadeus</option>
+            <option value="ambos">Texto + captura</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Precio del vuelo</label>
+          <input id="precioVuelo" placeholder="Opcional. Ej: USD 890">
+        </div>
+
+        <div>
+          <label>Tipo de precio del vuelo</label>
+          <select id="tipoPrecioVuelo">
+            <option value="por persona">Por persona</option>
+            <option value="grupo familiar">Grupo familiar</option>
+            <option value="precio total">Precio total</option>
+          </select>
+        </div>
+
+        <div class="full">
+          <label>Detalle de vuelos</label>
+          <textarea id="detalleVuelos" placeholder="Ej: Rosario → Panamá → Punta Cana&#10;Copa Airlines&#10;Salida 01:38 / llegada 13:37&#10;&#10;Regreso: Punta Cana → Panamá → Rosario&#10;Salida 14:39 / llegada 00:20&#10;Incluye mochila y carry on"></textarea>
+        </div>
+
+        <div class="full">
+          <label>Captura del vuelo / Amadeus</label>
+          <input type="file" id="capturaVuelo" accept="image/*">
+          <div id="pasteVuelo" class="paste-zone" tabindex="0">Hacé click acá y pegá la captura con Ctrl+V</div>
+          <div class="small-note">Opcional. Si usás captura solamente, podés dejar vacío el detalle de vuelos.</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="hotelesSection" style="margin-top:24px;">
+      <h2>Hotelería</h2>
+      <div class="actions">
+        <button class="btn btn-soft" type="button" onclick="agregarHotel()">+ Agregar hotel simple</button>
+        <button class="btn btn-soft" type="button" onclick="agregarCombo()">+ Agregar opción combinada</button>
+      </div>
+
+    <div id="hoteles"></div>
+    <div id="combos"></div>
+    </div>
+  </section>
+
+  <section class="card hidden" id="completoSection">
+    <h2>Itinerario completo</h2>
+    <p class="small-note">Usalo para viajes con muchas ciudades, hoteles, trenes, vuelos internos o servicios por tramo.</p>
+    <div class="actions">
+      <button class="btn btn-soft" type="button" onclick="agregarTramo()">+ Agregar tramo</button>
+    </div>
+    <div id="tramos"></div>
+  </section>
+
+  <section class="card">
+    <div class="actions">
+      <button class="btn btn-main" type="button" onclick="generarVista()">Generar vista previa</button>
+      <button class="btn btn-green" type="button" onclick="guardarCotizacion()">Guardar y generar link</button>
+      <button class="btn btn-soft" type="button" onclick="generarPDF()">Generar PDF</button>
+      <a class="btn btn-soft" href="historial.html">Ver historial</a>
+    </div>
+
+    <div id="linkGenerado" class="hidden" style="margin-top:18px;"></div>
+    <div id="preview" class="preview"></div>
+  </section>
+</main>
+
 <script>
-let contadorTramos=0;
-function agregarTramo(tipoInicial='Hotel'){
- contadorTramos++;
- const contenedor=document.getElementById('tramos');
- const div=document.createElement('div');
- div.className='tramo'; div.id='tramo-'+contadorTramos;
- div.innerHTML=`
- <div class="tramo-header"><strong>Tramo ${contadorTramos}</strong><button class="btn btn-secondary" onclick="eliminarTramo(${contadorTramos})">Eliminar</button></div>
- <div class="grid">
- <div class="campo"><label>Tipo de tramo</label><select class="tipo">
- ${['Hotel','Vuelo','Tren','Auto','Traslado','Excursión','Observación'].map(t=>`<option ${t===tipoInicial?'selected':''}>${t}</option>`).join('')}
- </select></div>
- <div class="campo"><label>Título / Ciudad / Ruta</label><input class="titulo" placeholder="Ej: PARÍS / Vuelo Bari - Catania"></div>
- <div class="campo"><label>Fechas</label><input class="fechas" placeholder="Ej: 04/05 al 08/05"></div>
- <div class="campo"><label>Noches / duración</label><input class="duracion" placeholder="Ej: 4 noches / 1h15"></div>
- <div class="campo"><label>Detalle principal</label><textarea class="detalle" placeholder="Hotel, habitación, vuelo, tren, auto, etc."></textarea></div>
- <div class="campo"><label>Régimen / incluye</label><input class="regimen" placeholder="Ej: CON DESAYUNO / All Inclusive / Carry on"></div>
- <div class="campo"><label>Precio</label><input class="precio" placeholder="Ej: USD 290 por persona"></div>
- <div class="campo"><label>Link Google / proveedor</label><input class="link" placeholder="https://maps.app.goo.gl/..."></div>
- <div class="campo"><label>Estado</label><select class="estado"><option></option><option>Reservado</option><option>A elegir</option><option>Opcional</option><option>Incluido</option></select></div>
- <div class="campo"><label>Imagen / captura opcional</label><input type="file" class="imagen" accept="image/*"><span class="small">Capturas de vuelos, trenes o autos. Se ve en vista previa; para link público permanente luego conectamos base de datos.</span></div>
- </div>`;
- contenedor.appendChild(div);
+const SUPABASE_URL = "https://izuvvwnqczvmphuvjzyf.supabase.co";
+const SUPABASE_KEY = "sb_publishable_r8syG_LzXy7NUymta20UFA_kPjGw_HN";
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let modo = "simple";
+let ultimaData = null;
+let editCodigo = null;
+let duplicarCodigo = null;
+let capturaVueloPegada = "";
+
+
+const ICONOS_INCLUYE = [
+  { value:"icon_avion.png", label:"Aéreo" },
+  { value:"icon_valija.png", label:"Equipaje" },
+  { value:"icon_bus.png", label:"Traslados" },
+  { value:"icon_hotel.png", label:"Hotel / alojamiento" },
+  { value:"icon_medico.png", label:"Asistencia médica" },
+  { value:"icon_agente.png", label:"Asesoramiento ETNIKA" },
+  { value:"icon_comida.png", label:"Comidas / régimen" },
+  { value:"icon_crucero.png", label:"Crucero" },
+  { value:"icon_checklist.png", label:"Checklist / servicios" },
+  { value:"icon_cafe.png", label:"Bebidas / café" },
+  { value:"icon_luna.png", label:"Noches" },
+  { value:"icon_calendario.png", label:"Fecha" }
+];
+
+function sugerirIconoIncluye(texto){
+  const t = String(texto || "").toLowerCase();
+  if(t.includes("aéreo") || t.includes("aereo") || t.includes("vuelo") || t.includes("pasaje")) return "icon_avion.png";
+  if(t.includes("equipaje") || t.includes("valija") || t.includes("mochila") || t.includes("carry")) return "icon_valija.png";
+  if(t.includes("traslado") || t.includes("bus") || t.includes("transfer")) return "icon_bus.png";
+  if(t.includes("alojamiento") || t.includes("hotel") || t.includes("noche")) return "icon_hotel.png";
+  if(t.includes("asistencia") || t.includes("seguro") || t.includes("médica") || t.includes("medica")) return "icon_medico.png";
+  if(t.includes("asesor") || t.includes("coordinación") || t.includes("coordinacion") || t.includes("etnika")) return "icon_agente.png";
+  if(t.includes("régimen") || t.includes("regimen") || t.includes("all inclusive") || t.includes("desayuno") || t.includes("comida") || t.includes("pensión") || t.includes("pension")) return "icon_comida.png";
+  if(t.includes("crucero") || t.includes("barco")) return "icon_crucero.png";
+  return "icon_checklist.png";
 }
-function eliminarTramo(id){const t=document.getElementById('tramo-'+id); if(t)t.remove();}
-function leerImagen(input){return new Promise(resolve=>{ if(!input.files||!input.files[0]){resolve('');return;} const r=new FileReader(); r.onload=e=>resolve(e.target.result); r.readAsDataURL(input.files[0]); });}
-function nl(txt){return (txt||'').replace(/\n/g,'<br>');}
+
+function agregarIncluye(item = {}){
+  const editor = document.getElementById("incluyeEditor");
+  if(!editor) return;
+
+  const texto = typeof item === "string" ? item : (item.texto || item.detalle || "");
+  const icono = typeof item === "object" && item.icono ? item.icono : sugerirIconoIncluye(texto);
+
+  const row = document.createElement("div");
+  row.className = "incluye-row";
+  row.innerHTML = `
+    <div>
+      <label>Ícono</label>
+      <select class="incluyeIcono">
+        ${ICONOS_INCLUYE.map(i => `<option value="${i.value}">${i.label}</option>`).join("")}
+      </select>
+    </div>
+    <div>
+      <label>Detalle</label>
+      <input class="incluyeTexto" placeholder="Ej: Aéreo con mochila y carry on" value="${texto}">
+    </div>
+    <div>
+      <button class="btn btn-danger" type="button" onclick="this.closest('.incluye-row').remove()">Eliminar</button>
+    </div>
+  `;
+  editor.appendChild(row);
+  row.querySelector(".incluyeIcono").value = icono;
+}
+
+function leerIncluyeItems(){
+  return [...document.querySelectorAll(".incluye-row")].map(row => ({
+    icono: row.querySelector(".incluyeIcono").value,
+    texto: row.querySelector(".incluyeTexto").value
+  })).filter(x => x.texto);
+}
+
+function cargarIncluyeItems(items){
+  const editor = document.getElementById("incluyeEditor");
+  if(!editor) return;
+  editor.innerHTML = "";
+  if(items && items.length){
+    items.forEach(agregarIncluye);
+  }else{
+    [
+      {icono:"icon_avion.png", texto:"Aéreo incluido"},
+      {icono:"icon_valija.png", texto:"Equipaje incluido"},
+      {icono:"icon_bus.png", texto:"Traslados en destino"},
+      {icono:"icon_hotel.png", texto:"Alojamiento según opción elegida"},
+      {icono:"icon_agente.png", texto:"Asesoramiento ETNIKA"}
+    ].forEach(agregarIncluye);
+  }
+}
+
+function setModo(nuevoModo){
+  modo = nuevoModo;
+  document.getElementById("btnSimple").classList.toggle("active", modo === "simple");
+  document.getElementById("btnCompleto").classList.toggle("active", modo === "completo");
+  document.getElementById("simpleSection").classList.toggle("hidden", modo !== "simple");
+  document.getElementById("completoSection").classList.toggle("hidden", modo !== "completo");
+  actualizarSimple();
+}
+
+function actualizarSimple(){
+  const tipo = getValue("tipoSimple") || "paquete";
+  const showSimple = modo === "simple";
+  const vuelos = document.getElementById("vuelosSection");
+  const hoteles = document.getElementById("hotelesSection");
+  if(vuelos) vuelos.classList.toggle("hidden", !showSimple || tipo === "solo_hotel");
+  if(hoteles) hoteles.classList.toggle("hidden", !showSimple || tipo === "solo_vuelos");
+}
+
+function setValue(id, value){
+  const el = document.getElementById(id);
+  if(el) el.value = value || "";
+}
+
+function getValue(id){
+  const el = document.getElementById(id);
+  return el ? el.value : "";
+}
+
+function fileToBase64(file){
+  return new Promise((resolve,reject)=>{
+    if(!file) return resolve("");
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function getFileBase64(id){
+  const el = document.getElementById(id);
+  if(!el || !el.files || !el.files[0]) return "";
+  return await fileToBase64(el.files[0]);
+}
+
+function normalizarEstrellas(valor){
+  if(!valor) return "";
+  const v = String(valor).trim();
+  if(v.includes("★★★★★") || v.includes("5")) return "★★★★★";
+  if(v.includes("★★★★") || v.includes("4")) return "★★★★";
+  if(v.includes("★★★") || v.includes("3")) return "★★★";
+  if(v.includes("★★") || v.includes("2")) return "★★";
+  if(v.includes("★") || v.includes("1")) return "★";
+  return "";
+}
+
+function composicionTemplate(p = {}){
+  return `
+    <div class="composicion-row">
+      <div>
+        <label>Familia</label>
+        <input class="precioComposicion" placeholder="Ej: 2 adultos + 2 menores" value="${p.composicion || p.familia || ""}">
+      </div>
+
+      <div>
+        <label>Habitaciones</label>
+        <input class="precioHabitaciones" placeholder="Ej: 1 Junior Suite" value="${p.habitaciones || ""}">
+      </div>
+
+      <div>
+        <label>Precio final</label>
+        <input class="precioValor" placeholder="Ej: USD 5.080" value="${p.precio || ""}">
+      </div>
+
+      <div>
+        <button class="btn btn-danger" type="button" onclick="this.closest('.composicion-row').remove()">Eliminar</button>
+      </div>
+    </div>
+  `;
+}
+
+function agregarComposicion(btn, p = {}){
+  const cont = btn.closest(".hotel-box, .combo-box").querySelector(".composicionesLista");
+  const temp = document.createElement("div");
+  temp.innerHTML = composicionTemplate(p);
+  const node = temp.firstElementChild;
+  cont.appendChild(node);
+}
+
+function leerComposiciones(box){
+  return [...box.querySelectorAll(".composicion-row")].map(row=>({
+    composicion: row.querySelector(".precioComposicion").value,
+    habitaciones: row.querySelector(".precioHabitaciones") ? row.querySelector(".precioHabitaciones").value : "",
+    precio: row.querySelector(".precioValor").value
+  })).filter(x => x.composicion || x.habitaciones || x.precio);
+}
+
+function initPasteZones(scope=document){
+  scope.querySelectorAll(".paste-zone").forEach(zone=>{
+    if(zone.dataset.ready === "1") return;
+    zone.dataset.ready = "1";
+    zone.addEventListener("paste", async (e)=>{
+      const items = e.clipboardData && e.clipboardData.items ? e.clipboardData.items : [];
+      for(const item of items){
+        if(item.type.indexOf("image") !== -1){
+          const file = item.getAsFile();
+          const base64 = await fileToBase64(file);
+          zone.dataset.imagen = base64;
+          zone.textContent = "Captura pegada correctamente";
+          zone.classList.add("has-image");
+          e.preventDefault();
+          return;
+        }
+      }
+    });
+  });
+}
+
+function comboServicioTemplate(s = {}){
+  return `
+    <div class="combo-servicio">
+      <div class="form-grid">
+        <div>
+          <label>Destino / zona</label>
+          <input class="comboDestino" placeholder="Ej: Punta Cana" value="${s.destino || ""}">
+        </div>
+
+        <div>
+          <label>Noches</label>
+          <input class="comboNoches" placeholder="Ej: 5 noches" value="${s.noches || ""}">
+        </div>
+
+        <div>
+          <label>Hotel</label>
+          <input class="comboHotel" placeholder="Ej: Bahía Príncipe" value="${s.hotel || ""}">
+        </div>
+
+        <div>
+          <label>Categoría</label>
+          <select class="comboCategoria">
+            <option value="">Sin categoría</option>
+            <option value="★">★</option>
+            <option value="★★">★★</option>
+            <option value="★★★">★★★</option>
+            <option value="★★★★">★★★★</option>
+            <option value="★★★★★">★★★★★</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Régimen</label>
+          <input class="comboRegimen" placeholder="Ej: All Inclusive" value="${s.regimen || ""}">
+        </div>
+
+        <div>
+          <label>Habitación</label>
+          <input class="comboHabitacion" placeholder="Opcional" value="${s.habitacion || ""}">
+        </div>
+
+        <div>
+          <label>Link Google Maps / hotel</label>
+          <input class="comboLink" placeholder="Opcional" value="${s.link || ""}">
+        </div>
+
+        <div style="display:flex;align-items:end;">
+          <button class="btn btn-danger" type="button" onclick="this.closest('.combo-servicio').remove()">Eliminar tramo</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function agregarServicioCombo(btn, s = {}){
+  const cont = btn.closest(".combo-box").querySelector(".comboServicios");
+  const temp = document.createElement("div");
+  temp.innerHTML = comboServicioTemplate(s);
+  const node = temp.firstElementChild;
+  cont.appendChild(node);
+  if(s.categoria) node.querySelector(".comboCategoria").value = normalizarEstrellas(s.categoria);
+}
+
+function agregarCombo(c = {}){
+  const wrap = document.createElement("div");
+  wrap.className = "combo-box";
+  wrap.innerHTML = `
+    <div class="hotel-head">
+      <h3>Opción combinada</h3>
+      <button class="btn btn-danger" type="button" onclick="this.closest('.combo-box').remove()">Eliminar</button>
+    </div>
+
+    <div class="form-grid">
+      <div>
+        <label>Nombre de la opción</label>
+        <input class="comboTitulo" placeholder="Ej: Punta Cana + Bayahibe" value="${c.titulo || ""}">
+      </div>
+
+      <div>
+        <label>Precio total de la opción</label>
+        <input class="comboPrecio" placeholder="Ej: USD 5.080" value="${c.precio || ""}">
+      </div>
+
+      <div>
+        <label>Tipo de precio</label>
+        <select class="comboTipoPrecio">
+          <option value="grupo familiar">Grupo familiar</option>
+          <option value="por persona">Por persona</option>
+          <option value="precio total">Precio total</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Estado</label>
+        <input class="comboEstado" placeholder="Ej: Disponible / A confirmar" value="${c.estado || ""}">
+      </div>
+    </div>
+
+    <div class="comboServicios"></div>
+
+    <div class="actions">
+      <button class="btn btn-soft" type="button" onclick="agregarServicioCombo(this)">+ Agregar destino / hotel al combo</button>
+    </div>
+
+    <div class="composiciones-box comboPreciosTitulo">
+      <h3>Precios por familia</h3>
+      <div class="small-note">Opcional. Si cargás familias, se muestran en tabla debajo de la opción y reemplazan el precio único.</div>
+      <div class="composicionesLista"></div>
+      <div class="actions">
+        <button class="btn btn-soft" type="button" onclick="agregarComposicion(this)">+ Agregar familia</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById("combos").appendChild(wrap);
+  if(c.tipoPrecio) wrap.querySelector(".comboTipoPrecio").value = c.tipoPrecio;
+  (c.precios || []).forEach(p => agregarComposicion(wrap.querySelector("button[onclick^='agregarComposicion']"), p));
+
+  const servicios = c.servicios && c.servicios.length ? c.servicios : [{}, {}];
+  servicios.forEach(s => agregarServicioCombo(wrap.querySelector("button[onclick^='agregarServicioCombo']"), s));
+}
+
+function initPasteVuelo(){
+  const zone = document.getElementById("pasteVuelo");
+  if(!zone) return;
+  zone.addEventListener("paste", async (e) => {
+    const items = e.clipboardData && e.clipboardData.items ? e.clipboardData.items : [];
+    for(const item of items){
+      if(item.type && item.type.indexOf("image") !== -1){
+        const file = item.getAsFile();
+        capturaVueloPegada = await fileToBase64(file);
+        zone.textContent = "Captura pegada correctamente";
+        zone.classList.add("has-image");
+        e.preventDefault();
+        return;
+      }
+    }
+  });
+}
+
+
+function agregarHotel(h = {}){
+  const wrap = document.createElement("div");
+  wrap.className = "hotel-box";
+  wrap.innerHTML = `
+    <div class="hotel-head">
+      <h3>Hotel / opción</h3>
+      <button class="btn btn-danger" type="button" onclick="this.closest('.hotel-box').remove()">Eliminar</button>
+    </div>
+
+    <div class="form-grid">
+      <div>
+        <label>Nombre del hotel</label>
+        <input class="hotelNombre" placeholder="Ej: Catalonia Bavaro" value="${h.nombre || ""}">
+      </div>
+
+      <div>
+        <label>Habitación</label>
+        <input class="hotelHabitacion" placeholder="Ej: Junior Suite" value="${h.habitacion || ""}">
+      </div>
+
+      <div>
+        <label>Régimen</label>
+        <input class="hotelRegimen" placeholder="Ej: All Inclusive / Desayuno" value="${h.regimen || ""}">
+      </div>
+
+      <div>
+        <label>Categoría</label>
+        <select class="hotelCategoria">
+          <option value="">Sin categoría</option>
+          <option value="★">★</option>
+          <option value="★★">★★</option>
+          <option value="★★★">★★★</option>
+          <option value="★★★★">★★★★</option>
+          <option value="★★★★★">★★★★★</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Precio</label>
+        <input class="hotelPrecio" placeholder="Ej: USD 6.900" value="${h.precio || ""}">
+      </div>
+
+      <div>
+        <label>Tipo de precio</label>
+        <select class="hotelTipoPrecio">
+          <option value="grupo familiar">Grupo familiar</option>
+          <option value="por persona">Por persona</option>
+          <option value="precio total">Precio total</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Estado</label>
+        <input class="hotelEstado" placeholder="Ej: Disponible / A confirmar" value="${h.estado || ""}">
+      </div>
+
+      <div>
+        <label>Link Google Maps / hotel</label>
+        <input class="hotelLink" placeholder="https://maps.app.goo.gl/..." value="${h.link || ""}">
+      </div>
+    </div>
+
+    <div class="composiciones-box">
+      <h3>Precios por familia</h3>
+      <div class="small-note">Opcional. Si cargás familias, se muestran en tabla debajo de la opción y reemplazan el precio único.</div>
+      <div class="composicionesLista"></div>
+      <div class="actions">
+        <button class="btn btn-soft" type="button" onclick="agregarComposicion(this)">+ Agregar familia</button>
+      </div>
+    </div>
+  `;
+  document.getElementById("hoteles").appendChild(wrap);
+  if(h.tipoPrecio) wrap.querySelector(".hotelTipoPrecio").value = h.tipoPrecio;
+  if(h.categoria) wrap.querySelector(".hotelCategoria").value = normalizarEstrellas(h.categoria);
+  (h.precios || []).forEach(p => agregarComposicion(wrap.querySelector("button[onclick^='agregarComposicion']"), p));
+}
+
+function agregarTramo(t = {}){
+  const wrap = document.createElement("div");
+  wrap.className = "tramo-box";
+  wrap.innerHTML = `
+    <div class="tramo-head">
+      <h3>Tramo</h3>
+      <button class="btn btn-danger" type="button" onclick="this.closest('.tramo-box').remove()">Eliminar</button>
+    </div>
+
+    <div class="form-grid">
+      <div>
+        <label>Tipo de tramo</label>
+        <select class="tramoTipo">
+          <option value="Hotel">Hotel</option>
+          <option value="Vuelo">Vuelo</option>
+          <option value="Tren">Tren</option>
+          <option value="Traslado">Traslado</option>
+          <option value="Auto">Auto</option>
+          <option value="Servicio">Servicio</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Título / ciudad / ruta</label>
+        <input class="tramoTitulo" placeholder="Ej: París / Vuelo Bari - Catania" value="${t.titulo || ""}">
+      </div>
+
+      <div>
+        <label>Fechas</label>
+        <input class="tramoFechas" placeholder="Ej: 04/05 al 08/05" value="${t.fechas || ""}">
+      </div>
+
+      <div>
+        <label>Noches / duración</label>
+        <input class="tramoDuracion" placeholder="Ej: 4 noches / 1h15" value="${t.duracion || ""}">
+      </div>
+
+      <div class="full">
+        <label>Detalle principal</label>
+        <textarea class="tramoDetalle" placeholder="Hotel, habitación, vuelo, tren, auto, etc.">${t.detalle || ""}</textarea>
+      </div>
+
+      <div>
+        <label>Régimen / incluye</label>
+        <input class="tramoRegimen" value="${t.regimen || ""}">
+      </div>
+
+      <div>
+        <label>Precio</label>
+        <input class="tramoPrecio" value="${t.precio || ""}">
+      </div>
+
+      <div>
+        <label>Link Google / proveedor</label>
+        <input class="tramoLink" value="${t.link || ""}">
+      </div>
+
+      <div>
+        <label>Estado</label>
+        <input class="tramoEstado" value="${t.estado || ""}">
+      </div>
+
+      <div class="full">
+        <label>Detalle escrito / información del tramo</label>
+        <textarea class="tramoDetalleExtra" placeholder="Opcional: pegá acá el detalle completo del vuelo, tren, auto, traslado o servicio.">${t.detalleExtra || ""}</textarea>
+      </div>
+
+      <div class="full">
+        <label>Captura del tramo</label>
+        <input type="file" class="tramoImagenFile" accept="image/*">
+        <div class="paste-zone tramoPasteZone" tabindex="0" style="margin-top:10px;">
+          Hacé click acá y pegá la captura con Ctrl+V
+        </div>
+        <div class="small-note">Opcional. Sirve para vuelos, trenes, autos, traslados o servicios.</div>
+      </div>
+
+      <div>
+        <label>Imagen / captura opcional</label>
+        <input type="file" class="tramoImagenFile" accept="image/*">
+      </div>
+    </div>
+  `;
+  document.getElementById("tramos").appendChild(wrap);
+  if(t.tipo) wrap.querySelector(".tramoTipo").value = t.tipo;
+  if(t.imagen){
+    const zone = wrap.querySelector(".tramoPasteZone");
+    zone.dataset.imagen = t.imagen;
+    zone.textContent = "La cotización ya tiene una captura guardada";
+    zone.classList.add("has-image");
+  }
+  initPasteZones(wrap);
+}
+
+function escapeLineas(texto){
+  return texto ? String(texto).replace(/\n/g,"<br>") : "";
+}
+
+function renderPreview(data){
+  const hoteles = (data.hoteles || []).map(h=>`
+    <div style="border:1px solid #eee;border-radius:14px;padding:14px;margin:10px 0;">
+      <strong>${h.nombre || "Hotel"}</strong><br>
+      ${h.categoria ? `<div style="color:#7700E0;font-weight:900;">${h.categoria}</div>` : ""}
+      ${h.habitacion || ""}<br>
+      ${h.regimen || ""}<br>
+      ${(h.precios || []).length ? `
+        <div style="margin-top:10px;">
+          ${h.precios.map(p=>`<div style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;border-top:1px solid #eee;padding:6px 0;"><span>${p.composicion}</span><span>${p.habitaciones || ""}</span><strong style="color:#7700E0;">${p.precio}</strong></div>`).join("")}
+        </div>
+      ` : `<strong style="color:#7700E0;">${h.precio || ""}</strong>`}
+    </div>
+  `).join("");
+
+  const combos = (data.combos || []).map(c=>`
+    <div style="border:1px solid #eee;border-radius:14px;padding:14px;margin:10px 0;background:#fffdf7;">
+      <strong style="color:#7700E0;">${c.titulo || "Opción combinada"}</strong><br>
+      ${(c.servicios || []).map(s=>`
+        <div style="margin-top:8px;">
+          <strong>${s.destino || ""}</strong> ${s.noches ? "· " + s.noches : ""}<br>
+          ${s.hotel || ""}<br>
+          ${s.categoria ? `<span style="color:#7700E0;font-weight:900;">${s.categoria}</span><br>` : ""}
+          ${s.habitacion || ""}${s.habitacion && s.regimen ? " · " : ""}${s.regimen || ""}
+        </div>
+      `).join("")}
+      ${(c.precios || []).length ? `
+        <div style="margin-top:10px;">
+          ${c.precios.map(p=>`<div style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;border-top:1px solid #eee;padding:6px 0;"><span>${p.composicion}</span><span>${p.habitaciones || ""}</span><strong style="color:#7700E0;">${p.precio}</strong></div>`).join("")}
+        </div>
+      ` : `<div style="margin-top:10px;"><strong style="color:#7700E0;">${c.precio || ""}</strong></div>`}
+    </div>
+  `).join("");
+
+  const vuelos = data.simple?.capturaVuelo
+    ? `<img src="${data.simple.capturaVuelo}" style="max-width:100%;border-radius:12px;margin-top:10px;">`
+    : `${data.simple?.detalleVuelos ? `<p>${escapeLineas(data.simple.detalleVuelos)}</p>` : ""}`;
+
+  return `
+    <h2>${data.destino || "Cotización"}</h2>
+    <p><strong>Fecha:</strong> ${data.fechaViaje || ""}</p>
+    <p><strong>Cliente:</strong> ${data.cliente || ""}</p>
+    <p><strong>Agente:</strong> ${data.vendedora || ""}</p>
+    ${data.modo === "simple" && data.tipoSimple !== "solo_hotel" && vuelos ? `<h3>Vuelos</h3>${vuelos}${data.simple?.precioVuelo ? `<p><strong style="color:#7700E0;">${data.simple.precioVuelo}</strong></p>` : ""}` : ""}
+    ${data.modo === "simple" && data.tipoSimple !== "solo_vuelos" ? `<h3>Hotelería</h3>${hoteles}${combos}` : ""}
+    ${data.comentariosInternos ? `<div style="background:#fff9e8;border:1px solid #f3d47c;border-radius:12px;padding:12px;margin-top:14px;"><strong>Comentarios internos:</strong><br>${escapeLineas(data.comentariosInternos)}</div>` : ""}
+  `;
+}
+
+async function construirData(){
+  const capturaVueloNueva = await getFileBase64("capturaVuelo");
+
+  const hoteles = [...document.querySelectorAll(".hotel-box")].map(box=>({
+    nombre: box.querySelector(".hotelNombre").value,
+    habitacion: box.querySelector(".hotelHabitacion").value,
+    regimen: box.querySelector(".hotelRegimen").value,
+    categoria: box.querySelector(".hotelCategoria").value,
+    precio: box.querySelector(".hotelPrecio").value,
+    tipoPrecio: box.querySelector(".hotelTipoPrecio").value,
+    estado: box.querySelector(".hotelEstado").value,
+    link: box.querySelector(".hotelLink").value,
+    precios: leerComposiciones(box)
+  }));
+
+  const combos = [...document.querySelectorAll(".combo-box")].map(box=>({
+    titulo: box.querySelector(".comboTitulo").value,
+    precio: box.querySelector(".comboPrecio").value,
+    tipoPrecio: box.querySelector(".comboTipoPrecio").value,
+    estado: box.querySelector(".comboEstado").value,
+    precios: leerComposiciones(box),
+    servicios: [...box.querySelectorAll(".combo-servicio")].map(s=>({
+      destino: s.querySelector(".comboDestino").value,
+      noches: s.querySelector(".comboNoches").value,
+      hotel: s.querySelector(".comboHotel").value,
+      categoria: s.querySelector(".comboCategoria").value,
+      regimen: s.querySelector(".comboRegimen").value,
+      habitacion: s.querySelector(".comboHabitacion").value,
+      link: s.querySelector(".comboLink").value
+    }))
+  }));
+
+  const tramos = [];
+  for(const box of document.querySelectorAll(".tramo-box")){
+    let imagen = "";
+    const fileInput = box.querySelector(".tramoImagenFile");
+    const file = fileInput && fileInput.files ? fileInput.files[0] : null;
+    if(file) imagen = await fileToBase64(file);
+
+    const pasteZone = box.querySelector(".tramoPasteZone");
+
+    tramos.push({
+      tipo: box.querySelector(".tramoTipo").value,
+      titulo: box.querySelector(".tramoTitulo").value,
+      fechas: box.querySelector(".tramoFechas").value,
+      duracion: box.querySelector(".tramoDuracion").value,
+      detalle: box.querySelector(".tramoDetalle").value,
+      detalleExtra: box.querySelector(".tramoDetalleExtra") ? box.querySelector(".tramoDetalleExtra").value : "",
+      regimen: box.querySelector(".tramoRegimen").value,
+      precio: box.querySelector(".tramoPrecio").value,
+      link: box.querySelector(".tramoLink").value,
+      estado: box.querySelector(".tramoEstado").value,
+      imagen: imagen || (pasteZone ? pasteZone.dataset.imagen : "") || box.dataset.imagen || ""
+    });
+  }
+
+  const data = {
+    modo,
+    tipoSimple: getValue("tipoSimple") || "paquete",
+    cliente: getValue("cliente"),
+    destino: getValue("destino"),
+    pasajeros: getValue("pasajeros"),
+    fechaViaje: getValue("fechaViaje"),
+    fechaCotizacion: getValue("fechaCotizacion"),
+    vendedora: getValue("vendedora"),
+    whatsapp: getValue("whatsapp"),
+    validez: getValue("validez"),
+    formaPago: getValue("formaPago"),
+    observaciones: getValue("observaciones"),
+    mostrarObservaciones: document.getElementById("mostrarObservaciones").checked,
+    comentariosInternos: getValue("comentariosInternos"),
+    incluyeItems: leerIncluyeItems(),
+    simple: {
+      modoVuelo: getValue("modoVuelo"),
+      detalleVuelos: getValue("detalleVuelos"),
+      precioVuelo: getValue("precioVuelo"),
+      tipoPrecioVuelo: getValue("tipoPrecioVuelo"),
+      capturaVuelo: capturaVueloNueva || capturaVueloPegada || (ultimaData?.simple?.capturaVuelo || "")
+    },
+    hoteles,
+    combos,
+    tramos
+  };
+
+  return data;
+}
+
 async function generarVista(){
- const cliente=document.getElementById('cliente').value; const destino=document.getElementById('destino').value; const pasajeros=document.getElementById('pasajeros').value; const fechaViaje=document.getElementById('fechaViaje').value; const fechaCotizacion=document.getElementById('fechaCotizacion').value; const vendedora=document.getElementById('vendedora').value; const whatsapp=document.getElementById('whatsapp').value; const codigo=document.getElementById('codigo').value; const formaPago=document.getElementById('formaPago').value; const observaciones=document.getElementById('observaciones').value;
- const tramos=document.querySelectorAll('.tramo'); let htmlTramos='';
- for(const tramo of tramos){
-  const tipo=tramo.querySelector('.tipo').value; const titulo=tramo.querySelector('.titulo').value; const fechas=tramo.querySelector('.fechas').value; const duracion=tramo.querySelector('.duracion').value; const detalle=tramo.querySelector('.detalle').value; const regimen=tramo.querySelector('.regimen').value; const precio=tramo.querySelector('.precio').value; const link=tramo.querySelector('.link').value; const estado=tramo.querySelector('.estado').value; const imagen=await leerImagen(tramo.querySelector('.imagen'));
-  htmlTramos+=`<div class="preview-section"><h3>${tipo}${titulo?': '+titulo:''}</h3>${fechas?`<p><strong>Fechas:</strong> ${fechas}</p>`:''}${duracion?`<p><strong>Duración / noches:</strong> ${duracion}</p>`:''}${detalle?`<p><strong>Detalle:</strong><br>${nl(detalle)}</p>`:''}${regimen?`<p><strong>Régimen / incluye:</strong> ${regimen}</p>`:''}${precio?`<p><strong>Precio:</strong> ${precio}</p>`:''}${estado?`<p><strong>Estado:</strong> ${estado}</p>`:''}${link?`<p><a href="${link}" target="_blank">Ver link / ubicación</a></p>`:''}${imagen?`<img src="${imagen}" class="preview-img">`:''}</div>`;
- }
- document.getElementById('preview').innerHTML=`<div class="preview-logo"><img src="DEGRADADO CON LEGAJO.png" alt="ETNIKA TRAVEL"></div><h2>${destino||'Cotización de viaje'}</h2><div class="preview-section">${cliente?`<p><strong>Cliente:</strong> ${cliente}</p>`:''}${pasajeros?`<p><strong>Pasajeros:</strong> ${pasajeros}</p>`:''}${fechaViaje?`<p><strong>Fecha de viaje:</strong> ${fechaViaje}</p>`:''}${fechaCotizacion?`<p><strong>Fecha de cotización:</strong> ${fechaCotizacion}</p>`:''}${codigo?`<p><strong>Cotización:</strong> ${codigo}</p>`:''}${vendedora?`<p><strong>Asesora:</strong> ${vendedora}</p>`:''}</div><h2>Itinerario y servicios</h2>${htmlTramos||'<p>No se agregaron tramos.</p>'}<div class="preview-section"><h3>Forma de pago</h3><p>${nl(formaPago)}</p></div><div class="preview-section"><h3>Condiciones importantes</h3><p>${nl(observaciones)}</p><p>La contratación implica la aceptación de las <a href="https://etnikatravel.tur.ar/general-conditions" target="_blank">Condiciones Generales de ETNIKA TRAVEL</a>.</p></div><div class="preview-section footer-preview"><h3>ETNIKA TRAVEL S.R.L.</h3><p>Legajo EVT Nº 18418 | CUIT 30-71775467-7</p><p><a href="https://maps.app.goo.gl/QGwE9kNAV4aiuszz9" target="_blank">📍 Ver oficina en Google Maps</a></p><p>🕒 Lunes a Viernes de 10:00 a 18:00 hs</p><p><a href="https://etnikatravel.tur.ar" target="_blank">🌐 etnikatravel.tur.ar</a></p>${whatsapp?`<p style="margin-top:15px;"><a class="btn btn-whatsapp" href="https://wa.me/${whatsapp}" target="_blank">📲 Contactar por WhatsApp</a></p>`:''}</div><div class="link-output"><strong>Próximo paso:</strong> cuando conectemos Supabase, acá aparecerá el link único para enviar al cliente.</div>`;
+  ultimaData = await construirData();
+  document.getElementById("preview").innerHTML = renderPreview(ultimaData);
 }
+
+async function guardarCotizacion(){
+  try{
+    const data = await construirData();
+
+    if(editCodigo){
+      data.codigo = editCodigo;
+      const payload = {
+        cliente: data.cliente,
+        destino: data.destino,
+        vendedora: data.vendedora,
+        fecha_viaje: data.fechaViaje,
+        fecha_cotizacion: data.fechaCotizacion,
+        precio_total: "",
+        datos_json: JSON.stringify(data)
+      };
+
+      const { error } = await supabaseClient.from("cotizaciones").update(payload).eq("codigo", editCodigo);
+      if(error) throw error;
+
+      mostrarLink(data.codigo);
+      ultimaData = data;
+      document.getElementById("preview").innerHTML = renderPreview(data);
+      return;
+    }
+
+    const insertPayload = {
+      cliente: data.cliente,
+      destino: data.destino,
+      vendedora: data.vendedora,
+      fecha_viaje: data.fechaViaje,
+      fecha_cotizacion: data.fechaCotizacion,
+      precio_total: "",
+      datos_json: JSON.stringify(data)
+    };
+
+    const { data: insertado, error: errorInsert } = await supabaseClient
+      .from("cotizaciones")
+      .insert(insertPayload)
+      .select()
+      .single();
+
+    if(errorInsert) throw errorInsert;
+
+    const anio = new Date().getFullYear();
+    const codigo = "ETK-" + anio + "-" + String(insertado.id).padStart(4,"0");
+    data.codigo = codigo;
+
+    const { error: errorUpdate } = await supabaseClient
+      .from("cotizaciones")
+      .update({ codigo: codigo, datos_json: JSON.stringify(data) })
+      .eq("id", insertado.id);
+
+    if(errorUpdate) throw errorUpdate;
+
+    mostrarLink(codigo);
+    ultimaData = data;
+    document.getElementById("preview").innerHTML = renderPreview(data);
+  }catch(error){
+    alert("No se pudo guardar la cotización. Detalle: " + error.message);
+    console.error(error);
+  }
+}
+
+function mostrarLink(codigo){
+  const link = window.location.origin + "/cotizacion.html?id=" + encodeURIComponent(codigo);
+  const box = document.getElementById("linkGenerado");
+  box.classList.remove("hidden");
+  box.innerHTML = `
+    <h2>Cotización guardada</h2>
+    <p><strong>Link público:</strong></p>
+    <div class="link-box"><a href="${link}" target="_blank">${link}</a></div>
+    <div class="actions">
+      <button class="btn btn-soft" type="button" onclick="navigator.clipboard.writeText('${link}')">Copiar link</button>
+      <a class="btn btn-green" href="https://wa.me/?text=${encodeURIComponent('Te comparto la cotización de ETNIKA TRAVEL: ' + link)}" target="_blank">Enviar por WhatsApp</a>
+    </div>
+  `;
+}
+
+function generarPDF(){
+  const element = document.getElementById("preview");
+  if(!element.innerHTML.trim()) {
+    alert("Primero generá la vista previa.");
+    return;
+  }
+  html2pdf().from(element).save("cotizacion-etnika.pdf");
+}
+
+async function cargarCotizacion(codigo, duplicando=false){
+  const { data, error } = await supabaseClient
+    .from("cotizaciones")
+    .select("*")
+    .eq("codigo", codigo)
+    .single();
+
+  if(error || !data){
+    alert("No se pudo cargar la cotización.");
+    console.error(error);
+    return;
+  }
+
+  const d = JSON.parse(data.datos_json);
+  ultimaData = d;
+
+  setModo(d.modo || "simple");
+  setValue("tipoSimple", d.tipoSimple || "paquete");
+  actualizarSimple();
+  setValue("cliente", d.cliente);
+  setValue("destino", d.destino);
+  setValue("pasajeros", d.pasajeros);
+  setValue("fechaViaje", d.fechaViaje);
+  setValue("fechaCotizacion", d.fechaCotizacion);
+  setValue("vendedora", d.vendedora);
+  setValue("whatsapp", d.whatsapp);
+  setValue("validez", d.validez);
+  setValue("formaPago", d.formaPago);
+  setValue("observaciones", d.observaciones);
+  setValue("comentariosInternos", d.comentariosInternos);
+  cargarIncluyeItems(d.incluyeItems || []);
+  document.getElementById("mostrarObservaciones").checked = d.mostrarObservaciones !== false;
+
+  if(d.simple){
+    setValue("modoVuelo", d.simple.modoVuelo || "texto");
+    setValue("detalleVuelos", d.simple.detalleVuelos || d.simple.vueloIda || "");
+    setValue("precioVuelo", d.simple.precioVuelo);
+    setValue("tipoPrecioVuelo", d.simple.tipoPrecioVuelo || "por persona");
+    if(d.simple.capturaVuelo && document.getElementById("pasteVuelo")){
+      document.getElementById("pasteVuelo").textContent = "La cotización ya tiene una captura guardada";
+      document.getElementById("pasteVuelo").classList.add("has-image");
+    }
+  }
+
+  document.getElementById("hoteles").innerHTML = "";
+  (d.hoteles || []).forEach(agregarHotel);
+  if(!(d.hoteles || []).length && !(d.combos || []).length) agregarHotel();
+
+  document.getElementById("combos").innerHTML = "";
+  (d.combos || []).forEach(agregarCombo);
+
+  document.getElementById("tramos").innerHTML = "";
+  (d.tramos || []).forEach(agregarTramo);
+
+  if(duplicando){
+    editCodigo = null;
+    document.getElementById("tituloPanel").textContent = "Duplicando cotización";
+  }else{
+    editCodigo = codigo;
+    document.getElementById("tituloPanel").textContent = "Editando cotización " + codigo;
+  }
+
+  await generarVista();
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  initPasteZones();
+  initPasteVuelo();
+  const hoy = new Date();
+  if(!getValue("fechaCotizacion")){
+    setValue("fechaCotizacion", hoy.toLocaleDateString("es-AR"));
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  editCodigo = params.get("edit");
+  duplicarCodigo = params.get("duplicar");
+
+  if(editCodigo){
+    cargarCotizacion(editCodigo, false);
+  }else if(duplicarCodigo){
+    cargarCotizacion(duplicarCodigo, true);
+  }else{
+    agregarHotel();
+    cargarIncluyeItems();
+    actualizarSimple();
+  }
+});
 </script>
 </body>
 </html>
