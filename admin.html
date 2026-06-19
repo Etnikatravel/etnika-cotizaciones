@@ -1164,173 +1164,173 @@ function mostrarLink(codigo){
 }
 
 
-async function generarPDF(){
-  const data = await construirData();
+function safePDF(texto){
+  return String(texto || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function brPDF(texto){ return safePDF(texto).replace(/\n/g,"<br>"); }
+function iconoPDF(item){ return (typeof item === "object" && item.icono) ? "icons/" + item.icono : ""; }
+function textoIncluyePDF(item){ return typeof item === "object" ? (item.texto || item.detalle || "") : item; }
 
-  if(!data.cliente && !data.destino){
-    alert("Primero completá los datos de la cotización.");
-    return;
-  }
+function renderTablaFamiliasPDF(precios){
+  if(!precios || !precios.length) return "";
+  return `
+    <div class="family-price-table">
+      <div class="family-price-header">
+        <div>Familia</div><div>Habitaciones</div><div>Precio final</div>
+      </div>
+      ${precios.map(p=>`
+        <div class="family-price-row">
+          <div class="family-name">${safePDF(p.composicion || p.familia || "")}</div>
+          <div class="family-rooms">${safePDF(p.habitaciones || "")}</div>
+          <div class="family-amount">${safePDF(p.precio || "")}</div>
+        </div>
+      `).join("")}
+    </div>`;
+}
 
-  const contenido = renderPreview(data);
+function renderPDFCotizacion(data){
+  const incluye = data.incluyeItems && data.incluyeItems.length ? data.incluyeItems : [
+    {icono:"icon_avion.png", texto:"Aéreo incluido"},
+    {icono:"icon_valija.png", texto:"Equipaje incluido"},
+    {icono:"icon_bus.png", texto:"Traslados en destino"},
+    {icono:"icon_hotel.png", texto:"Alojamiento según opción elegida"},
+    {icono:"icon_agente.png", texto:"Asesoramiento ETNIKA"}
+  ];
 
-  const win = window.open("", "_blank");
-  if(!win){
-    alert("El navegador bloqueó la ventana del PDF. Permití ventanas emergentes para este sitio.");
-    return;
-  }
+  const tipoSimple = data.tipoSimple || "paquete";
+  const mostrarVuelos = data.modo === "simple" && tipoSimple !== "solo_hotel";
+  const mostrarHoteles = data.modo === "simple" && tipoSimple !== "solo_vuelos";
 
-  win.document.open();
-  win.document.write(`
-<!DOCTYPE html>
+  const s = data.simple || {};
+  const vuelosHTML = (mostrarVuelos && (s.detalleVuelos || s.capturaVuelo || s.precioVuelo)) ? `
+    <section class="card">
+      <h2>Vuelos</h2>
+      ${s.detalleVuelos ? `<div class="flight-box">${brPDF(s.detalleVuelos)}</div>` : ""}
+      ${s.capturaVuelo ? `<img class="capture-img" src="${s.capturaVuelo}">` : ""}
+      ${s.precioVuelo ? `<div class="single-price left"><div>${safePDF(s.precioVuelo)}</div><span>${safePDF(s.tipoPrecioVuelo || "")}</span></div>` : ""}
+    </section>` : "";
+
+  const hotelesHTML = (data.hoteles || []).map(h=>{
+    const tieneTabla = h.precios && h.precios.length;
+    return `
+      <div class="hotel-card ${tieneTabla ? "full-layout" : ""}">
+        <div class="hotel-row">
+          <div>
+            <div class="hotel-name">${safePDF(h.nombre || "Hotel")}</div>
+            ${h.categoria ? `<div class="hotel-stars">${safePDF(h.categoria)}</div>` : ""}
+            ${h.habitacion ? `<div class="hotel-detail"><strong>Hab.</strong> ${safePDF(h.habitacion)}</div>` : ""}
+            ${h.regimen ? `<div class="hotel-detail"><strong>Régimen:</strong> ${safePDF(h.regimen)}</div>` : ""}
+            ${h.estado ? `<div class="hotel-detail"><strong>Estado:</strong> ${safePDF(h.estado)}</div>` : ""}
+            ${tieneTabla ? renderTablaFamiliasPDF(h.precios) : ""}
+          </div>
+          ${!tieneTabla && h.precio ? `<div class="hotel-price"><div class="hotel-price-value">${safePDF(h.precio)}</div><div class="hotel-price-note">${safePDF(h.tipoPrecio || "grupo familiar")}</div></div>` : ""}
+        </div>
+      </div>`;
+  }).join("");
+
+  const combosHTML = (data.combos || []).map(c=>{
+    const tieneTabla = c.precios && c.precios.length;
+    return `
+      <div class="hotel-card full-layout">
+        <div class="combo-title">${safePDF(c.titulo || "Opción combinada")}</div>
+        ${(c.servicios || []).map((sv,i)=>`
+          ${i > 0 ? `<div class="combo-plus">+</div>` : ""}
+          <div class="combo-service">
+            <div class="combo-destination">${safePDF(sv.destino || "")}${sv.noches ? " · " + safePDF(sv.noches) : ""}</div>
+            <div class="hotel-name small">${safePDF(sv.hotel || "")}</div>
+            ${sv.categoria ? `<div class="hotel-stars">${safePDF(sv.categoria)}</div>` : ""}
+            ${sv.habitacion ? `<div class="hotel-detail"><strong>Hab.</strong> ${safePDF(sv.habitacion)}</div>` : ""}
+            ${sv.regimen ? `<div class="hotel-detail"><strong>Régimen:</strong> ${safePDF(sv.regimen)}</div>` : ""}
+          </div>
+        `).join("")}
+        ${c.estado ? `<div class="hotel-detail"><strong>Estado:</strong> ${safePDF(c.estado)}</div>` : ""}
+        ${tieneTabla ? renderTablaFamiliasPDF(c.precios) : (c.precio ? `<div class="single-price left"><div>${safePDF(c.precio)}</div><span>${safePDF(c.tipoPrecio || "grupo familiar")}</span></div>` : "")}
+      </div>`;
+  }).join("");
+
+  const hoteleriaHTML = (mostrarHoteles && (hotelesHTML || combosHTML)) ? `<section class="card"><h2>Opciones de alojamiento</h2><div class="hotel-list">${hotelesHTML}${combosHTML}</div></section>` : "";
+
+  const tramosHTML = (data.modo === "completo" && (data.tramos || []).length) ? `
+    <section class="card"><h2>Itinerario y servicios</h2>
+      ${(data.tramos || []).map(t=>`
+        <div class="hotel-card">
+          <div class="hotel-name">${safePDF(t.tipo || "Tramo")}: ${safePDF(t.titulo || "")}</div>
+          ${t.fechas ? `<div class="hotel-detail"><strong>Fechas:</strong> ${safePDF(t.fechas)}</div>` : ""}
+          ${t.duracion ? `<div class="hotel-detail"><strong>Duración / noches:</strong> ${safePDF(t.duracion)}</div>` : ""}
+          ${t.detalle ? `<div class="hotel-detail">${brPDF(t.detalle)}</div>` : ""}
+          ${t.detalleExtra ? `<div class="flight-box">${brPDF(t.detalleExtra)}</div>` : ""}
+          ${t.regimen ? `<div class="hotel-detail"><strong>Incluye / empresa:</strong> ${safePDF(t.regimen)}</div>` : ""}
+          ${t.estado ? `<div class="hotel-detail"><strong>Estado:</strong> ${safePDF(t.estado)}</div>` : ""}
+          ${t.precio ? `<div class="single-price left"><div>${safePDF(t.precio)}</div></div>` : ""}
+          ${t.imagen ? `<img class="capture-img" src="${t.imagen}">` : ""}
+        </div>`).join("")}
+    </section>` : "";
+
+  return `<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <title>Cotización ETNIKA</title>
 <style>
-  @page{ size:A4; margin:10mm; }
-  *{ box-sizing:border-box; }
-  body{
-    margin:0;
-    background:#ffffff;
-    color:#222;
-    font-family:Arial, Helvetica, sans-serif;
-    font-size:12px;
-  }
-  .pdf-wrap{
-    width:190mm;
-    margin:0 auto;
-    padding:0;
-  }
-  .pdf-actions{
-    position:sticky;
-    top:0;
-    z-index:999;
-    background:white;
-    border-bottom:1px solid #e9e9ef;
-    padding:10px;
-    text-align:center;
-  }
-  .pdf-actions button{
-    border:none;
-    border-radius:999px;
-    padding:10px 18px;
-    font-weight:900;
-    cursor:pointer;
-    background:linear-gradient(135deg,#00E5BF,#7700E0);
-    color:white;
-  }
-  .logo{
-    text-align:center;
-    margin:6px 0 10px;
-  }
-  .logo img{
-    max-width:135px;
-    height:auto;
-  }
-  .content{
-    border:1px solid #e9e9ef;
-    border-radius:12px;
-    padding:12px;
-    margin-bottom:10px;
-  }
-  h2{
-    color:#7700E0;
-    font-size:16px;
-    margin:8px 0;
-  }
-  h3{
-    color:#7700E0;
-    font-size:14px;
-    margin:8px 0 4px;
-  }
-  p{
-    margin:4px 0;
-    line-height:1.35;
-  }
-  strong{
-    font-weight:900;
-  }
-  img{
-    max-width:100%;
-  }
-  .family-price-table,
-  .price-table{
-    margin-top:10px;
-    border:1px solid #e9e9ef;
-    border-radius:9px;
-    overflow:hidden;
-    width:100%;
-  }
-  .family-price-header,
-  .family-price-row{
-    display:grid;
-    grid-template-columns:1fr 1.25fr 1fr;
-    align-items:stretch;
-  }
-  .family-price-header{
-    background:#f5f0ff;
-    color:#7700E0;
-    font-size:10px;
-    font-weight:900;
-    text-transform:uppercase;
-    border-bottom:1px solid #e9e9ef;
-  }
-  .family-price-header > div,
-  .family-price-row > div{
-    padding:7px 8px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    border-right:1px solid #e9e9ef;
-    min-height:28px;
-  }
-  .family-price-header > div:last-child,
-  .family-price-row > div:last-child{
-    border-right:none;
-  }
-  .family-price-row{
-    border-bottom:1px solid #e9e9ef;
-  }
-  .family-price-row:nth-child(even){
-    background:#fcfcff;
-  }
-  .family-price-row:last-child{
-    border-bottom:none;
-  }
-  .family-amount,
-  .price-amount{
-    color:#7700E0;
-    font-weight:900;
-    font-size:13px;
-    white-space:nowrap;
-  }
-  .preview{
-    border:none;
-    padding:0;
-    margin:0;
-  }
-  @media print{
-    .pdf-actions{display:none;}
-    body{background:white;}
-    .pdf-wrap{width:auto;}
-  }
+@page{size:A4;margin:10mm}*{box-sizing:border-box}body{margin:0;background:#fff;color:#2a2a2a;font-family:Arial,Helvetica,sans-serif;font-size:11.5px}.print-bar{position:sticky;top:0;z-index:9999;background:white;border-bottom:1px solid #e9e9ef;padding:8px;text-align:center}.print-bar button{border:none;border-radius:999px;padding:10px 20px;font-weight:900;background:linear-gradient(135deg,#00E5BF,#7700E0);color:white;cursor:pointer}.page{width:190mm;margin:0 auto}.logo{text-align:center;margin:6px 0 10px}.logo img{max-width:135px;height:auto}.card{background:white;border:1px solid #e9e9ef;border-radius:14px;padding:12px;margin-bottom:9px;break-inside:avoid;page-break-inside:avoid}h2{color:#7700E0;font-size:17px;margin:0 0 10px;font-weight:900}.data-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.data-box{background:#fbfbff;border:1px solid #e9e9ef;border-radius:10px;padding:7px 8px;min-height:42px;display:flex;align-items:center;gap:6px}.data-box img{width:22px;height:22px;object-fit:contain}.data-label{font-size:8.5px;font-weight:900;color:#555;margin-bottom:2px}.data-value{font-size:10.5px;color:#111;font-weight:700;line-height:1.2}.destination-box{margin-top:10px;border:1px solid #e9e9ef;border-radius:12px;padding:15px 10px;text-align:center;background:linear-gradient(180deg,#fff,#fbfbff)}.destination-title{color:#7700E0;font-size:32px;line-height:1;font-weight:900;text-transform:uppercase;letter-spacing:-1px}.destination-date{margin-top:8px;color:#00E5BF;font-size:17px;font-weight:900;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:7px}.destination-date img{width:22px;height:22px;object-fit:contain}.includes-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.include-item{background:#fbfbff;border:1px solid #e9e9ef;border-radius:10px;padding:8px 5px;min-height:64px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;gap:4px;font-size:9px;font-weight:900}.include-item img{width:30px;height:30px;object-fit:contain}.flight-box{border:1px solid #e9e9ef;border-left:4px solid #00E5BF;border-radius:10px;background:#fbfbff;padding:8px;line-height:1.35;margin-top:5px}.capture-img{max-width:100%;max-height:145mm;border-radius:10px;margin-top:7px;display:block}.hotel-list{display:flex;flex-direction:column;gap:8px}.hotel-card{border:1px solid #e9e9ef;border-radius:12px;padding:10px;break-inside:avoid;page-break-inside:avoid}.hotel-row{display:grid;grid-template-columns:1fr 125px;gap:10px;align-items:center}.hotel-card.full-layout .hotel-row{grid-template-columns:1fr}.hotel-name{color:#7700E0;font-size:16px;font-weight:900;line-height:1.15;margin-bottom:4px}.hotel-name.small{font-size:14px;margin-bottom:3px}.hotel-stars{color:#7700E0;font-size:13px;letter-spacing:1px;font-weight:900;margin-bottom:4px}.hotel-detail{font-size:11.5px;line-height:1.35}.hotel-detail strong{color:#555}.hotel-price{text-align:center}.hotel-price-value,.single-price div{color:#7700E0;font-size:18px;line-height:1;font-weight:900}.hotel-price-note,.single-price span{display:block;color:#666;font-size:8.5px;margin-top:4px;text-transform:uppercase}.single-price.left{margin-top:8px;text-align:left}.combo-title{color:#7700E0;font-size:16px;font-weight:900;text-transform:uppercase;margin-bottom:6px}.combo-service{background:#fbfbff;border:1px solid #e9e9ef;border-radius:10px;padding:8px;margin:5px 0}.combo-destination{color:#222;font-weight:900;text-transform:uppercase;margin-bottom:3px}.combo-plus{color:#7700E0;font-weight:900;font-size:14px;text-align:center;margin:2px 0}.family-price-table{margin-top:9px;border:1px solid #e9e9ef;border-radius:9px;overflow:hidden;background:#fff;width:100%}.family-price-header,.family-price-row{display:grid;grid-template-columns:1fr 1.25fr 1fr;align-items:stretch}.family-price-header{background:#f5f0ff;color:#7700E0;font-size:9.5px;font-weight:900;text-transform:uppercase;border-bottom:1px solid #e9e9ef}.family-price-header>div,.family-price-row>div{padding:7px 8px;display:flex;align-items:center;justify-content:center;text-align:center;border-right:1px solid #e9e9ef;min-height:28px}.family-price-header>div:last-child,.family-price-row>div:last-child{border-right:none}.family-price-row{border-bottom:1px solid #e9e9ef}.family-price-row:nth-child(even){background:#fcfcff}.family-price-row:last-child{border-bottom:none}.family-name{color:#222;font-weight:800}.family-rooms{color:#555;font-weight:700}.family-amount{color:#7700E0;font-size:13px;font-weight:900;white-space:nowrap}.info-section{background:#fbfbff;border:1px solid #e9e9ef;border-radius:10px;padding:9px;line-height:1.45}.footer{text-align:center;font-size:9px;line-height:1.45;color:#333}.footer h3{color:#7700E0;font-size:14px;margin:0 0 5px}.legal{color:#777;font-size:8.5px;margin-top:8px}@media print{.print-bar{display:none}.page{width:auto}}
 </style>
 </head>
 <body>
-  <div class="pdf-actions">
-    <button onclick="window.print()">Imprimir / guardar PDF</button>
-  </div>
-  <div class="pdf-wrap">
-    <div class="logo"><img src="DEGRADADO CON LEGAJO.png" alt="ETNIKA TRAVEL"></div>
-    <div class="content">
-      ${contenido}
+<div class="print-bar"><button onclick="window.print()">Imprimir / guardar PDF</button></div>
+<div class="page">
+  <div class="logo"><img src="DEGRADADO CON LEGAJO.png" alt="ETNIKA TRAVEL"></div>
+  <section class="card">
+    <h2>Datos de la cotización</h2>
+    <div class="data-grid">
+      <div class="data-box"><img src="icons/top_cliente.png"><div><div class="data-label">Cliente</div><div class="data-value">${safePDF(data.cliente)}</div></div></div>
+      <div class="data-box"><img src="icons/top_pasajeros.png"><div><div class="data-label">Pasajeros</div><div class="data-value">${safePDF(data.pasajeros)}</div></div></div>
+      <div class="data-box"><img src="icons/top_fecha.png"><div><div class="data-label">Fecha de cotización</div><div class="data-value">${safePDF(data.fechaCotizacion)}</div></div></div>
+      <div class="data-box"><img src="icons/top_cotizacion.png"><div><div class="data-label">Cotización</div><div class="data-value">${safePDF(data.codigo)}</div></div></div>
+      <div class="data-box"><img src="icons/top_agente.png"><div><div class="data-label">Agente</div><div class="data-value">${safePDF(data.vendedora)}</div></div></div>
     </div>
-  </div>
-</body>
-</html>
-  `);
+    <div class="destination-box">
+      <div class="destination-title">${safePDF(data.destino || "Cotización de viaje")}</div>
+      ${data.fechaViaje ? `<div class="destination-date"><img src="icons/top_fecha.png">${safePDF(data.fechaViaje)}</div>` : ""}
+    </div>
+  </section>
+  <section class="card">
+    <h2>Tu viaje incluye</h2>
+    <div class="includes-grid">
+      ${incluye.map(item=>`<div class="include-item">${iconoPDF(item) ? `<img src="${iconoPDF(item)}">` : ""}<span>${safePDF(textoIncluyePDF(item))}</span></div>`).join("")}
+    </div>
+  </section>
+  ${vuelosHTML}
+  ${hoteleriaHTML}
+  ${tramosHTML}
+  ${data.formaPago ? `<section class="card"><h2>Forma de pago</h2><div class="info-section">${brPDF(data.formaPago)}</div></section>` : ""}
+  ${data.mostrarObservaciones && data.observaciones ? `<section class="card"><h2>Observaciones</h2><div class="info-section">${brPDF(data.observaciones)}</div></section>` : ""}
+  <section class="card footer">
+    <h3>ETNIKA TRAVEL S.R.L.</h3>
+    <div>Legajo EVT Nº 18418 | CUIT 30-71775467-7</div>
+    <div>Dirección: Rosario, Santa Fe, Argentina</div>
+    <div>WhatsApp: ${safePDF(data.whatsapp || "5493412177311")}</div>
+    <div>Horario: Lunes a Viernes de 10:00 a 18:00 hs</div>
+    <div>Web: etnikatravel.tur.ar | Instagram: @etnikatravel</div>
+    <div>Condiciones generales: https://etnikatravel.tur.ar/general-conditions</div>
+    <div class="legal">Tarifas sujetas a disponibilidad y modificación sin previo aviso hasta el momento de la reserva y emisión.${data.validez ? `<br>Validez de la cotización: ${safePDF(data.validez)}` : ""}</div>
+  </section>
+</div>
+</body></html>`;
+}
+
+async function generarPDF(){
+  const data = await construirData();
+  if(!data.cliente && !data.destino){
+    alert("Primero completá los datos de la cotización.");
+    return;
+  }
+  const win = window.open("", "_blank");
+  if(!win){
+    alert("El navegador bloqueó la ventana del PDF. Permití ventanas emergentes para este sitio.");
+    return;
+  }
+  win.document.open();
+  win.document.write(renderPDFCotizacion(data));
   win.document.close();
 }
 
