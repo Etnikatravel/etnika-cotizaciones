@@ -299,7 +299,7 @@ function renderIncluye(data){
     }).join("")
   }</div></section>`;
 }
-function renderVuelos(data){const simple=data.simple||{};const tieneTexto=simple.detalleVuelos||simple.vueloIda||simple.vueloVuelta;const tieneCaptura=simple.capturaVuelo;const tienePrecio=simple.precioVuelo;if(!tieneTexto&&!tieneCaptura&&!tienePrecio)return"";return `<section class="card"><h2 class="section-title">Vuelos</h2>${tieneTexto?`<div class="flight-box"><div class="flight-title">Detalle de vuelos</div>${escapeLineas(simple.detalleVuelos||[simple.vueloIda,simple.vueloVuelta].filter(Boolean).join("\n\n"))}</div>`:""}${tieneCaptura?`<img src="${simple.capturaVuelo}" class="preview-img">`:""}${tienePrecio?`<div class="hotel-card" style="margin-top:16px;"><div class="hotel-price" style="text-align:center;"><div class="hotel-price-value">${simple.precioVuelo}</div><div class="hotel-price-note">${tipoPrecioLabel(simple.tipoPrecioVuelo)}</div></div></div>`:""}</section>`;}
+function renderVuelos(data){const simple=data.simple||{};const opciones=(simple.opcionesVuelo&&simple.opcionesVuelo.length)?simple.opcionesVuelo:((simple.detalleVuelos||simple.vueloIda||simple.vueloVuelta||simple.capturaVuelo||simple.precioVuelo)?[simple]:[]);if(!opciones.length)return"";return `<section class="card"><h2 class="section-title">Vuelos</h2>${opciones.map((v,i)=>{const detalle=v.detalleVuelos||[v.vueloIda,v.vueloVuelta].filter(Boolean).join("\n\n");return `<div class="hotel-card" style="margin-top:16px;"><div class="hotel-name">Opción de vuelo ${i+1}</div>${detalle?`<div class="flight-box"><div class="flight-title">Detalle de vuelos</div>${escapeLineas(detalle)}</div>`:""}${v.capturaVuelo?`<img src="${v.capturaVuelo}" class="preview-img">`:""}${v.precioVuelo?`<div class="hotel-price" style="text-align:center;margin-top:12px;"><div class="hotel-price-value">${v.precioVuelo}</div><div class="hotel-price-note">${tipoPrecioLabel(v.tipoPrecioVuelo)}</div></div>`:""}</div>`}).join("")}</section>`;}
 
 function renderPrecios(precios, fallbackPrecio, fallbackTipo){
   if(precios && precios.length){
@@ -437,6 +437,7 @@ function renderTramos(data){
     <div class="hotel-card">
       <div class="hotel-row">
         <div>
+          ${t.ciudad?`<div class="combo-destination">${t.ciudad}</div>`:""}
           <div class="hotel-name">${t.tipo||""}: ${t.titulo||""}</div>
           ${t.fechas?`<div class="hotel-detail"><strong>Fechas:</strong> ${t.fechas}</div>`:""}
           ${t.duracion?`<div class="hotel-detail"><strong>Duración / noches:</strong> ${t.duracion}</div>`:""}
