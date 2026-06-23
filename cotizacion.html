@@ -88,6 +88,7 @@ a{color:var(--violeta);font-weight:800;}
   margin-bottom:5px;
   text-transform:uppercase;
 }
+.destination-group-title{background:#f5f0ff;color:var(--violeta);font-weight:900;font-size:20px;text-transform:uppercase;border-radius:14px;padding:12px 16px;margin:10px 0 14px;}
 .combo-plus{
   color:var(--violeta);
   font-size:24px;
@@ -299,7 +300,7 @@ function renderIncluye(data){
     }).join("")
   }</div></section>`;
 }
-function renderVuelos(data){const simple=data.simple||{};const opciones=(simple.opcionesVuelo&&simple.opcionesVuelo.length)?simple.opcionesVuelo:((simple.detalleVuelos||simple.vueloIda||simple.vueloVuelta||simple.capturaVuelo||simple.precioVuelo)?[simple]:[]);if(!opciones.length)return"";return `<section class="card"><h2 class="section-title">Vuelos</h2>${opciones.map((v,i)=>{const detalle=v.detalleVuelos||[v.vueloIda,v.vueloVuelta].filter(Boolean).join("\n\n");return `<div class="hotel-card" style="margin-top:16px;"><div class="hotel-name">Opción de vuelo ${i+1}</div>${detalle?`<div class="flight-box"><div class="flight-title">Detalle de vuelos</div>${escapeLineas(detalle)}</div>`:""}${v.capturaVuelo?`<img src="${v.capturaVuelo}" class="preview-img">`:""}${v.precioVuelo?`<div class="hotel-price" style="text-align:center;margin-top:12px;"><div class="hotel-price-value">${v.precioVuelo}</div><div class="hotel-price-note">${tipoPrecioLabel(v.tipoPrecioVuelo)}</div></div>`:""}</div>`}).join("")}</section>`;}
+function renderVuelos(data){const simple=data.simple||{};const tieneTexto=simple.detalleVuelos||simple.vueloIda||simple.vueloVuelta;const tieneCaptura=simple.capturaVuelo;const tienePrecio=simple.precioVuelo;if(!tieneTexto&&!tieneCaptura&&!tienePrecio)return"";return `<section class="card"><h2 class="section-title">Vuelos</h2>${tieneTexto?`<div class="flight-box"><div class="flight-title">Detalle de vuelos</div>${escapeLineas(simple.detalleVuelos||[simple.vueloIda,simple.vueloVuelta].filter(Boolean).join("\n\n"))}</div>`:""}${tieneCaptura?`<img src="${simple.capturaVuelo}" class="preview-img">`:""}${tienePrecio?`<div class="hotel-card" style="margin-top:16px;"><div class="hotel-price" style="text-align:center;"><div class="hotel-price-value">${simple.precioVuelo}</div><div class="hotel-price-note">${tipoPrecioLabel(simple.tipoPrecioVuelo)}</div></div></div>`:""}</section>`;}
 
 function renderPrecios(precios, fallbackPrecio, fallbackTipo){
   if(precios && precios.length){
@@ -430,17 +431,15 @@ function renderHoteles(data){
 
   return `<section class="card"><h2 class="section-title">Opciones de alojamiento</h2><div class="hotel-list">${hotelesHtml}${combosHtml}</div></section>`;
 }
-function renderTramos(data){
-  const tramos=data.tramos||[];
-  if(!tramos.length)return"";
-  return `<section class="card"><h2 class="section-title">Itinerario y servicios</h2><div class="hotel-list">${tramos.map(t=>`
-    <div class="hotel-card">
+function renderTramoCard(t){
+  const tipo=t.tipo||"Tramo";
+  const esHotel=tipo==="Hotel";
+  return `<div class="hotel-card">
       <div class="hotel-row">
         <div>
-          ${t.ciudad?`<div class="combo-destination">${t.ciudad}</div>`:""}
-          <div class="hotel-name">${t.tipo||""}: ${t.titulo||""}</div>
-          ${t.fechas?`<div class="hotel-detail"><strong>Fechas:</strong> ${t.fechas}</div>`:""}
-          ${t.duracion?`<div class="hotel-detail"><strong>Duración / noches:</strong> ${t.duracion}</div>`:""}
+          <div class="hotel-name">${esHotel ? (t.titulo||"Hotel") : `${tipo}: ${t.titulo||""}`}</div>
+          ${(!esHotel && t.fechas)?`<div class="hotel-detail"><strong>Fecha:</strong> ${t.fechas}</div>`:""}
+          ${(!esHotel && t.duracion)?`<div class="hotel-detail"><strong>Duración:</strong> ${t.duracion}</div>`:""}
           ${t.detalle?`<div class="hotel-detail">${escapeLineas(t.detalle)}</div>`:""}
           ${t.detalleExtra?`<div class="tramo-extra">${escapeLineas(t.detalleExtra)}</div>`:""}
           ${t.regimen?`<div class="hotel-detail"><strong>Incluye / empresa:</strong> ${t.regimen}</div>`:""}
@@ -450,7 +449,19 @@ function renderTramos(data){
         </div>
         <div class="hotel-price">${t.precio?`<div class="hotel-price-value">${limpiarPrecio(t.precio)}</div>`:""}</div>
       </div>
-    </div>`).join("")}</div></section>`;
+    </div>`;
+}
+function renderTramos(data){
+  const destinos=data.destinos||[];
+  const tramos=data.tramos||[];
+  if(!destinos.length && !tramos.length)return"";
+  const destinosHtml=destinos.map(d=>`
+    <div class="destination-group">
+      <div class="destination-group-title">${d.fechas||""} ${d.destino||""}${d.noches?` - ${d.noches}`:""}</div>
+      ${(d.tramos||[]).map(renderTramoCard).join("")}
+    </div>`).join("");
+  const sueltosHtml=tramos.map(renderTramoCard).join("");
+  return `<section class="card"><h2 class="section-title">Itinerario y servicios</h2><div class="hotel-list">${destinosHtml}${sueltosHtml}</div></section>`;
 }
 function renderCotizacion(data){return `<section class="card"><h2 class="section-title">Datos de la cotización</h2><div class="data-grid">${data.cliente?`<div class="data-box"><img src="icons/icon_pasajeros.png" class="etnika-icon" alt=""><div><div class="data-label">Cliente</div><div class="data-value">${data.cliente}</div></div></div>`:""}${data.pasajeros?`<div class="data-box"><img src="icons/icon_pasajeros.png" class="etnika-icon" alt=""><div><div class="data-label">Pasajeros</div><div class="data-value">${data.pasajeros}</div></div></div>`:""}${data.fechaCotizacion?`<div class="data-box"><img src="icons/icon_checklist.png" class="etnika-icon" alt=""><div><div class="data-label">Fecha de cotización</div><div class="data-value">${data.fechaCotizacion}</div></div></div>`:""}${data.codigo?`<div class="data-box"><img src="icons/icon_checklist.png" class="etnika-icon" alt=""><div><div class="data-label">Cotización</div><div class="data-value">${data.codigo}</div></div></div>`:""}${data.vendedora?`<div class="data-box"><img src="icons/icon_agente.png" class="etnika-icon" alt=""><div><div class="data-label">Agente</div><div class="data-value">${data.vendedora}</div></div></div>`:""}</div><div class="destination-box"><div class="destination-title">${data.destino||"Cotización de viaje"}</div>${data.fechaViaje?`<div class="destination-date"><img src="icons/icon_calendario.png" alt="">${data.fechaViaje}</div>`:""}</div></section>${renderIncluye(data)}${data.modo==="completo"?renderTramos(data):((data.tipoSimple||"paquete")!=="solo_hotel"?renderVuelos(data):"")}${data.modo==="simple"&&((data.tipoSimple||"paquete")!=="solo_vuelos")?renderHoteles(data):""}${data.formaPago?`<section class="card"><h2 class="section-title">Forma de pago</h2><div class="info-section">${escapeLineas(data.formaPago)}</div></section>`:""}${data.mostrarObservaciones&&data.observaciones?`<section class="card"><h2 class="section-title">Observaciones</h2><div class="info-section">${escapeLineas(data.observaciones)}</div></section>`:""}<section class="card footer"><h3>ETNIKA TRAVEL S.R.L.</h3><p>Legajo EVT Nº 18418 | CUIT 30-71775467-7</p><p><a href="https://maps.app.goo.gl/QGwE9kNAV4aiuszz9" target="_blank">📍 Ver oficina en Google Maps</a></p><p>🕒 Lunes a Viernes de 10:00 a 18:00 hs</p><p><a href="https://etnikatravel.tur.ar" target="_blank">🌐 etnikatravel.tur.ar</a> | <a href="https://instagram.com/etnikatravel" target="_blank">📸 @etnikatravel</a></p><p><a href="https://etnikatravel.tur.ar/general-conditions" target="_blank">Condiciones generales de contratación</a></p>${data.whatsapp?`<p><a class="btn btn-option" href="https://wa.me/${String(data.whatsapp).replace(/\D/g,"")}" target="_blank">📲 Contactar por WhatsApp</a></p>`:""}<div class="legal">Tarifas sujetas a disponibilidad y modificación sin previo aviso hasta el momento de la reserva y emisión.${data.validez?`<div class="validez">Validez de la cotización: ${data.validez}</div>`:""}</div></section>`;}
 async function cargar(){const params=new URLSearchParams(window.location.search);const codigo=params.get("id");if(!codigo){document.getElementById("cotizacion").innerHTML='<div class="card"><h2 class="section-title">No se indicó una cotización.</h2></div>';return;}const {data,error}=await supabaseClient.from("cotizaciones").select("*").eq("codigo",codigo).single();if(error||!data){document.getElementById("cotizacion").innerHTML='<div class="card"><h2 class="section-title">No encontramos esta cotización.</h2></div>';console.error(error);return;}const datos=JSON.parse(data.datos_json);document.getElementById("cotizacion").innerHTML=renderCotizacion(datos);}
