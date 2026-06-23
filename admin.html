@@ -123,7 +123,7 @@ textarea{min-height:92px;resize:vertical;}
   box-shadow:0 8px 20px rgba(119,0,224,.25);
 }
 
-.hotel-box,.tramo-box{
+.hotel-box,.tramo-box,.destino-box{
   border:1px solid var(--borde);
   border-radius:20px;
   padding:20px;
@@ -131,7 +131,7 @@ textarea{min-height:92px;resize:vertical;}
   background:#fbfbff;
 }
 
-.hotel-head,.tramo-head{
+.hotel-head,.tramo-head,.destino-head{
   display:flex;
   justify-content:space-between;
   align-items:center;
@@ -384,11 +384,6 @@ textarea{min-height:92px;resize:vertical;}
           <div class="small-note">Opcional. Si usás captura solamente, podés dejar vacío el detalle de vuelos.</div>
         </div>
       </div>
-
-      <div class="actions" style="margin-top:16px;">
-        <button class="btn btn-soft" type="button" onclick="agregarOpcionVuelo()">+ Agregar otra opción de vuelo</button>
-      </div>
-      <div id="vuelosOpcionesExtra"></div>
     </div>
 
     <div id="hotelesSection" style="margin-top:24px;">
@@ -407,8 +402,10 @@ textarea{min-height:92px;resize:vertical;}
     <h2>Itinerario completo</h2>
     <p class="small-note">Usalo para viajes con muchas ciudades, hoteles, trenes, vuelos internos o servicios por tramo.</p>
     <div class="actions">
-      <button class="btn btn-soft" type="button" onclick="agregarTramo()">+ Agregar tramo</button>
+      <button class="btn btn-soft" type="button" onclick="agregarDestino()">+ Agregar destino</button>
+      <button class="btn btn-soft" type="button" onclick="agregarTramo()">+ Agregar vuelo / tren / auto</button>
     </div>
+    <div id="destinos"></div>
     <div id="tramos"></div>
   </section>
 
@@ -774,77 +771,6 @@ function initPasteVuelo(){
   });
 }
 
-function agregarOpcionVuelo(v = {}){
-  const cont = document.getElementById("vuelosOpcionesExtra");
-  if(!cont) return;
-  const wrap = document.createElement("div");
-  wrap.className = "hotel-box vuelo-opcion";
-  wrap.innerHTML = `
-    <div class="hotel-head">
-      <h3>Opción de vuelo</h3>
-      <button class="btn btn-danger" type="button" onclick="this.closest('.vuelo-opcion').remove()">Eliminar</button>
-    </div>
-    <div class="form-grid">
-      <div>
-        <label>Precio del vuelo</label>
-        <input class="vueloPrecio" placeholder="Ej: USD 1180" value="${v.precioVuelo || v.precio || ""}">
-      </div>
-      <div>
-        <label>Tipo de precio</label>
-        <select class="vueloTipoPrecio">
-          <option value="por persona">Por persona</option>
-          <option value="grupo familiar">Grupo familiar</option>
-          <option value="precio total">Precio total</option>
-        </select>
-      </div>
-      <div class="full">
-        <label>Detalle de vuelos</label>
-        <textarea class="vueloDetalle" placeholder="Pegá acá la segunda opción de vuelos, fechas, escalas, equipaje, etc.">${v.detalleVuelos || v.detalle || ""}</textarea>
-      </div>
-      <div class="full">
-        <label>Captura del vuelo / Amadeus</label>
-        <input type="file" class="vueloCapturaFile" accept="image/*">
-        <div class="paste-zone vueloPasteZone" tabindex="0" style="margin-top:10px;">Hacé click acá y pegá la captura con Ctrl+V</div>
-      </div>
-    </div>
-  `;
-  cont.appendChild(wrap);
-  wrap.querySelector(".vueloTipoPrecio").value = v.tipoPrecioVuelo || v.tipoPrecio || "por persona";
-  if(v.capturaVuelo || v.captura){
-    const zone = wrap.querySelector(".vueloPasteZone");
-    zone.dataset.imagen = v.capturaVuelo || v.captura;
-    zone.textContent = "La cotización ya tiene una captura guardada";
-    zone.classList.add("has-image");
-  }
-  initPasteZones(wrap);
-}
-
-async function leerOpcionesVuelo(capturaPrimera){
-  const opciones = [];
-  const primera = {
-    detalleVuelos: getValue("detalleVuelos"),
-    precioVuelo: getValue("precioVuelo"),
-    tipoPrecioVuelo: getValue("tipoPrecioVuelo"),
-    capturaVuelo: capturaPrimera
-  };
-  if(primera.detalleVuelos || primera.precioVuelo || primera.capturaVuelo) opciones.push(primera);
-
-  for(const box of document.querySelectorAll(".vuelo-opcion")){
-    const fileInput = box.querySelector(".vueloCapturaFile");
-    const file = fileInput && fileInput.files ? fileInput.files[0] : null;
-    const pasteZone = box.querySelector(".vueloPasteZone");
-    const captura = file ? await fileToBase64(file) : ((pasteZone ? pasteZone.dataset.imagen : "") || "");
-    const opcion = {
-      detalleVuelos: box.querySelector(".vueloDetalle").value,
-      precioVuelo: box.querySelector(".vueloPrecio").value,
-      tipoPrecioVuelo: box.querySelector(".vueloTipoPrecio").value,
-      capturaVuelo: captura
-    };
-    if(opcion.detalleVuelos || opcion.precioVuelo || opcion.capturaVuelo) opciones.push(opcion);
-  }
-  return opciones;
-}
-
 
 function agregarHotel(h = {}){
   const wrap = document.createElement("div");
@@ -923,19 +849,68 @@ function agregarHotel(h = {}){
   (h.precios || []).forEach(p => agregarComposicion(wrap.querySelector("button[onclick^='agregarComposicion']"), p));
 }
 
-function agregarTramo(t = {}){
+function agregarDestino(d = {}){
+  const wrap = document.createElement("div");
+  wrap.className = "destino-box";
+  wrap.innerHTML = `
+    <div class="destino-head">
+      <h3>Destino</h3>
+      <button class="btn btn-danger" type="button" onclick="this.closest('.destino-box').remove()">Eliminar destino</button>
+    </div>
+
+    <div class="form-grid">
+      <div>
+        <label>Destino / ciudad</label>
+        <input class="destinoNombre" placeholder="Ej: Milán" value="${d.destino || d.nombre || ''}">
+      </div>
+      <div>
+        <label>Fechas</label>
+        <input class="destinoFechas" placeholder="Ej: 10/09 al 12/09" value="${d.fechas || ''}">
+      </div>
+      <div>
+        <label>Cantidad de noches</label>
+        <input class="destinoNoches" placeholder="Ej: 2 noches" value="${d.noches || ''}">
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-soft" type="button" onclick="agregarTramo({}, this.closest('.destino-box').querySelector('.destinoTramos'), 'Hotel')">+ Agregar hotel en este destino</button>
+    </div>
+    <div class="destinoTramos"></div>
+  `;
+  document.getElementById("destinos").appendChild(wrap);
+  (d.tramos || d.hoteles || []).forEach(t => agregarTramo(t, wrap.querySelector('.destinoTramos'), t.tipo || 'Hotel'));
+}
+
+function actualizarCamposTramo(box){
+  const tipo = box.querySelector('.tramoTipo')?.value || 'Hotel';
+  const esHotel = tipo === 'Hotel';
+  const fechaBox = box.querySelector('.tramoFechas')?.closest('div');
+  const durBox = box.querySelector('.tramoDuracion')?.closest('div');
+  const tituloLabel = box.querySelector('.tramoTituloLabel');
+  const tituloInput = box.querySelector('.tramoTitulo');
+  const durLabel = box.querySelector('.tramoDuracionLabel');
+  if(tituloLabel) tituloLabel.textContent = esHotel ? 'Hotel / alojamiento' : 'Ruta / servicio';
+  if(tituloInput) tituloInput.placeholder = esHotel ? 'Ej: B&B Hotel Milano Duomo' : 'Ej: Tren Milán - Florencia';
+  if(fechaBox) fechaBox.classList.toggle('hidden', esHotel);
+  if(durBox) durBox.classList.toggle('hidden', esHotel);
+  if(durLabel) durLabel.textContent = 'Duración';
+}
+
+function agregarTramo(t = {}, contenedor = null, tipoDefault = null){
   const wrap = document.createElement("div");
   wrap.className = "tramo-box";
+  const tipoInicial = tipoDefault || t.tipo || "Hotel";
   wrap.innerHTML = `
     <div class="tramo-head">
-      <h3>Tramo</h3>
+      <h3>${tipoInicial === 'Hotel' ? 'Opción de hotel' : 'Tramo / servicio'}</h3>
       <button class="btn btn-danger" type="button" onclick="this.closest('.tramo-box').remove()">Eliminar</button>
     </div>
 
     <div class="form-grid">
       <div>
-        <label>Tipo de tramo</label>
-        <select class="tramoTipo">
+        <label>Tipo</label>
+        <select class="tramoTipo" onchange="actualizarCamposTramo(this.closest('.tramo-box'))">
           <option value="Hotel">Hotel</option>
           <option value="Vuelo">Vuelo</option>
           <option value="Tren">Tren</option>
@@ -946,48 +921,43 @@ function agregarTramo(t = {}){
       </div>
 
       <div>
-        <label>Ciudad / destino</label>
-        <input class="tramoCiudad" placeholder="Ej: París" value="${t.ciudad || ""}">
+        <label class="tramoTituloLabel">Hotel / alojamiento</label>
+        <input class="tramoTitulo" placeholder="Ej: B&B Hotel Milano Duomo" value="${t.titulo || ''}">
       </div>
 
       <div>
-        <label>Título / hotel / ruta</label>
-        <input class="tramoTitulo" placeholder="Ej: Hotel en París / Vuelo Bari - Catania" value="${t.titulo || ""}">
+        <label>Fecha</label>
+        <input class="tramoFechas" placeholder="Ej: 12/09" value="${t.fechas || ''}">
       </div>
 
       <div>
-        <label>Fechas</label>
-        <input class="tramoFechas" placeholder="Ej: 04/05 al 08/05" value="${t.fechas || ""}">
-      </div>
-
-      <div>
-        <label>Noches / duración</label>
-        <input class="tramoDuracion" placeholder="Ej: 4 noches / 1h15" value="${t.duracion || ""}">
+        <label class="tramoDuracionLabel">Duración</label>
+        <input class="tramoDuracion" placeholder="Ej: 1h55" value="${t.duracion || ''}">
       </div>
 
       <div class="full">
-        <label>Detalle del tramo</label>
-        <textarea class="tramoDetalle" placeholder="Hotel, habitación, vuelo, tren, auto, traslado, observaciones del servicio, etc.">${t.detalle || t.detalleExtra || ""}</textarea>
+        <label>Detalle / información</label>
+        <textarea class="tramoDetalle" placeholder="Habitación, vuelo, tren, auto, traslado o servicio.">${t.detalle || ''}</textarea>
       </div>
 
       <div>
         <label>Régimen / incluye</label>
-        <input class="tramoRegimen" value="${t.regimen || ""}">
+        <input class="tramoRegimen" value="${t.regimen || ''}">
       </div>
 
       <div>
         <label>Precio</label>
-        <input class="tramoPrecio" value="${t.precio || ""}">
+        <input class="tramoPrecio" value="${t.precio || ''}">
       </div>
 
       <div>
         <label>Link Google / proveedor</label>
-        <input class="tramoLink" value="${t.link || ""}">
+        <input class="tramoLink" value="${t.link || ''}">
       </div>
 
       <div>
         <label>Estado</label>
-        <input class="tramoEstado" value="${t.estado || ""}">
+        <input class="tramoEstado" value="${t.estado || ''}">
       </div>
 
       <div class="full">
@@ -996,18 +966,19 @@ function agregarTramo(t = {}){
         <div class="paste-zone tramoPasteZone" tabindex="0" style="margin-top:10px;">
           Hacé click acá y pegá la captura con Ctrl+V
         </div>
-        <div class="small-note">Opcional. Sirve para vuelos, trenes, autos, traslados o servicios.</div>
+        <div class="small-note">Opcional. Sirve para vuelos, trenes, autos, traslados, servicios u hoteles.</div>
       </div>
     </div>
   `;
-  document.getElementById("tramos").appendChild(wrap);
-  if(t.tipo) wrap.querySelector(".tramoTipo").value = t.tipo;
+  (contenedor || document.getElementById("tramos")).appendChild(wrap);
+  wrap.querySelector(".tramoTipo").value = tipoInicial;
   if(t.imagen){
     const zone = wrap.querySelector(".tramoPasteZone");
     zone.dataset.imagen = t.imagen;
     zone.textContent = "La cotización ya tiene una captura guardada";
     zone.classList.add("has-image");
   }
+  actualizarCamposTramo(wrap);
   initPasteZones(wrap);
 }
 
@@ -1049,22 +1020,16 @@ function renderPreview(data){
     </div>
   `).join("");
 
-  const opcionesVuelo = (data.simple?.opcionesVuelo && data.simple.opcionesVuelo.length) ? data.simple.opcionesVuelo : (data.simple ? [data.simple] : []);
-  const vuelos = opcionesVuelo.map((v,i)=>`
-    <div style="border:1px solid #eee;border-radius:14px;padding:14px;margin:10px 0;">
-      <strong style="color:#7700E0;">Opción de vuelo ${i+1}</strong>
-      ${v.detalleVuelos ? `<p>${escapeLineas(v.detalleVuelos)}</p>` : ""}
-      ${v.capturaVuelo ? `<img src="${v.capturaVuelo}" style="max-width:100%;border-radius:12px;margin-top:10px;">` : ""}
-      ${v.precioVuelo ? `<p><strong style="color:#7700E0;">${v.precioVuelo}</strong> <small>${v.tipoPrecioVuelo || ""}</small></p>` : ""}
-    </div>
-  `).join("");
+  const vuelos = data.simple?.capturaVuelo
+    ? `<img src="${data.simple.capturaVuelo}" style="max-width:100%;border-radius:12px;margin-top:10px;">`
+    : `${data.simple?.detalleVuelos ? `<p>${escapeLineas(data.simple.detalleVuelos)}</p>` : ""}`;
 
   return `
     <h2>${data.destino || "Cotización"}</h2>
     <p><strong>Fecha:</strong> ${data.fechaViaje || ""}</p>
     <p><strong>Cliente:</strong> ${data.cliente || ""}</p>
     <p><strong>Agente:</strong> ${data.vendedora || ""}</p>
-    ${data.modo === "simple" && data.tipoSimple !== "solo_hotel" && vuelos ? `<h3>Vuelos</h3>${vuelos}` : ""}
+    ${data.modo === "simple" && data.tipoSimple !== "solo_hotel" && vuelos ? `<h3>Vuelos</h3>${vuelos}${data.simple?.precioVuelo ? `<p><strong style="color:#7700E0;">${data.simple.precioVuelo}</strong></p>` : ""}` : ""}
     ${data.modo === "simple" && data.tipoSimple !== "solo_vuelos" ? `<h3>Hotelería</h3>${hoteles}${combos}` : ""}
     ${data.comentariosInternos ? `<div style="background:#fff9e8;border:1px solid #f3d47c;border-radius:12px;padding:12px;margin-top:14px;"><strong>Comentarios internos:</strong><br>${escapeLineas(data.comentariosInternos)}</div>` : ""}
   `;
@@ -1072,8 +1037,6 @@ function renderPreview(data){
 
 async function construirData(){
   const capturaVueloNueva = await getFileBase64("capturaVuelo");
-  const capturaPrimera = capturaVueloNueva || capturaVueloPegada || (ultimaData?.simple?.capturaVuelo || ultimaData?.simple?.opcionesVuelo?.[0]?.capturaVuelo || "");
-  const opcionesVuelo = await leerOpcionesVuelo(capturaPrimera);
 
   const hoteles = [...document.querySelectorAll(".hotel-box")].map(box=>({
     nombre: box.querySelector(".hotelNombre").value,
@@ -1104,29 +1067,44 @@ async function construirData(){
     }))
   }));
 
-  const tramos = [];
-  for(const box of document.querySelectorAll(".tramo-box")){
+  async function leerTramoBox(box){
     let imagen = "";
     const fileInput = box.querySelector(".tramoImagenFile");
     const file = fileInput && fileInput.files ? fileInput.files[0] : null;
     if(file) imagen = await fileToBase64(file);
-
     const pasteZone = box.querySelector(".tramoPasteZone");
-
-    tramos.push({
-      tipo: box.querySelector(".tramoTipo").value,
-      ciudad: box.querySelector(".tramoCiudad") ? box.querySelector(".tramoCiudad").value : "",
-      titulo: box.querySelector(".tramoTitulo").value,
-      fechas: box.querySelector(".tramoFechas").value,
-      duracion: box.querySelector(".tramoDuracion").value,
-      detalle: box.querySelector(".tramoDetalle").value,
+    return {
+      tipo: box.querySelector(".tramoTipo")?.value || "Hotel",
+      titulo: box.querySelector(".tramoTitulo")?.value || "",
+      fechas: box.querySelector(".tramoFechas")?.value || "",
+      duracion: box.querySelector(".tramoDuracion")?.value || "",
+      detalle: box.querySelector(".tramoDetalle")?.value || "",
       detalleExtra: "",
-      regimen: box.querySelector(".tramoRegimen").value,
-      precio: box.querySelector(".tramoPrecio").value,
-      link: box.querySelector(".tramoLink").value,
-      estado: box.querySelector(".tramoEstado").value,
+      regimen: box.querySelector(".tramoRegimen")?.value || "",
+      precio: box.querySelector(".tramoPrecio")?.value || "",
+      link: box.querySelector(".tramoLink")?.value || "",
+      estado: box.querySelector(".tramoEstado")?.value || "",
       imagen: imagen || (pasteZone ? pasteZone.dataset.imagen : "") || box.dataset.imagen || ""
+    };
+  }
+
+  const destinos = [];
+  for(const dest of document.querySelectorAll(".destino-box")){
+    const tramosDestino = [];
+    for(const box of dest.querySelectorAll(".destinoTramos > .tramo-box")){
+      tramosDestino.push(await leerTramoBox(box));
+    }
+    destinos.push({
+      destino: dest.querySelector(".destinoNombre")?.value || "",
+      fechas: dest.querySelector(".destinoFechas")?.value || "",
+      noches: dest.querySelector(".destinoNoches")?.value || "",
+      tramos: tramosDestino
     });
+  }
+
+  const tramos = [];
+  for(const box of document.querySelectorAll("#tramos > .tramo-box")){
+    tramos.push(await leerTramoBox(box));
   }
 
   const data = {
@@ -1150,11 +1128,11 @@ async function construirData(){
       detalleVuelos: getValue("detalleVuelos"),
       precioVuelo: getValue("precioVuelo"),
       tipoPrecioVuelo: getValue("tipoPrecioVuelo"),
-      capturaVuelo: capturaPrimera,
-      opcionesVuelo
+      capturaVuelo: capturaVueloNueva || capturaVueloPegada || (ultimaData?.simple?.capturaVuelo || "")
     },
     hoteles,
     combos,
+    destinos,
     tramos
   };
 
@@ -1283,18 +1261,12 @@ function renderPDFCotizacion(data){
   const mostrarHoteles = data.modo === "simple" && tipoSimple !== "solo_vuelos";
 
   const s = data.simple || {};
-  const opcionesVueloPDF = (s.opcionesVuelo && s.opcionesVuelo.length) ? s.opcionesVuelo : ((s.detalleVuelos || s.capturaVuelo || s.precioVuelo) ? [s] : []);
-  const vuelosHTML = (mostrarVuelos && opcionesVueloPDF.length) ? `
+  const vuelosHTML = (mostrarVuelos && (s.detalleVuelos || s.capturaVuelo || s.precioVuelo)) ? `
     <section class="card">
       <h2>Vuelos</h2>
-      ${opcionesVueloPDF.map((v,i)=>`
-        <div class="hotel-card full-layout">
-          <div class="hotel-name">Opción de vuelo ${i+1}</div>
-          ${v.detalleVuelos ? `<div class="flight-box">${brPDF(v.detalleVuelos)}</div>` : ""}
-          ${v.capturaVuelo ? `<img class="capture-img" src="${v.capturaVuelo}">` : ""}
-          ${v.precioVuelo ? `<div class="single-price left"><div>${safePDF(v.precioVuelo)}</div><span>${safePDF(v.tipoPrecioVuelo || "")}</span></div>` : ""}
-        </div>
-      `).join("")}
+      ${s.detalleVuelos ? `<div class="flight-box">${brPDF(s.detalleVuelos)}</div>` : ""}
+      ${s.capturaVuelo ? `<img class="capture-img" src="${s.capturaVuelo}">` : ""}
+      ${s.precioVuelo ? `<div class="single-price left"><div>${safePDF(s.precioVuelo)}</div><span>${safePDF(s.tipoPrecioVuelo || "")}</span></div>` : ""}
     </section>` : "";
 
   const hotelesHTML = (data.hoteles || []).map(h=>{
@@ -1337,21 +1309,35 @@ function renderPDFCotizacion(data){
 
   const hoteleriaHTML = (mostrarHoteles && (hotelesHTML || combosHTML)) ? `<section class="card"><h2>Opciones de alojamiento</h2><div class="hotel-list">${hotelesHTML}${combosHTML}</div></section>` : "";
 
-  const tramosHTML = (data.modo === "completo" && (data.tramos || []).length) ? `
-    <section class="card"><h2>Itinerario y servicios</h2>
-      ${(data.tramos || []).map(t=>`
-        <div class="hotel-card">
-          ${t.ciudad ? `<div class="combo-destination">${safePDF(t.ciudad)}</div>` : ""}
-          <div class="hotel-name">${safePDF(t.tipo || "Tramo")}: ${safePDF(t.titulo || "")}</div>
-          ${t.fechas ? `<div class="hotel-detail"><strong>Fechas:</strong> ${safePDF(t.fechas)}</div>` : ""}
-          ${t.duracion ? `<div class="hotel-detail"><strong>Duración / noches:</strong> ${safePDF(t.duracion)}</div>` : ""}
+  function renderTramoPDF(t){
+    const tipo = t.tipo || "Tramo";
+    const esHotel = tipo === "Hotel";
+    return `<div class="hotel-card">
+          <div class="hotel-name">${safePDF(esHotel ? (t.titulo || "Hotel") : (tipo + ": " + (t.titulo || "")))}</div>
+          ${(!esHotel && t.fechas) ? `<div class="hotel-detail"><strong>Fecha:</strong> ${safePDF(t.fechas)}</div>` : ""}
+          ${(!esHotel && t.duracion) ? `<div class="hotel-detail"><strong>Duración:</strong> ${safePDF(t.duracion)}</div>` : ""}
           ${t.detalle ? `<div class="hotel-detail">${brPDF(t.detalle)}</div>` : ""}
           ${t.detalleExtra ? `<div class="flight-box">${brPDF(t.detalleExtra)}</div>` : ""}
           ${t.regimen ? `<div class="hotel-detail"><strong>Incluye / empresa:</strong> ${safePDF(t.regimen)}</div>` : ""}
           ${t.estado ? `<div class="hotel-detail"><strong>Estado:</strong> ${safePDF(t.estado)}</div>` : ""}
           ${t.precio ? `<div class="single-price left"><div>${safePDF(t.precio)}</div></div>` : ""}
           ${t.imagen ? `<img class="capture-img" src="${t.imagen}">` : ""}
-        </div>`).join("")}
+        </div>`;
+  }
+
+  const destinosHTML = (data.destinos || []).map(d=>`
+    <div class="destination-group">
+      <div class="combo-destination" style="background:#f5f0ff;border-radius:8px;padding:7px 9px;color:#7700E0;">
+        ${safePDF(d.fechas || "")} ${safePDF(d.destino || "")} ${d.noches ? " - " + safePDF(d.noches) : ""}
+      </div>
+      ${(d.tramos || []).map(renderTramoPDF).join("")}
+    </div>`).join("");
+
+  const sueltosHTML = (data.tramos || []).map(renderTramoPDF).join("");
+
+  const tramosHTML = (data.modo === "completo" && (destinosHTML || sueltosHTML)) ? `
+    <section class="card"><h2>Itinerario y servicios</h2>
+      ${destinosHTML}${sueltosHTML}
     </section>` : "";
 
   return `<!DOCTYPE html>
@@ -1457,20 +1443,14 @@ async function cargarCotizacion(codigo, duplicando=false){
   document.getElementById("mostrarObservaciones").checked = d.mostrarObservaciones !== false;
 
   if(d.simple){
-    const opciones = d.simple.opcionesVuelo && d.simple.opcionesVuelo.length ? d.simple.opcionesVuelo : [d.simple];
-    const primera = opciones[0] || d.simple;
     setValue("modoVuelo", d.simple.modoVuelo || "texto");
-    setValue("detalleVuelos", primera.detalleVuelos || d.simple.detalleVuelos || d.simple.vueloIda || "");
-    setValue("precioVuelo", primera.precioVuelo || d.simple.precioVuelo);
-    setValue("tipoPrecioVuelo", primera.tipoPrecioVuelo || d.simple.tipoPrecioVuelo || "por persona");
-    if((primera.capturaVuelo || d.simple.capturaVuelo) && document.getElementById("pasteVuelo")){
-      document.getElementById("pasteVuelo").dataset.imagen = primera.capturaVuelo || d.simple.capturaVuelo;
+    setValue("detalleVuelos", d.simple.detalleVuelos || d.simple.vueloIda || "");
+    setValue("precioVuelo", d.simple.precioVuelo);
+    setValue("tipoPrecioVuelo", d.simple.tipoPrecioVuelo || "por persona");
+    if(d.simple.capturaVuelo && document.getElementById("pasteVuelo")){
       document.getElementById("pasteVuelo").textContent = "La cotización ya tiene una captura guardada";
       document.getElementById("pasteVuelo").classList.add("has-image");
     }
-    const extra = document.getElementById("vuelosOpcionesExtra");
-    if(extra) extra.innerHTML = "";
-    opciones.slice(1).forEach(agregarOpcionVuelo);
   }
 
   document.getElementById("hoteles").innerHTML = "";
@@ -1480,8 +1460,14 @@ async function cargarCotizacion(codigo, duplicando=false){
   document.getElementById("combos").innerHTML = "";
   (d.combos || []).forEach(agregarCombo);
 
+  document.getElementById("destinos").innerHTML = "";
   document.getElementById("tramos").innerHTML = "";
-  (d.tramos || []).forEach(agregarTramo);
+  if((d.destinos || []).length){
+    (d.destinos || []).forEach(agregarDestino);
+    (d.tramos || []).forEach(t => agregarTramo(t));
+  }else{
+    (d.tramos || []).forEach(agregarTramo);
+  }
 
   if(duplicando){
     editCodigo = null;
