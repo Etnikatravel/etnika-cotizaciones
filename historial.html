@@ -214,14 +214,36 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let cotizaciones = [];
 
 async function cargarCotizaciones(){
-  const { data, error } = await supabaseClient
+  const resultado = document.getElementById("resultado");
+  resultado.innerHTML = '<div class="empty">Cargando cotizaciones...</div>';
+
+  let data = null;
+  let error = null;
+
+  // Consulta principal: ordena por fecha de creación para evitar errores si cambia el id interno.
+  const consultaPrincipal = await supabaseClient
     .from("cotizaciones")
-    .select("*")
-    .order("id", { ascending:false });
+    .select("codigo, cliente, destino, vendedora, fecha_viaje, created_at, datos_json")
+    .order("created_at", { ascending:false });
+
+  data = consultaPrincipal.data;
+  error = consultaPrincipal.error;
+
+  // Respaldo: si alguna columna no existe en una versión anterior de la tabla, intenta traer todo.
+  if(error){
+    console.warn("Consulta principal historial falló, intentando respaldo:", error);
+    const consultaRespaldo = await supabaseClient
+      .from("cotizaciones")
+      .select("*")
+      .order("created_at", { ascending:false });
+
+    data = consultaRespaldo.data;
+    error = consultaRespaldo.error;
+  }
 
   if(error){
-    document.getElementById("resultado").innerHTML = '<div class="empty">No se pudieron cargar las cotizaciones.</div>';
-    console.error(error);
+    resultado.innerHTML = '<div class="empty">No se pudieron cargar las cotizaciones.<br><small>' + (error.message || "Revisar conexión o permisos de Supabase") + '</small></div>';
+    console.error("Error historial:", error);
     return;
   }
 
