@@ -384,6 +384,11 @@ textarea{min-height:92px;resize:vertical;}
           <div class="small-note">Opcional. Si usás captura solamente, podés dejar vacío el detalle de vuelos.</div>
         </div>
       </div>
+
+      <div class="actions" style="margin-top:16px;">
+        <button class="btn btn-soft" type="button" onclick="agregarOpcionVuelo()">+ Agregar otra opción de vuelo</button>
+      </div>
+      <div id="vuelosOpcionesExtra"></div>
     </div>
 
     <div id="hotelesSection" style="margin-top:24px;">
@@ -769,6 +774,77 @@ function initPasteVuelo(){
   });
 }
 
+function agregarOpcionVuelo(v = {}){
+  const cont = document.getElementById("vuelosOpcionesExtra");
+  if(!cont) return;
+  const wrap = document.createElement("div");
+  wrap.className = "hotel-box vuelo-opcion";
+  wrap.innerHTML = `
+    <div class="hotel-head">
+      <h3>Opción de vuelo</h3>
+      <button class="btn btn-danger" type="button" onclick="this.closest('.vuelo-opcion').remove()">Eliminar</button>
+    </div>
+    <div class="form-grid">
+      <div>
+        <label>Precio del vuelo</label>
+        <input class="vueloPrecio" placeholder="Ej: USD 1180" value="${v.precioVuelo || v.precio || ""}">
+      </div>
+      <div>
+        <label>Tipo de precio</label>
+        <select class="vueloTipoPrecio">
+          <option value="por persona">Por persona</option>
+          <option value="grupo familiar">Grupo familiar</option>
+          <option value="precio total">Precio total</option>
+        </select>
+      </div>
+      <div class="full">
+        <label>Detalle de vuelos</label>
+        <textarea class="vueloDetalle" placeholder="Pegá acá la segunda opción de vuelos, fechas, escalas, equipaje, etc.">${v.detalleVuelos || v.detalle || ""}</textarea>
+      </div>
+      <div class="full">
+        <label>Captura del vuelo / Amadeus</label>
+        <input type="file" class="vueloCapturaFile" accept="image/*">
+        <div class="paste-zone vueloPasteZone" tabindex="0" style="margin-top:10px;">Hacé click acá y pegá la captura con Ctrl+V</div>
+      </div>
+    </div>
+  `;
+  cont.appendChild(wrap);
+  wrap.querySelector(".vueloTipoPrecio").value = v.tipoPrecioVuelo || v.tipoPrecio || "por persona";
+  if(v.capturaVuelo || v.captura){
+    const zone = wrap.querySelector(".vueloPasteZone");
+    zone.dataset.imagen = v.capturaVuelo || v.captura;
+    zone.textContent = "La cotización ya tiene una captura guardada";
+    zone.classList.add("has-image");
+  }
+  initPasteZones(wrap);
+}
+
+async function leerOpcionesVuelo(capturaPrimera){
+  const opciones = [];
+  const primera = {
+    detalleVuelos: getValue("detalleVuelos"),
+    precioVuelo: getValue("precioVuelo"),
+    tipoPrecioVuelo: getValue("tipoPrecioVuelo"),
+    capturaVuelo: capturaPrimera
+  };
+  if(primera.detalleVuelos || primera.precioVuelo || primera.capturaVuelo) opciones.push(primera);
+
+  for(const box of document.querySelectorAll(".vuelo-opcion")){
+    const fileInput = box.querySelector(".vueloCapturaFile");
+    const file = fileInput && fileInput.files ? fileInput.files[0] : null;
+    const pasteZone = box.querySelector(".vueloPasteZone");
+    const captura = file ? await fileToBase64(file) : ((pasteZone ? pasteZone.dataset.imagen : "") || "");
+    const opcion = {
+      detalleVuelos: box.querySelector(".vueloDetalle").value,
+      precioVuelo: box.querySelector(".vueloPrecio").value,
+      tipoPrecioVuelo: box.querySelector(".vueloTipoPrecio").value,
+      capturaVuelo: captura
+    };
+    if(opcion.detalleVuelos || opcion.precioVuelo || opcion.capturaVuelo) opciones.push(opcion);
+  }
+  return opciones;
+}
+
 
 function agregarHotel(h = {}){
   const wrap = document.createElement("div");
@@ -870,8 +946,13 @@ function agregarTramo(t = {}){
       </div>
 
       <div>
-        <label>Título / ciudad / ruta</label>
-        <input class="tramoTitulo" placeholder="Ej: París / Vuelo Bari - Catania" value="${t.titulo || ""}">
+        <label>Ciudad / destino</label>
+        <input class="tramoCiudad" placeholder="Ej: París" value="${t.ciudad || ""}">
+      </div>
+
+      <div>
+        <label>Título / hotel / ruta</label>
+        <input class="tramoTitulo" placeholder="Ej: Hotel en París / Vuelo Bari - Catania" value="${t.titulo || ""}">
       </div>
 
       <div>
@@ -885,8 +966,8 @@ function agregarTramo(t = {}){
       </div>
 
       <div class="full">
-        <label>Detalle principal</label>
-        <textarea class="tramoDetalle" placeholder="Hotel, habitación, vuelo, tren, auto, etc.">${t.detalle || ""}</textarea>
+        <label>Detalle del tramo</label>
+        <textarea class="tramoDetalle" placeholder="Hotel, habitación, vuelo, tren, auto, traslado, observaciones del servicio, etc.">${t.detalle || t.detalleExtra || ""}</textarea>
       </div>
 
       <div>
@@ -910,22 +991,12 @@ function agregarTramo(t = {}){
       </div>
 
       <div class="full">
-        <label>Detalle escrito / información del tramo</label>
-        <textarea class="tramoDetalleExtra" placeholder="Opcional: pegá acá el detalle completo del vuelo, tren, auto, traslado o servicio.">${t.detalleExtra || ""}</textarea>
-      </div>
-
-      <div class="full">
         <label>Captura del tramo</label>
         <input type="file" class="tramoImagenFile" accept="image/*">
         <div class="paste-zone tramoPasteZone" tabindex="0" style="margin-top:10px;">
           Hacé click acá y pegá la captura con Ctrl+V
         </div>
         <div class="small-note">Opcional. Sirve para vuelos, trenes, autos, traslados o servicios.</div>
-      </div>
-
-      <div>
-        <label>Imagen / captura opcional</label>
-        <input type="file" class="tramoImagenFile" accept="image/*">
       </div>
     </div>
   `;
@@ -978,16 +1049,22 @@ function renderPreview(data){
     </div>
   `).join("");
 
-  const vuelos = data.simple?.capturaVuelo
-    ? `<img src="${data.simple.capturaVuelo}" style="max-width:100%;border-radius:12px;margin-top:10px;">`
-    : `${data.simple?.detalleVuelos ? `<p>${escapeLineas(data.simple.detalleVuelos)}</p>` : ""}`;
+  const opcionesVuelo = (data.simple?.opcionesVuelo && data.simple.opcionesVuelo.length) ? data.simple.opcionesVuelo : (data.simple ? [data.simple] : []);
+  const vuelos = opcionesVuelo.map((v,i)=>`
+    <div style="border:1px solid #eee;border-radius:14px;padding:14px;margin:10px 0;">
+      <strong style="color:#7700E0;">Opción de vuelo ${i+1}</strong>
+      ${v.detalleVuelos ? `<p>${escapeLineas(v.detalleVuelos)}</p>` : ""}
+      ${v.capturaVuelo ? `<img src="${v.capturaVuelo}" style="max-width:100%;border-radius:12px;margin-top:10px;">` : ""}
+      ${v.precioVuelo ? `<p><strong style="color:#7700E0;">${v.precioVuelo}</strong> <small>${v.tipoPrecioVuelo || ""}</small></p>` : ""}
+    </div>
+  `).join("");
 
   return `
     <h2>${data.destino || "Cotización"}</h2>
     <p><strong>Fecha:</strong> ${data.fechaViaje || ""}</p>
     <p><strong>Cliente:</strong> ${data.cliente || ""}</p>
     <p><strong>Agente:</strong> ${data.vendedora || ""}</p>
-    ${data.modo === "simple" && data.tipoSimple !== "solo_hotel" && vuelos ? `<h3>Vuelos</h3>${vuelos}${data.simple?.precioVuelo ? `<p><strong style="color:#7700E0;">${data.simple.precioVuelo}</strong></p>` : ""}` : ""}
+    ${data.modo === "simple" && data.tipoSimple !== "solo_hotel" && vuelos ? `<h3>Vuelos</h3>${vuelos}` : ""}
     ${data.modo === "simple" && data.tipoSimple !== "solo_vuelos" ? `<h3>Hotelería</h3>${hoteles}${combos}` : ""}
     ${data.comentariosInternos ? `<div style="background:#fff9e8;border:1px solid #f3d47c;border-radius:12px;padding:12px;margin-top:14px;"><strong>Comentarios internos:</strong><br>${escapeLineas(data.comentariosInternos)}</div>` : ""}
   `;
@@ -995,6 +1072,8 @@ function renderPreview(data){
 
 async function construirData(){
   const capturaVueloNueva = await getFileBase64("capturaVuelo");
+  const capturaPrimera = capturaVueloNueva || capturaVueloPegada || (ultimaData?.simple?.capturaVuelo || ultimaData?.simple?.opcionesVuelo?.[0]?.capturaVuelo || "");
+  const opcionesVuelo = await leerOpcionesVuelo(capturaPrimera);
 
   const hoteles = [...document.querySelectorAll(".hotel-box")].map(box=>({
     nombre: box.querySelector(".hotelNombre").value,
@@ -1036,11 +1115,12 @@ async function construirData(){
 
     tramos.push({
       tipo: box.querySelector(".tramoTipo").value,
+      ciudad: box.querySelector(".tramoCiudad") ? box.querySelector(".tramoCiudad").value : "",
       titulo: box.querySelector(".tramoTitulo").value,
       fechas: box.querySelector(".tramoFechas").value,
       duracion: box.querySelector(".tramoDuracion").value,
       detalle: box.querySelector(".tramoDetalle").value,
-      detalleExtra: box.querySelector(".tramoDetalleExtra") ? box.querySelector(".tramoDetalleExtra").value : "",
+      detalleExtra: "",
       regimen: box.querySelector(".tramoRegimen").value,
       precio: box.querySelector(".tramoPrecio").value,
       link: box.querySelector(".tramoLink").value,
@@ -1070,7 +1150,8 @@ async function construirData(){
       detalleVuelos: getValue("detalleVuelos"),
       precioVuelo: getValue("precioVuelo"),
       tipoPrecioVuelo: getValue("tipoPrecioVuelo"),
-      capturaVuelo: capturaVueloNueva || capturaVueloPegada || (ultimaData?.simple?.capturaVuelo || "")
+      capturaVuelo: capturaPrimera,
+      opcionesVuelo
     },
     hoteles,
     combos,
@@ -1202,12 +1283,18 @@ function renderPDFCotizacion(data){
   const mostrarHoteles = data.modo === "simple" && tipoSimple !== "solo_vuelos";
 
   const s = data.simple || {};
-  const vuelosHTML = (mostrarVuelos && (s.detalleVuelos || s.capturaVuelo || s.precioVuelo)) ? `
+  const opcionesVueloPDF = (s.opcionesVuelo && s.opcionesVuelo.length) ? s.opcionesVuelo : ((s.detalleVuelos || s.capturaVuelo || s.precioVuelo) ? [s] : []);
+  const vuelosHTML = (mostrarVuelos && opcionesVueloPDF.length) ? `
     <section class="card">
       <h2>Vuelos</h2>
-      ${s.detalleVuelos ? `<div class="flight-box">${brPDF(s.detalleVuelos)}</div>` : ""}
-      ${s.capturaVuelo ? `<img class="capture-img" src="${s.capturaVuelo}">` : ""}
-      ${s.precioVuelo ? `<div class="single-price left"><div>${safePDF(s.precioVuelo)}</div><span>${safePDF(s.tipoPrecioVuelo || "")}</span></div>` : ""}
+      ${opcionesVueloPDF.map((v,i)=>`
+        <div class="hotel-card full-layout">
+          <div class="hotel-name">Opción de vuelo ${i+1}</div>
+          ${v.detalleVuelos ? `<div class="flight-box">${brPDF(v.detalleVuelos)}</div>` : ""}
+          ${v.capturaVuelo ? `<img class="capture-img" src="${v.capturaVuelo}">` : ""}
+          ${v.precioVuelo ? `<div class="single-price left"><div>${safePDF(v.precioVuelo)}</div><span>${safePDF(v.tipoPrecioVuelo || "")}</span></div>` : ""}
+        </div>
+      `).join("")}
     </section>` : "";
 
   const hotelesHTML = (data.hoteles || []).map(h=>{
@@ -1254,6 +1341,7 @@ function renderPDFCotizacion(data){
     <section class="card"><h2>Itinerario y servicios</h2>
       ${(data.tramos || []).map(t=>`
         <div class="hotel-card">
+          ${t.ciudad ? `<div class="combo-destination">${safePDF(t.ciudad)}</div>` : ""}
           <div class="hotel-name">${safePDF(t.tipo || "Tramo")}: ${safePDF(t.titulo || "")}</div>
           ${t.fechas ? `<div class="hotel-detail"><strong>Fechas:</strong> ${safePDF(t.fechas)}</div>` : ""}
           ${t.duracion ? `<div class="hotel-detail"><strong>Duración / noches:</strong> ${safePDF(t.duracion)}</div>` : ""}
@@ -1369,14 +1457,20 @@ async function cargarCotizacion(codigo, duplicando=false){
   document.getElementById("mostrarObservaciones").checked = d.mostrarObservaciones !== false;
 
   if(d.simple){
+    const opciones = d.simple.opcionesVuelo && d.simple.opcionesVuelo.length ? d.simple.opcionesVuelo : [d.simple];
+    const primera = opciones[0] || d.simple;
     setValue("modoVuelo", d.simple.modoVuelo || "texto");
-    setValue("detalleVuelos", d.simple.detalleVuelos || d.simple.vueloIda || "");
-    setValue("precioVuelo", d.simple.precioVuelo);
-    setValue("tipoPrecioVuelo", d.simple.tipoPrecioVuelo || "por persona");
-    if(d.simple.capturaVuelo && document.getElementById("pasteVuelo")){
+    setValue("detalleVuelos", primera.detalleVuelos || d.simple.detalleVuelos || d.simple.vueloIda || "");
+    setValue("precioVuelo", primera.precioVuelo || d.simple.precioVuelo);
+    setValue("tipoPrecioVuelo", primera.tipoPrecioVuelo || d.simple.tipoPrecioVuelo || "por persona");
+    if((primera.capturaVuelo || d.simple.capturaVuelo) && document.getElementById("pasteVuelo")){
+      document.getElementById("pasteVuelo").dataset.imagen = primera.capturaVuelo || d.simple.capturaVuelo;
       document.getElementById("pasteVuelo").textContent = "La cotización ya tiene una captura guardada";
       document.getElementById("pasteVuelo").classList.add("has-image");
     }
+    const extra = document.getElementById("vuelosOpcionesExtra");
+    if(extra) extra.innerHTML = "";
+    opciones.slice(1).forEach(agregarOpcionVuelo);
   }
 
   document.getElementById("hoteles").innerHTML = "";
