@@ -894,6 +894,7 @@ function actualizarCamposTramo(box){
   if(tituloInput) tituloInput.placeholder = esHotel ? 'Ej: B&B Hotel Milano Duomo' : 'Ej: Tren Milán - Florencia';
   if(fechaBox) fechaBox.classList.toggle('hidden', esHotel);
   if(durBox) durBox.classList.toggle('hidden', esHotel);
+  box.querySelectorAll('.campoHotelOnly').forEach(el => el.classList.toggle('hidden', !esHotel));
   if(durLabel) durLabel.textContent = 'Duración';
 }
 
@@ -940,7 +941,7 @@ function agregarTramo(t = {}, contenedor = null, tipoDefault = null){
         <textarea class="tramoDetalle" placeholder="Habitación, vuelo, tren, auto, traslado o servicio.">${t.detalle || ''}</textarea>
       </div>
 
-      <div>
+      <div class="campoHotelOnly">
         <label>Régimen / incluye</label>
         <input class="tramoRegimen" value="${t.regimen || ''}">
       </div>
@@ -950,12 +951,12 @@ function agregarTramo(t = {}, contenedor = null, tipoDefault = null){
         <input class="tramoPrecio" value="${t.precio || ''}">
       </div>
 
-      <div>
+      <div class="campoHotelOnly">
         <label>Link Google / proveedor</label>
         <input class="tramoLink" value="${t.link || ''}">
       </div>
 
-      <div>
+      <div class="campoHotelOnly">
         <label>Estado</label>
         <input class="tramoEstado" value="${t.estado || ''}">
       </div>
