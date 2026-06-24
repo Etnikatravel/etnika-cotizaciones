@@ -216,8 +216,9 @@ let cotizaciones = [];
 async function cargarCotizaciones(){
   const { data, error } = await supabaseClient
     .from("cotizaciones")
-    .select("*")
-    .order("id", { ascending:false });
+    .select("codigo, cliente, destino, vendedora, fecha_viaje, created_at")
+    .order("created_at", { ascending:false })
+    .limit(100);
 
   if(error){
     document.getElementById("resultado").innerHTML = '<div class="empty">No se pudieron cargar las cotizaciones.</div>';
