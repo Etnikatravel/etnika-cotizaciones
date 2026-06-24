@@ -246,6 +246,67 @@ a{color:var(--violeta);font-weight:800;}
 .price-amount{overflow-wrap:anywhere;word-break:normal;white-space:normal;}
 .flights-grid .preview-img{max-width:min(100%,760px);}
 @media print{.preview-img{max-width:100% !important;max-height:620px !important;}}
+
+
+/* PATCH ETNIKA v10: iconos superiores, capturas y precios largos */
+.data-box .etnika-icon{
+  width:42px;
+  height:42px;
+  min-width:42px;
+  object-fit:contain;
+  display:block;
+}
+.destination-date img{
+  width:32px;
+  height:32px;
+  object-fit:contain;
+  vertical-align:middle;
+  margin-right:8px;
+}
+.includes-grid{
+  justify-content:center !important;
+  align-items:stretch;
+}
+.preview-img{
+  display:block !important;
+  width:auto !important;
+  max-width:min(100%, 920px) !important;
+  height:auto !important;
+  max-height:720px !important;
+  object-fit:contain !important;
+  margin:18px auto 0 !important;
+}
+.hotel-row{
+  grid-template-columns:minmax(0,1fr) minmax(220px,320px) !important;
+}
+.hotel-price{
+  width:100% !important;
+  max-width:320px !important;
+  min-width:0 !important;
+  justify-self:end;
+  overflow:hidden;
+}
+.hotel-price-value{
+  display:block;
+  width:100%;
+  max-width:100%;
+  box-sizing:border-box;
+  font-size:clamp(20px, 1.9vw, 32px) !important;
+  line-height:1.08 !important;
+  white-space:normal !important;
+  overflow-wrap:anywhere !important;
+  word-break:break-word !important;
+  hyphens:auto;
+  text-align:center !important;
+}
+.hotel-actions{width:100%;}
+.hotel-actions .btn{width:100%;max-width:100%;}
+@media(max-width:900px){
+  .hotel-row{grid-template-columns:1fr !important;}
+  .hotel-price{justify-self:center;max-width:420px !important;}
+  .hotel-price-value{font-size:clamp(22px,6vw,32px) !important;}
+}
+
 </style>
 </head>
 <body>
@@ -472,7 +533,7 @@ function renderTramos(data){
   const sueltosHtml=tramos.map(renderTramoCard).join("");
   return `<section class="card"><h2 class="section-title">Itinerario y servicios</h2><div class="hotel-list">${destinosHtml}${sueltosHtml}</div></section>`;
 }
-function renderCotizacion(data){return `<section class="card"><h2 class="section-title">Datos de la cotización</h2><div class="data-grid">${data.cliente?`<div class="data-box"><img src="icons/icon_persona.png" class="etnika-icon" alt=""><div><div class="data-label">Cliente</div><div class="data-value">${data.cliente}</div></div></div>`:""}${data.pasajeros?`<div class="data-box"><img src="icons/icon_pasajeros.png" class="etnika-icon" alt=""><div><div class="data-label">Pasajeros</div><div class="data-value">${data.pasajeros}</div></div></div>`:""}${data.fechaCotizacion?`<div class="data-box"><img src="icons/icon_calendario.png" class="etnika-icon" alt=""><div><div class="data-label">Fecha de cotización</div><div class="data-value">${data.fechaCotizacion}</div></div></div>`:""}${data.codigo?`<div class="data-box"><img src="icons/icon_checklist.png" class="etnika-icon" alt=""><div><div class="data-label">Cotización</div><div class="data-value">${data.codigo}</div></div></div>`:""}${data.vendedora?`<div class="data-box"><img src="icons/icon_agente.png" class="etnika-icon" alt=""><div><div class="data-label">Agente</div><div class="data-value">${data.vendedora}</div></div></div>`:""}</div><div class="destination-box"><div class="destination-title">${data.destino||"Cotización de viaje"}</div>${data.fechaViaje?`<div class="destination-date"><img src="icons/icon_calendario.png" alt="">${data.fechaViaje}</div>`:""}</div></section>${renderIncluye(data)}${data.modo==="completo"?renderTramos(data):((data.tipoSimple||"paquete")!=="solo_hotel"?renderVuelos(data):"")}${data.modo==="simple"&&((data.tipoSimple||"paquete")!=="solo_vuelos")?renderHoteles(data):""}${data.formaPago?`<section class="card"><h2 class="section-title">Forma de pago</h2><div class="info-section">${escapeLineas(data.formaPago)}</div></section>`:""}${data.mostrarObservaciones&&data.observaciones?`<section class="card"><h2 class="section-title">Observaciones</h2><div class="info-section">${escapeLineas(data.observaciones)}</div></section>`:""}<section class="card footer"><h3>ETNIKA TRAVEL S.R.L.</h3><p>Legajo EVT Nº 18418 | CUIT 30-71775467-7</p><p><a href="https://maps.app.goo.gl/QGwE9kNAV4aiuszz9" target="_blank">📍 Ver oficina en Google Maps</a></p><p>🕒 Lunes a Viernes de 10:00 a 18:00 hs</p><p><a href="https://etnikatravel.tur.ar" target="_blank">🌐 etnikatravel.tur.ar</a> | <a href="https://instagram.com/etnikatravel" target="_blank">📸 @etnikatravel</a></p><p><a href="https://etnikatravel.tur.ar/general-conditions" target="_blank">Condiciones generales de contratación</a></p>${data.whatsapp?`<p><a class="btn btn-option" href="https://wa.me/${String(data.whatsapp).replace(/\D/g,"")}" target="_blank">📲 Contactar por WhatsApp</a></p>`:""}<div class="legal">Tarifas sujetas a disponibilidad y modificación sin previo aviso hasta el momento de la reserva y emisión.${data.validez?`<div class="validez">Validez de la cotización: ${data.validez}</div>`:""}</div></section>`;}
+function renderCotizacion(data){return `<section class="card"><h2 class="section-title">Datos de la cotización</h2><div class="data-grid">${data.cliente?`<div class="data-box"><img src="icons/top_cliente.png" class="etnika-icon" alt=""><div><div class="data-label">Cliente</div><div class="data-value">${data.cliente}</div></div></div>`:""}${data.pasajeros?`<div class="data-box"><img src="icons/top_pasajeros.png" class="etnika-icon" alt=""><div><div class="data-label">Pasajeros</div><div class="data-value">${data.pasajeros}</div></div></div>`:""}${data.fechaCotizacion?`<div class="data-box"><img src="icons/top_fecha.png" class="etnika-icon" alt=""><div><div class="data-label">Fecha de cotización</div><div class="data-value">${data.fechaCotizacion}</div></div></div>`:""}${data.codigo?`<div class="data-box"><img src="icons/top_cotizacion.png" class="etnika-icon" alt=""><div><div class="data-label">Cotización</div><div class="data-value">${data.codigo}</div></div></div>`:""}${data.vendedora?`<div class="data-box"><img src="icons/top_agente.png" class="etnika-icon" alt=""><div><div class="data-label">Agente</div><div class="data-value">${data.vendedora}</div></div></div>`:""}</div><div class="destination-box"><div class="destination-title">${data.destino||"Cotización de viaje"}</div>${data.fechaViaje?`<div class="destination-date"><img src="icons/top_fecha.png" alt="">${data.fechaViaje}</div>`:""}</div></section>${renderIncluye(data)}${data.modo==="completo"?renderTramos(data):((data.tipoSimple||"paquete")!=="solo_hotel"?renderVuelos(data):"")}${data.modo==="simple"&&((data.tipoSimple||"paquete")!=="solo_vuelos")?renderHoteles(data):""}${data.formaPago?`<section class="card"><h2 class="section-title">Forma de pago</h2><div class="info-section">${escapeLineas(data.formaPago)}</div></section>`:""}${data.mostrarObservaciones&&data.observaciones?`<section class="card"><h2 class="section-title">Observaciones</h2><div class="info-section">${escapeLineas(data.observaciones)}</div></section>`:""}<section class="card footer"><h3>ETNIKA TRAVEL S.R.L.</h3><p>Legajo EVT Nº 18418 | CUIT 30-71775467-7</p><p><a href="https://maps.app.goo.gl/QGwE9kNAV4aiuszz9" target="_blank">📍 Ver oficina en Google Maps</a></p><p>🕒 Lunes a Viernes de 10:00 a 18:00 hs</p><p><a href="https://etnikatravel.tur.ar" target="_blank">🌐 etnikatravel.tur.ar</a> | <a href="https://instagram.com/etnikatravel" target="_blank">📸 @etnikatravel</a></p><p><a href="https://etnikatravel.tur.ar/general-conditions" target="_blank">Condiciones generales de contratación</a></p>${data.whatsapp?`<p><a class="btn btn-option" href="https://wa.me/${String(data.whatsapp).replace(/\D/g,"")}" target="_blank">📲 Contactar por WhatsApp</a></p>`:""}<div class="legal">Tarifas sujetas a disponibilidad y modificación sin previo aviso hasta el momento de la reserva y emisión.${data.validez?`<div class="validez">Validez de la cotización: ${data.validez}</div>`:""}</div></section>`;}
 async function cargar(){const params=new URLSearchParams(window.location.search);const codigo=params.get("id");if(!codigo){document.getElementById("cotizacion").innerHTML='<div class="card"><h2 class="section-title">No se indicó una cotización.</h2></div>';return;}const {data,error}=await supabaseClient.from("cotizaciones").select("*").eq("codigo",codigo).single();if(error||!data){document.getElementById("cotizacion").innerHTML='<div class="card"><h2 class="section-title">No encontramos esta cotización.</h2></div>';console.error(error);return;}const datos=JSON.parse(data.datos_json);datos.codigo=codigo||data.codigo||datos.codigo||"";document.getElementById("cotizacion").innerHTML=renderCotizacion(datos);}
 cargar();
 </script>
