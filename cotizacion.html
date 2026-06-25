@@ -30,21 +30,21 @@ body{background:radial-gradient(circle at top left,rgba(0,229,191,.16),transpare
 .destination-box{margin-top:18px;border:1px solid var(--borde);border-radius:18px;padding:26px 20px;text-align:center;background:linear-gradient(180deg,#ffffff,#fbfbff);}
 .destination-title{font-size:54px;line-height:1;font-weight:900;text-transform:uppercase;letter-spacing:-1px;color:var(--violeta);}
 .destination-date{margin-top:14px;font-size:26px;font-weight:900;color:var(--turquesa);text-transform:uppercase;}
-.includes-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;}
-.include-item{background:#fbfbff;border:1px solid var(--borde);border-radius:16px;padding:18px 12px;min-height:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;font-size:15px;font-weight:800;flex:0 1 190px;}
+.includes-grid{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;}
+.include-item{background:#fbfbff;border:1px solid var(--borde);border-radius:16px;padding:18px 12px;min-height:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;font-size:15px;font-weight:800;flex:0 1 200px;}
 .include-icon{color:var(--violeta);font-size:30px;line-height:1;}
 .flights-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;}
 .flight-box{background:#fbfbff;border:1px solid var(--borde);border-left:6px solid var(--turquesa);border-radius:18px;padding:18px 20px;line-height:1.45;font-size:17px;}
 .flight-title{color:var(--violeta);font-weight:900;margin-bottom:8px;}
-.preview-img{display:block;width:auto;max-width:min(100%,920px);height:auto;max-height:720px;object-fit:contain;border-radius:16px;margin:18px auto 0;box-shadow:0 8px 20px rgba(0,0,0,.08);}
+.preview-img{display:block;max-width:760px;width:100%;height:auto;object-fit:contain;border-radius:16px;margin:14px auto 0;box-shadow:0 8px 20px rgba(0,0,0,.08);}
 .hotel-list{display:flex;flex-direction:column;gap:16px;}
 .hotel-card{background:white;border:1px solid var(--borde);border-radius:22px;padding:24px;box-shadow:0 8px 24px rgba(0,0,0,.06);}
-.hotel-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,360px);gap:26px;align-items:center;}
-.hotel-name{font-size:26px;line-height:1.12;font-weight:900;color:var(--violeta);margin-bottom:12px;}
+.hotel-row{display:grid;grid-template-columns:1fr 270px;gap:26px;align-items:center;}
+.hotel-name{font-size:26px;line-height:1.12;font-weight:900;color:var(--violeta);margin-bottom:12px;white-space:pre-line;word-break:break-word;overflow-wrap:anywhere;}
 .hotel-detail{font-size:18px;line-height:1.55;color:#333;}
 .hotel-detail strong{color:#555;}
-.hotel-price{text-align:center;max-width:360px;width:100%;justify-self:end;}
-.hotel-price-value{color:var(--violeta);font-size:clamp(24px,2.4vw,36px);font-weight:900;line-height:1.08;white-space:normal;overflow-wrap:anywhere;word-break:normal;text-align:center;}
+.hotel-price{text-align:center;}
+.hotel-price-value{color:var(--violeta);font-size:clamp(24px,3.1vw,36px);font-weight:900;line-height:1.08;white-space:pre-line;word-break:break-word;overflow-wrap:anywhere;text-align:center;}
 .hotel-price-note{color:#666;font-size:15px;margin-top:8px;}
 .hotel-actions{margin-top:16px;display:flex;flex-direction:column;gap:10px;}
 .btn{border:none;padding:13px 18px;border-radius:999px;font-weight:900;cursor:pointer;text-decoration:none;display:inline-flex;justify-content:center;align-items:center;text-align:center;font-size:15px;}
@@ -57,8 +57,8 @@ body{background:radial-gradient(circle at top left,rgba(0,229,191,.16),transpare
 .legal{text-align:center;color:#777;font-size:12px;line-height:1.5;margin-top:18px;}
 .validez{font-size:12px;color:#777;text-align:center;margin-top:10px;}
 a{color:var(--violeta);font-weight:800;}
-@media(max-width:900px){.data-grid{grid-template-columns:repeat(2,1fr);}.flights-grid{grid-template-columns:1fr;}.hotel-row{grid-template-columns:1fr;}.hotel-price{text-align:center;justify-self:center;max-width:420px;}.hotel-actions{max-width:420px;margin-left:auto;margin-right:auto;}.destination-title{font-size:42px;}.destination-date{font-size:22px;}}
-@media(max-width:560px){.container{padding:0 12px;margin-top:18px;}.header{padding:16px 12px 12px;}.logo{max-width:220px;}.card{padding:20px;border-radius:20px;}.data-grid{grid-template-columns:1fr;}.include-item{flex-basis:100%;}.destination-title{font-size:34px;}.destination-date{font-size:19px;}.hotel-name{font-size:22px;}.hotel-price-value{font-size:clamp(22px,8vw,30px);}}
+@media(max-width:900px){.data-grid{grid-template-columns:repeat(2,1fr);}.includes-grid{}.flights-grid{grid-template-columns:1fr;}.hotel-row{grid-template-columns:1fr;}.hotel-price{text-align:left;}.hotel-actions{max-width:320px;}.destination-title{font-size:42px;}.destination-date{font-size:22px;}}
+@media(max-width:560px){.container{padding:0 12px;margin-top:18px;}.header{padding:16px 12px 12px;}.logo{max-width:220px;}.card{padding:20px;border-radius:20px;}.data-grid{grid-template-columns:1fr;}.destination-title{font-size:34px;}.destination-date{font-size:19px;}.hotel-name{font-size:22px;}.hotel-price-value{font-size:30px;}}
 
 .hotel-stars{
   color:var(--violeta);
@@ -121,9 +121,12 @@ a{color:var(--violeta);font-weight:800;}
 }
 .price-amount{
   color:var(--violeta);
-  font-size:22px;
+  font-size:clamp(18px,2.2vw,22px);
   font-weight:900;
-  white-space:nowrap;
+  white-space:pre-line;
+  word-break:break-word;
+  overflow-wrap:anywhere;
+  text-align:center;
 }
 .price-type{
   color:#666;
@@ -198,9 +201,9 @@ a{color:var(--violeta);font-weight:800;}
   color:var(--violeta);
   font-size:clamp(17px,2vw,21px);
   font-weight:900;
-  white-space:normal;
+  white-space:pre-line;
+  word-break:break-word;
   overflow-wrap:anywhere;
-  word-break:normal;
 }
 .hotel-card.full-layout .hotel-row{
   grid-template-columns:1fr;
@@ -229,8 +232,8 @@ a{color:var(--violeta);font-weight:800;}
   display:block;
 }
 .data-box .etnika-icon{
-  width:44px;
-  height:44px;
+  width:34px;
+  height:34px;
 }
 
 
@@ -239,13 +242,6 @@ a{color:var(--violeta);font-weight:800;}
 .include-item span{min-height:44px;display:flex;align-items:flex-start;justify-content:center;text-align:center;}
 .destination-date{display:flex;align-items:center;justify-content:center;gap:10px;}
 .destination-date img{width:34px;height:34px;object-fit:contain;}
-
-/* Ajustes ETNIKA v9: íconos oficiales, centrado y textos largos */
-.data-box{min-width:0;}
-.data-value{overflow-wrap:anywhere;word-break:normal;}
-.price-amount{overflow-wrap:anywhere;word-break:normal;white-space:normal;}
-.flights-grid .preview-img{max-width:min(100%,760px);}
-@media print{.preview-img{max-width:100% !important;max-height:620px !important;}}
 </style>
 </head>
 <body>
@@ -258,7 +254,7 @@ const SUPABASE_KEY = "sb_publishable_r8syG_LzXy7NUymta20UFA_kPjGw_HN";
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 function escapeLineas(texto){return texto ? String(texto).replace(/\n/g,"<br>") : "";}
-function limpiarPrecio(precio){return precio ? String(precio).replace(/precio final grupo familiar/ig,"").replace(/USD(?=\d)/ig,"USD ").replace(/\s+/g," ").trim() : "";}
+function limpiarPrecio(precio){return precio ? String(precio).replace(/precio final grupo familiar/ig,"").trim() : "";}
 function tipoPrecioLabel(tipo){if(!tipo)return"Precio final grupo familiar";const t=String(tipo).toLowerCase();if(t.includes("persona"))return"Precio por persona";if(t.includes("total"))return"Precio total";return"Precio final grupo familiar";}
 function textoWhatsApp(data, hotel){const numero=data.whatsapp?String(data.whatsapp).replace(/\D/g,""):"5493412177311";const msg=encodeURIComponent("Hola, quiero avanzar con esta opción de ETNIKA TRAVEL:\n\nAgente: "+(data.vendedora||"")+"\nCotización: "+(data.codigo||"")+"\nDestino: "+(data.destino||"")+"\nFecha: "+(data.fechaViaje||"")+"\nHotel: "+(hotel.nombre||"")+"\nPrecio: "+(hotel.precio||""));return `https://wa.me/${numero}?text=${msg}`;}
 
@@ -303,13 +299,13 @@ function renderIncluye(data){
       return `
         <div class="include-item">
           <img src="${iconoIncluye(item,i)}" class="include-icon-img" alt="">
-          <span>${texto}</span>
+          <span>${escapeLineas(texto)}</span>
         </div>
       `;
     }).join("")
   }</div></section>`;
 }
-function renderVuelos(data){const simple=data.simple||{};const tieneTexto=simple.detalleVuelos||simple.vueloIda||simple.vueloVuelta;const tieneCaptura=simple.capturaVuelo;const tienePrecio=simple.precioVuelo;if(!tieneTexto&&!tieneCaptura&&!tienePrecio)return"";return `<section class="card"><h2 class="section-title">Vuelos</h2>${tieneTexto?`<div class="flight-box"><div class="flight-title">Detalle de vuelos</div>${escapeLineas(simple.detalleVuelos||[simple.vueloIda,simple.vueloVuelta].filter(Boolean).join("\n\n"))}</div>`:""}${tieneCaptura?`<img src="${simple.capturaVuelo}" class="preview-img">`:""}${tienePrecio?`<div class="hotel-card" style="margin-top:16px;"><div class="hotel-price" style="text-align:center;"><div class="hotel-price-value">${limpiarPrecio(simple.precioVuelo)}</div><div class="hotel-price-note">${tipoPrecioLabel(simple.tipoPrecioVuelo)}</div></div></div>`:""}</section>`;}
+function renderVuelos(data){const simple=data.simple||{};const tieneTexto=simple.detalleVuelos||simple.vueloIda||simple.vueloVuelta;const tieneCaptura=simple.capturaVuelo;const tienePrecio=simple.precioVuelo;if(!tieneTexto&&!tieneCaptura&&!tienePrecio)return"";return `<section class="card"><h2 class="section-title">Vuelos</h2>${tieneTexto?`<div class="flight-box"><div class="flight-title">Detalle de vuelos</div>${escapeLineas(simple.detalleVuelos||[simple.vueloIda,simple.vueloVuelta].filter(Boolean).join("\n\n"))}</div>`:""}${tieneCaptura?`<img src="${simple.capturaVuelo}" class="preview-img">`:""}${tienePrecio?`<div class="hotel-card" style="margin-top:16px;"><div class="hotel-price" style="text-align:center;"><div class="hotel-price-value">${escapeLineas(limpiarPrecio(simple.precioVuelo))}</div><div class="hotel-price-note">${tipoPrecioLabel(simple.tipoPrecioVuelo)}</div></div></div>`:""}</section>`;}
 
 function renderPrecios(precios, fallbackPrecio, fallbackTipo){
   if(precios && precios.length){
@@ -320,7 +316,7 @@ function renderPrecios(precios, fallbackPrecio, fallbackTipo){
             <div class="price-composition">${p.composicion || ""}</div>
             <div class="price-type">${tipoPrecioLabel(p.tipoPrecio || fallbackTipo)}</div>
           </div>
-          <div class="price-amount">${limpiarPrecio(p.precio || "")}</div>
+          <div class="price-amount">${escapeLineas(limpiarPrecio(p.precio || ""))}</div>
         </div>
       `).join("")}
     </div>`;
@@ -328,7 +324,7 @@ function renderPrecios(precios, fallbackPrecio, fallbackTipo){
 
   if(fallbackPrecio){
     return `
-      <div class="hotel-price-value">${limpiarPrecio(fallbackPrecio)}</div>
+      <div class="hotel-price-value">${escapeLineas(limpiarPrecio(fallbackPrecio))}</div>
       <div class="hotel-price-note">${tipoPrecioLabel(fallbackTipo)}</div>
     `;
   }
@@ -351,7 +347,7 @@ function renderTablaFamilias(precios){
         <div class="family-price-row">
           <div class="family-name">${p.composicion || p.familia || ""}</div>
           <div class="family-rooms">${p.habitaciones || ""}</div>
-          <div class="family-amount">${limpiarPrecio(p.precio || "")}</div>
+          <div class="family-amount">${escapeLineas(limpiarPrecio(p.precio || ""))}</div>
         </div>
       `).join("")}
     </div>
@@ -370,7 +366,7 @@ function renderHoteles(data){
       <div class="hotel-card ${tieneTabla ? "full-layout" : ""}">
         <div class="hotel-row">
           <div>
-            <div class="hotel-name">${h.nombre||"Hotel"}</div>
+            <div class="hotel-name">${escapeLineas(h.nombre||"Hotel")}</div>
             ${h.categoria?`<div class="hotel-stars">${h.categoria}</div>`:""}
             ${h.habitacion?`<div class="hotel-detail"><strong>Hab.</strong> ${h.habitacion}</div>`:""}
             ${h.regimen?`<div class="hotel-detail"><strong>Régimen:</strong> ${h.regimen}</div>`:""}
@@ -381,7 +377,7 @@ function renderHoteles(data){
 
           ${!tieneTabla ? `
             <div class="hotel-price">
-              ${h.precio?`<div class="hotel-price-value">${limpiarPrecio(h.precio)}</div>`:""}
+              ${h.precio?`<div class="hotel-price-value">${escapeLineas(limpiarPrecio(h.precio))}</div>`:""}
               <div class="hotel-price-note">${tipoPrecioLabel(h.tipoPrecio||data.tipoPrecio)}</div>
               <div class="hotel-actions">
                 ${h.link?`<a class="btn btn-google" href="${h.link}" target="_blank">Ver hotel en Google</a>`:""}
@@ -412,7 +408,7 @@ function renderHoteles(data){
               ${i>0?`<div class="combo-plus">+</div>`:""}
               <div class="combo-service">
                 <div class="combo-destination">${s.destino || ""}${s.noches ? " · " + s.noches : ""}</div>
-                <div class="hotel-name" style="font-size:22px;margin-bottom:6px;">${s.hotel || ""}</div>
+                <div class="hotel-name" style="font-size:22px;margin-bottom:6px;">${escapeLineas(s.hotel || "")}</div>
                 ${s.categoria?`<div class="hotel-stars">${s.categoria}</div>`:""}
                 ${s.habitacion?`<div class="hotel-detail"><strong>Hab.</strong> ${s.habitacion}</div>`:""}
                 ${s.regimen?`<div class="hotel-detail"><strong>Régimen:</strong> ${s.regimen}</div>`:""}
@@ -424,7 +420,7 @@ function renderHoteles(data){
 
             ${tieneTabla ? renderTablaFamilias(c.precios) : `
               <div class="hotel-price" style="text-align:left;margin-top:18px;">
-                ${c.precio?`<div class="hotel-price-value">${limpiarPrecio(c.precio)}</div>`:""}
+                ${c.precio?`<div class="hotel-price-value">${escapeLineas(limpiarPrecio(c.precio))}</div>`:""}
                 <div class="hotel-price-note">${tipoPrecioLabel(c.tipoPrecio||data.tipoPrecio)}</div>
               </div>
             `}
@@ -446,7 +442,7 @@ function renderTramoCard(t){
   return `<div class="hotel-card">
       <div class="hotel-row">
         <div>
-          <div class="hotel-name">${esHotel ? (t.titulo||"Hotel") : `${tipo}: ${t.titulo||""}`}</div>
+          <div class="hotel-name">${esHotel ? escapeLineas(t.titulo||"Hotel") : escapeLineas(`${tipo}: ${t.titulo||""}`)}</div>
           ${(!esHotel && t.fechas)?`<div class="hotel-detail"><strong>Fecha:</strong> ${t.fechas}</div>`:""}
           ${(!esHotel && t.duracion)?`<div class="hotel-detail"><strong>Duración:</strong> ${t.duracion}</div>`:""}
           ${t.detalle?`<div class="hotel-detail">${escapeLineas(t.detalle)}</div>`:""}
@@ -456,7 +452,7 @@ function renderTramoCard(t){
           ${t.link?`<div class="hotel-detail"><a href="${t.link}" target="_blank">Ver link / ubicación</a></div>`:""}
           ${t.imagen?`<img src="${t.imagen}" class="preview-img">`:""}
         </div>
-        <div class="hotel-price">${t.precio?`<div class="hotel-price-value">${limpiarPrecio(t.precio)}</div>`:""}</div>
+        <div class="hotel-price">${t.precio?`<div class="hotel-price-value">${escapeLineas(limpiarPrecio(t.precio))}</div>`:""}</div>
       </div>
     </div>`;
 }
@@ -472,7 +468,7 @@ function renderTramos(data){
   const sueltosHtml=tramos.map(renderTramoCard).join("");
   return `<section class="card"><h2 class="section-title">Itinerario y servicios</h2><div class="hotel-list">${destinosHtml}${sueltosHtml}</div></section>`;
 }
-function renderCotizacion(data){return `<section class="card"><h2 class="section-title">Datos de la cotización</h2><div class="data-grid">${data.cliente?`<div class="data-box"><img src="icons/icon_persona.png" class="etnika-icon" alt=""><div><div class="data-label">Cliente</div><div class="data-value">${data.cliente}</div></div></div>`:""}${data.pasajeros?`<div class="data-box"><img src="icons/icon_pasajeros.png" class="etnika-icon" alt=""><div><div class="data-label">Pasajeros</div><div class="data-value">${data.pasajeros}</div></div></div>`:""}${data.fechaCotizacion?`<div class="data-box"><img src="icons/icon_calendario.png" class="etnika-icon" alt=""><div><div class="data-label">Fecha de cotización</div><div class="data-value">${data.fechaCotizacion}</div></div></div>`:""}${data.codigo?`<div class="data-box"><img src="icons/icon_checklist.png" class="etnika-icon" alt=""><div><div class="data-label">Cotización</div><div class="data-value">${data.codigo}</div></div></div>`:""}${data.vendedora?`<div class="data-box"><img src="icons/icon_agente.png" class="etnika-icon" alt=""><div><div class="data-label">Agente</div><div class="data-value">${data.vendedora}</div></div></div>`:""}</div><div class="destination-box"><div class="destination-title">${data.destino||"Cotización de viaje"}</div>${data.fechaViaje?`<div class="destination-date"><img src="icons/icon_calendario.png" alt="">${data.fechaViaje}</div>`:""}</div></section>${renderIncluye(data)}${data.modo==="completo"?renderTramos(data):((data.tipoSimple||"paquete")!=="solo_hotel"?renderVuelos(data):"")}${data.modo==="simple"&&((data.tipoSimple||"paquete")!=="solo_vuelos")?renderHoteles(data):""}${data.formaPago?`<section class="card"><h2 class="section-title">Forma de pago</h2><div class="info-section">${escapeLineas(data.formaPago)}</div></section>`:""}${data.mostrarObservaciones&&data.observaciones?`<section class="card"><h2 class="section-title">Observaciones</h2><div class="info-section">${escapeLineas(data.observaciones)}</div></section>`:""}<section class="card footer"><h3>ETNIKA TRAVEL S.R.L.</h3><p>Legajo EVT Nº 18418 | CUIT 30-71775467-7</p><p><a href="https://maps.app.goo.gl/QGwE9kNAV4aiuszz9" target="_blank">📍 Ver oficina en Google Maps</a></p><p>🕒 Lunes a Viernes de 10:00 a 18:00 hs</p><p><a href="https://etnikatravel.tur.ar" target="_blank">🌐 etnikatravel.tur.ar</a> | <a href="https://instagram.com/etnikatravel" target="_blank">📸 @etnikatravel</a></p><p><a href="https://etnikatravel.tur.ar/general-conditions" target="_blank">Condiciones generales de contratación</a></p>${data.whatsapp?`<p><a class="btn btn-option" href="https://wa.me/${String(data.whatsapp).replace(/\D/g,"")}" target="_blank">📲 Contactar por WhatsApp</a></p>`:""}<div class="legal">Tarifas sujetas a disponibilidad y modificación sin previo aviso hasta el momento de la reserva y emisión.${data.validez?`<div class="validez">Validez de la cotización: ${data.validez}</div>`:""}</div></section>`;}
+function renderCotizacion(data){return `<section class="card"><h2 class="section-title">Datos de la cotización</h2><div class="data-grid">${data.cliente?`<div class="data-box"><img src="icons/top_cliente.png" class="etnika-icon" alt=""><div><div class="data-label">Cliente</div><div class="data-value">${data.cliente}</div></div></div>`:""}${data.pasajeros?`<div class="data-box"><img src="icons/top_pasajeros.png" class="etnika-icon" alt=""><div><div class="data-label">Pasajeros</div><div class="data-value">${data.pasajeros}</div></div></div>`:""}${data.fechaCotizacion?`<div class="data-box"><img src="icons/top_fecha.png" class="etnika-icon" alt=""><div><div class="data-label">Fecha de cotización</div><div class="data-value">${data.fechaCotizacion}</div></div></div>`:""}${data.codigo?`<div class="data-box"><img src="icons/top_cotizacion.png" class="etnika-icon" alt=""><div><div class="data-label">Cotización</div><div class="data-value">${data.codigo}</div></div></div>`:""}${data.vendedora?`<div class="data-box"><img src="icons/top_agente.png" class="etnika-icon" alt=""><div><div class="data-label">Agente</div><div class="data-value">${data.vendedora}</div></div></div>`:""}</div><div class="destination-box"><div class="destination-title">${data.destino||"Cotización de viaje"}</div>${data.fechaViaje?`<div class="destination-date"><img src="icons/icon_calendario.png" alt="">${data.fechaViaje}</div>`:""}</div></section>${renderIncluye(data)}${data.modo==="completo"?renderTramos(data):((data.tipoSimple||"paquete")!=="solo_hotel"?renderVuelos(data):"")}${data.modo==="simple"&&((data.tipoSimple||"paquete")!=="solo_vuelos")?renderHoteles(data):""}${data.formaPago?`<section class="card"><h2 class="section-title">Forma de pago</h2><div class="info-section">${escapeLineas(data.formaPago)}</div></section>`:""}${data.mostrarObservaciones&&data.observaciones?`<section class="card"><h2 class="section-title">Observaciones</h2><div class="info-section">${escapeLineas(data.observaciones)}</div></section>`:""}<section class="card footer"><h3>ETNIKA TRAVEL S.R.L.</h3><p>Legajo EVT Nº 18418 | CUIT 30-71775467-7</p><p><a href="https://maps.app.goo.gl/QGwE9kNAV4aiuszz9" target="_blank">📍 Ver oficina en Google Maps</a></p><p>🕒 Lunes a Viernes de 10:00 a 18:00 hs</p><p><a href="https://etnikatravel.tur.ar" target="_blank">🌐 etnikatravel.tur.ar</a> | <a href="https://instagram.com/etnikatravel" target="_blank">📸 @etnikatravel</a></p><p><a href="https://etnikatravel.tur.ar/general-conditions" target="_blank">Condiciones generales de contratación</a></p>${data.whatsapp?`<p><a class="btn btn-option" href="https://wa.me/${String(data.whatsapp).replace(/\D/g,"")}" target="_blank">📲 Contactar por WhatsApp</a></p>`:""}<div class="legal">Tarifas sujetas a disponibilidad y modificación sin previo aviso hasta el momento de la reserva y emisión.${data.validez?`<div class="validez">Validez de la cotización: ${data.validez}</div>`:""}</div></section>`;}
 async function cargar(){const params=new URLSearchParams(window.location.search);const codigo=params.get("id");if(!codigo){document.getElementById("cotizacion").innerHTML='<div class="card"><h2 class="section-title">No se indicó una cotización.</h2></div>';return;}const {data,error}=await supabaseClient.from("cotizaciones").select("*").eq("codigo",codigo).single();if(error||!data){document.getElementById("cotizacion").innerHTML='<div class="card"><h2 class="section-title">No encontramos esta cotización.</h2></div>';console.error(error);return;}const datos=JSON.parse(data.datos_json);datos.codigo=codigo||data.codigo||datos.codigo||"";document.getElementById("cotizacion").innerHTML=renderCotizacion(datos);}
 cargar();
 </script>
