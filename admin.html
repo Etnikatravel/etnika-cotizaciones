@@ -784,7 +784,7 @@ function agregarHotel(h = {}){
     <div class="form-grid">
       <div>
         <label>Nombre del hotel</label>
-        <input class="hotelNombre" placeholder="Ej: Catalonia Bavaro" value="${h.nombre || ""}">
+        <textarea class="hotelNombre" rows="2" placeholder="Ej: Catalonia Bavaro">${h.nombre || ""}</textarea>
       </div>
 
       <div>
@@ -811,7 +811,7 @@ function agregarHotel(h = {}){
 
       <div>
         <label>Precio</label>
-        <input class="hotelPrecio" placeholder="Ej: USD 6.900" value="${h.precio || ""}">
+        <textarea class="hotelPrecio" rows="3" placeholder="Ej:\n7 CUOTAS\nDE USD 290">${h.precio || ""}</textarea>
       </div>
 
       <div>
