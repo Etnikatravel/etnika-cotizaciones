@@ -30,13 +30,13 @@ body{background:radial-gradient(circle at top left,rgba(0,229,191,.16),transpare
 .destination-box{margin-top:18px;border:1px solid var(--borde);border-radius:18px;padding:26px 20px;text-align:center;background:linear-gradient(180deg,#ffffff,#fbfbff);}
 .destination-title{font-size:54px;line-height:1;font-weight:900;text-transform:uppercase;letter-spacing:-1px;color:var(--violeta);}
 .destination-date{margin-top:14px;font-size:26px;font-weight:900;color:var(--turquesa);text-transform:uppercase;}
-.includes-grid{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;}
-.include-item{background:#fbfbff;border:1px solid var(--borde);border-radius:16px;padding:18px 12px;min-height:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;font-size:15px;font-weight:800;flex:0 1 200px;}
+.includes-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;}
+.include-item{background:#fbfbff;border:1px solid var(--borde);border-radius:16px;padding:18px 12px;min-height:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;font-size:15px;font-weight:800;flex:0 1 190px;}
 .include-icon{color:var(--violeta);font-size:30px;line-height:1;}
 .flights-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;}
 .flight-box{background:#fbfbff;border:1px solid var(--borde);border-left:6px solid var(--turquesa);border-radius:18px;padding:18px 20px;line-height:1.45;font-size:17px;}
 .flight-title{color:var(--violeta);font-weight:900;margin-bottom:8px;}
-.preview-img{display:block;max-width:760px;width:100%;height:auto;object-fit:contain;border-radius:16px;margin:14px auto 0;box-shadow:0 8px 20px rgba(0,0,0,.08);}
+.preview-img{display:block;max-width:min(100%,820px);width:auto;max-height:520px;height:auto;object-fit:contain;border-radius:16px;margin:18px auto 0;box-shadow:0 8px 20px rgba(0,0,0,.08);}
 .hotel-list{display:flex;flex-direction:column;gap:16px;}
 .hotel-card{background:white;border:1px solid var(--borde);border-radius:22px;padding:24px;box-shadow:0 8px 24px rgba(0,0,0,.06);}
 .hotel-row{display:grid;grid-template-columns:1fr 270px;gap:26px;align-items:center;}
@@ -44,7 +44,7 @@ body{background:radial-gradient(circle at top left,rgba(0,229,191,.16),transpare
 .hotel-detail{font-size:18px;line-height:1.55;color:#333;}
 .hotel-detail strong{color:#555;}
 .hotel-price{text-align:center;}
-.hotel-price-value{color:var(--violeta);font-size:clamp(24px,3.1vw,36px);font-weight:900;line-height:1.08;white-space:pre-line;word-break:break-word;overflow-wrap:anywhere;text-align:center;}
+.hotel-price-value{color:var(--violeta);font-size:clamp(22px,3vw,36px);font-weight:900;line-height:1.08;white-space:pre-line;word-break:break-word;overflow-wrap:anywhere;text-align:center;}
 .hotel-price-note{color:#666;font-size:15px;margin-top:8px;}
 .hotel-actions{margin-top:16px;display:flex;flex-direction:column;gap:10px;}
 .btn{border:none;padding:13px 18px;border-radius:999px;font-weight:900;cursor:pointer;text-decoration:none;display:inline-flex;justify-content:center;align-items:center;text-align:center;font-size:15px;}
@@ -57,8 +57,8 @@ body{background:radial-gradient(circle at top left,rgba(0,229,191,.16),transpare
 .legal{text-align:center;color:#777;font-size:12px;line-height:1.5;margin-top:18px;}
 .validez{font-size:12px;color:#777;text-align:center;margin-top:10px;}
 a{color:var(--violeta);font-weight:800;}
-@media(max-width:900px){.data-grid{grid-template-columns:repeat(2,1fr);}.includes-grid{}.flights-grid{grid-template-columns:1fr;}.hotel-row{grid-template-columns:1fr;}.hotel-price{text-align:left;}.hotel-actions{max-width:320px;}.destination-title{font-size:42px;}.destination-date{font-size:22px;}}
-@media(max-width:560px){.container{padding:0 12px;margin-top:18px;}.header{padding:16px 12px 12px;}.logo{max-width:220px;}.card{padding:20px;border-radius:20px;}.data-grid{grid-template-columns:1fr;}.destination-title{font-size:34px;}.destination-date{font-size:19px;}.hotel-name{font-size:22px;}.hotel-price-value{font-size:30px;}}
+@media(max-width:900px){.data-grid{grid-template-columns:repeat(2,1fr);}.flights-grid{grid-template-columns:1fr;}.hotel-row{grid-template-columns:1fr;}.hotel-price{text-align:center;}.hotel-actions{max-width:320px;margin-left:auto;margin-right:auto;}.destination-title{font-size:42px;}.destination-date{font-size:22px;}}
+@media(max-width:560px){.container{padding:0 12px;margin-top:18px;}.header{padding:16px 12px 12px;}.logo{max-width:220px;}.card{padding:20px;border-radius:20px;}.data-grid{grid-template-columns:1fr;}.include-item{flex-basis:100%;}.destination-title{font-size:34px;}.destination-date{font-size:19px;}.hotel-name{font-size:22px;}.hotel-price-value{font-size:clamp(20px,7vw,30px);}}
 
 .hotel-stars{
   color:var(--violeta);
@@ -121,7 +121,7 @@ a{color:var(--violeta);font-weight:800;}
 }
 .price-amount{
   color:var(--violeta);
-  font-size:clamp(18px,2.2vw,22px);
+  font-size:clamp(17px,2.2vw,22px);
   font-weight:900;
   white-space:pre-line;
   word-break:break-word;
@@ -199,11 +199,12 @@ a{color:var(--violeta);font-weight:800;}
 }
 .family-amount{
   color:var(--violeta);
-  font-size:clamp(17px,2vw,21px);
+  font-size:clamp(16px,2.1vw,21px);
   font-weight:900;
   white-space:pre-line;
   word-break:break-word;
   overflow-wrap:anywhere;
+  text-align:center;
 }
 .hotel-card.full-layout .hotel-row{
   grid-template-columns:1fr;
@@ -307,27 +308,25 @@ function renderIncluye(data){
 }
 function renderVuelos(data){
   const simple=data.simple||{};
-  const opciones = simple.opcionesVuelos && simple.opcionesVuelos.length ? simple.opcionesVuelos : [];
+  const opciones=(simple.opcionesVuelos&&simple.opcionesVuelos.length)?simple.opcionesVuelos:((simple.detalleVuelos||simple.vueloIda||simple.vueloVuelta||simple.capturaVuelo||simple.precioVuelo)?[{
+    fecha:simple.fechaVuelo||"",
+    detalle:simple.detalleVuelos||[simple.vueloIda,simple.vueloVuelta].filter(Boolean).join("\n\n"),
+    precio:simple.precioVuelo||"",
+    tipoPrecio:simple.tipoPrecioVuelo||"",
+    captura:simple.capturaVuelo||""
+  }]:[]);
 
-  if(opciones.length){
-    return `<section class="card"><h2 class="section-title">Vuelos</h2>${opciones.map((op,i)=>`
-      <div class="flight-box" style="margin-bottom:16px;">
-        <div class="flight-title">Opción de vuelo ${i+1}</div>
-        ${op.fecha?`<div class="hotel-detail"><strong>Fecha:</strong> ${op.fecha}</div>`:""}
-        ${op.detalle?`<div style="margin-top:8px;">${escapeLineas(op.detalle)}</div>`:""}
-      </div>
-      ${op.capturaVuelo?`<img src="${op.capturaVuelo}" class="preview-img">`:""}
-      ${op.precio?`<div class="hotel-card" style="margin-top:16px;margin-bottom:16px;"><div class="hotel-price" style="text-align:center;"><div class="hotel-price-value">${escapeLineas(limpiarPrecio(op.precio))}</div><div class="hotel-price-note">${tipoPrecioLabel(op.tipoPrecio)}</div></div></div>`:""}
-    `).join("")}</section>`;
-  }
+  if(!opciones.length)return"";
 
-  const tieneTexto=simple.detalleVuelos||simple.vueloIda||simple.vueloVuelta;
-  const tieneCaptura=simple.capturaVuelo;
-  const tienePrecio=simple.precioVuelo;
-  if(!tieneTexto&&!tieneCaptura&&!tienePrecio)return"";
-  return `<section class="card"><h2 class="section-title">Vuelos</h2>${tieneTexto?`<div class="flight-box"><div class="flight-title">Detalle de vuelos</div>${simple.fechaVuelo?`<div class="hotel-detail"><strong>Fecha:</strong> ${simple.fechaVuelo}</div>`:""}${escapeLineas(simple.detalleVuelos||[simple.vueloIda,simple.vueloVuelta].filter(Boolean).join("
-
-"))}</div>`:""}${tieneCaptura?`<img src="${simple.capturaVuelo}" class="preview-img">`:""}${tienePrecio?`<div class="hotel-card" style="margin-top:16px;"><div class="hotel-price" style="text-align:center;"><div class="hotel-price-value">${escapeLineas(limpiarPrecio(simple.precioVuelo))}</div><div class="hotel-price-note">${tipoPrecioLabel(simple.tipoPrecioVuelo)}</div></div></div>`:""}</section>`;
+  return `<section class="card"><h2 class="section-title">Vuelos</h2>${opciones.map((v,i)=>`
+    <div class="flight-box" style="margin-bottom:16px;">
+      <div class="flight-title">Opción de vuelo ${i+1}</div>
+      ${v.fecha?`<div><strong>Fecha:</strong> ${escapeLineas(v.fecha)}</div>`:""}
+      ${v.detalle?`<div style="margin-top:8px;">${escapeLineas(v.detalle)}</div>`:""}
+      ${v.captura?`<img src="${v.captura}" class="preview-img">`:""}
+      ${v.precio?`<div class="hotel-price" style="text-align:center;margin-top:14px;"><div class="hotel-price-value">${escapeLineas(limpiarPrecio(v.precio))}</div><div class="hotel-price-note">${tipoPrecioLabel(v.tipoPrecio||simple.tipoPrecioVuelo)}</div></div>`:""}
+    </div>
+  `).join("")}</section>`;
 }
 
 function renderPrecios(precios, fallbackPrecio, fallbackTipo){
@@ -347,7 +346,7 @@ function renderPrecios(precios, fallbackPrecio, fallbackTipo){
 
   if(fallbackPrecio){
     return `
-      <div class="hotel-price-value">${escapeLineas(limpiarPrecio(fallbackPrecio))}</div>
+      <div class="hotel-price-value">${limpiarPrecio(fallbackPrecio)}</div>
       <div class="hotel-price-note">${tipoPrecioLabel(fallbackTipo)}</div>
     `;
   }
@@ -465,7 +464,7 @@ function renderTramoCard(t){
   return `<div class="hotel-card">
       <div class="hotel-row">
         <div>
-          <div class="hotel-name">${esHotel ? escapeLineas(t.titulo||"Hotel") : escapeLineas(`${tipo}: ${t.titulo||""}`)}</div>
+          <div class="hotel-name">${escapeLineas(esHotel ? (t.titulo||"Hotel") : `${tipo}: ${t.titulo||""}`)}</div>
           ${(!esHotel && t.fechas)?`<div class="hotel-detail"><strong>Fecha:</strong> ${t.fechas}</div>`:""}
           ${(!esHotel && t.duracion)?`<div class="hotel-detail"><strong>Duración:</strong> ${t.duracion}</div>`:""}
           ${t.detalle?`<div class="hotel-detail">${escapeLineas(t.detalle)}</div>`:""}
