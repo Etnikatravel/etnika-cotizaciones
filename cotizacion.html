@@ -308,7 +308,17 @@ function renderIncluye(data){
 }
 function renderVuelos(data){
   const simple = data.simple || {};
+
+  const opcionPrincipal = {
+    fecha: simple.fechaVuelo || simple.fechaVuelos || "",
+    detalle: simple.detalleVuelos || [simple.vueloIda, simple.vueloVuelta].filter(Boolean).join("\n\n"),
+    precio: simple.precioVuelo || "",
+    tipoPrecio: simple.tipoPrecioVuelo || "",
+    captura: simple.capturaVuelo || ""
+  };
+
   const opcionesGuardadas = []
+    .concat((opcionPrincipal.fecha || opcionPrincipal.detalle || opcionPrincipal.precio || opcionPrincipal.captura) ? [opcionPrincipal] : [])
     .concat(Array.isArray(simple.vuelosOpciones) ? simple.vuelosOpciones : [])
     .concat(Array.isArray(simple.opcionesVuelos) ? simple.opcionesVuelos : []);
 
@@ -316,30 +326,24 @@ function renderVuelos(data){
     v.fecha || v.detalle || v.precio || v.captura || v.capturaVuelo || v.imagen
   ));
 
-  if(opciones.length){
-    return `<section class="card"><h2 class="section-title">Vuelos</h2>${
-      opciones.map((v,i)=>{
-        const captura = v.captura || v.capturaVuelo || v.imagen || "";
-        return `
-          <div class="hotel-card" style="margin-top:${i ? "18px" : "0"};">
-            <div class="flight-box">
-              <div class="flight-title">Opción de vuelo ${i+1}</div>
-              ${v.fecha ? `<div><strong>Fecha:</strong> ${escapeLineas(v.fecha)}</div>` : ""}
-              ${v.detalle ? `<div style="margin-top:8px;">${escapeLineas(v.detalle)}</div>` : ""}
-              ${v.precio ? `<div class="hotel-price" style="margin-top:12px;text-align:left;"><div class="hotel-price-value" style="text-align:left;">${escapeLineas(v.precio)}</div><div class="hotel-price-note">${tipoPrecioLabel(v.tipoPrecio || simple.tipoPrecioVuelo)}</div></div>` : ""}
-            </div>
-            ${captura ? `<img src="${captura}" class="preview-img">` : ""}
-          </div>
-        `;
-      }).join("")
-    }</section>`;
-  }
+  if(!opciones.length) return "";
 
-  const tieneTexto = simple.detalleVuelos || simple.vueloIda || simple.vueloVuelta;
-  const tieneCaptura = simple.capturaVuelo;
-  const tienePrecio = simple.precioVuelo;
-  if(!tieneTexto && !tieneCaptura && !tienePrecio) return "";
-  return `<section class="card"><h2 class="section-title">Vuelos</h2>${tieneTexto?`<div class="flight-box"><div class="flight-title">Detalle de vuelos</div>${escapeLineas(simple.detalleVuelos||[simple.vueloIda,simple.vueloVuelta].filter(Boolean).join("\n\n"))}</div>`:""}${tieneCaptura?`<img src="${simple.capturaVuelo}" class="preview-img">`:""}${tienePrecio?`<div class="hotel-card" style="margin-top:16px;"><div class="hotel-price" style="text-align:center;"><div class="hotel-price-value">${escapeLineas(simple.precioVuelo)}</div><div class="hotel-price-note">${tipoPrecioLabel(simple.tipoPrecioVuelo)}</div></div></div>`:""}</section>`;
+  return `<section class="card"><h2 class="section-title">Vuelos</h2>${
+    opciones.map((v,i)=>{
+      const captura = v.captura || v.capturaVuelo || v.imagen || "";
+      return `
+        <div class="hotel-card" style="margin-top:${i ? "18px" : "0"};">
+          <div class="flight-box">
+            <div class="flight-title">Opción de vuelo ${i+1}</div>
+            ${v.fecha ? `<div><strong>Fecha:</strong> ${escapeLineas(v.fecha)}</div>` : ""}
+            ${v.detalle ? `<div style="margin-top:8px;">${escapeLineas(v.detalle)}</div>` : ""}
+            ${v.precio ? `<div class="hotel-price" style="margin-top:12px;text-align:left;"><div class="hotel-price-value" style="text-align:left;">${escapeLineas(v.precio)}</div><div class="hotel-price-note">${tipoPrecioLabel(v.tipoPrecio || simple.tipoPrecioVuelo)}</div></div>` : ""}
+          </div>
+          ${captura ? `<img src="${captura}" class="preview-img">` : ""}
+        </div>
+      `;
+    }).join("")
+  }</section>`;
 }
 
 function renderPrecios(precios, fallbackPrecio, fallbackTipo){
