@@ -306,28 +306,7 @@ function renderIncluye(data){
     }).join("")
   }</div></section>`;
 }
-function renderVuelos(data){
-  const simple=data.simple||{};
-  const opciones=(simple.opcionesVuelos&&simple.opcionesVuelos.length)?simple.opcionesVuelos:((simple.detalleVuelos||simple.vueloIda||simple.vueloVuelta||simple.capturaVuelo||simple.precioVuelo)?[{
-    fecha:simple.fechaVuelo||"",
-    detalle:simple.detalleVuelos||[simple.vueloIda,simple.vueloVuelta].filter(Boolean).join("\n\n"),
-    precio:simple.precioVuelo||"",
-    tipoPrecio:simple.tipoPrecioVuelo||"",
-    captura:simple.capturaVuelo||""
-  }]:[]);
-
-  if(!opciones.length)return"";
-
-  return `<section class="card"><h2 class="section-title">Vuelos</h2>${opciones.map((v,i)=>`
-    <div class="flight-box" style="margin-bottom:16px;">
-      <div class="flight-title">Opción de vuelo ${i+1}</div>
-      ${v.fecha?`<div><strong>Fecha:</strong> ${escapeLineas(v.fecha)}</div>`:""}
-      ${v.detalle?`<div style="margin-top:8px;">${escapeLineas(v.detalle)}</div>`:""}
-      ${v.captura?`<img src="${v.captura}" class="preview-img">`:""}
-      ${v.precio?`<div class="hotel-price" style="text-align:center;margin-top:14px;"><div class="hotel-price-value">${escapeLineas(limpiarPrecio(v.precio))}</div><div class="hotel-price-note">${tipoPrecioLabel(v.tipoPrecio||simple.tipoPrecioVuelo)}</div></div>`:""}
-    </div>
-  `).join("")}</section>`;
-}
+function renderVuelos(data){const simple=data.simple||{};const tieneTexto=simple.detalleVuelos||simple.vueloIda||simple.vueloVuelta;const tieneCaptura=simple.capturaVuelo;const tienePrecio=simple.precioVuelo;if(!tieneTexto&&!tieneCaptura&&!tienePrecio)return"";return `<section class="card"><h2 class="section-title">Vuelos</h2>${tieneTexto?`<div class="flight-box"><div class="flight-title">Detalle de vuelos</div>${escapeLineas(simple.detalleVuelos||[simple.vueloIda,simple.vueloVuelta].filter(Boolean).join("\n\n"))}</div>`:""}${tieneCaptura?`<img src="${simple.capturaVuelo}" class="preview-img">`:""}${tienePrecio?`<div class="hotel-card" style="margin-top:16px;"><div class="hotel-price" style="text-align:center;"><div class="hotel-price-value">${escapeLineas(simple.precioVuelo)}</div><div class="hotel-price-note">${tipoPrecioLabel(simple.tipoPrecioVuelo)}</div></div></div>`:""}</section>`;}
 
 function renderPrecios(precios, fallbackPrecio, fallbackTipo){
   if(precios && precios.length){
