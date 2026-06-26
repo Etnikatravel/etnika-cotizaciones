@@ -305,7 +305,30 @@ function renderIncluye(data){
     }).join("")
   }</div></section>`;
 }
-function renderVuelos(data){const simple=data.simple||{};const tieneTexto=simple.detalleVuelos||simple.vueloIda||simple.vueloVuelta;const tieneCaptura=simple.capturaVuelo;const tienePrecio=simple.precioVuelo;if(!tieneTexto&&!tieneCaptura&&!tienePrecio)return"";return `<section class="card"><h2 class="section-title">Vuelos</h2>${tieneTexto?`<div class="flight-box"><div class="flight-title">Detalle de vuelos</div>${escapeLineas(simple.detalleVuelos||[simple.vueloIda,simple.vueloVuelta].filter(Boolean).join("\n\n"))}</div>`:""}${tieneCaptura?`<img src="${simple.capturaVuelo}" class="preview-img">`:""}${tienePrecio?`<div class="hotel-card" style="margin-top:16px;"><div class="hotel-price" style="text-align:center;"><div class="hotel-price-value">${escapeLineas(limpiarPrecio(simple.precioVuelo))}</div><div class="hotel-price-note">${tipoPrecioLabel(simple.tipoPrecioVuelo)}</div></div></div>`:""}</section>`;}
+function renderVuelos(data){
+  const simple=data.simple||{};
+  const opciones = simple.opcionesVuelos && simple.opcionesVuelos.length ? simple.opcionesVuelos : [];
+
+  if(opciones.length){
+    return `<section class="card"><h2 class="section-title">Vuelos</h2>${opciones.map((op,i)=>`
+      <div class="flight-box" style="margin-bottom:16px;">
+        <div class="flight-title">Opción de vuelo ${i+1}</div>
+        ${op.fecha?`<div class="hotel-detail"><strong>Fecha:</strong> ${op.fecha}</div>`:""}
+        ${op.detalle?`<div style="margin-top:8px;">${escapeLineas(op.detalle)}</div>`:""}
+      </div>
+      ${op.capturaVuelo?`<img src="${op.capturaVuelo}" class="preview-img">`:""}
+      ${op.precio?`<div class="hotel-card" style="margin-top:16px;margin-bottom:16px;"><div class="hotel-price" style="text-align:center;"><div class="hotel-price-value">${escapeLineas(limpiarPrecio(op.precio))}</div><div class="hotel-price-note">${tipoPrecioLabel(op.tipoPrecio)}</div></div></div>`:""}
+    `).join("")}</section>`;
+  }
+
+  const tieneTexto=simple.detalleVuelos||simple.vueloIda||simple.vueloVuelta;
+  const tieneCaptura=simple.capturaVuelo;
+  const tienePrecio=simple.precioVuelo;
+  if(!tieneTexto&&!tieneCaptura&&!tienePrecio)return"";
+  return `<section class="card"><h2 class="section-title">Vuelos</h2>${tieneTexto?`<div class="flight-box"><div class="flight-title">Detalle de vuelos</div>${simple.fechaVuelo?`<div class="hotel-detail"><strong>Fecha:</strong> ${simple.fechaVuelo}</div>`:""}${escapeLineas(simple.detalleVuelos||[simple.vueloIda,simple.vueloVuelta].filter(Boolean).join("
+
+"))}</div>`:""}${tieneCaptura?`<img src="${simple.capturaVuelo}" class="preview-img">`:""}${tienePrecio?`<div class="hotel-card" style="margin-top:16px;"><div class="hotel-price" style="text-align:center;"><div class="hotel-price-value">${escapeLineas(limpiarPrecio(simple.precioVuelo))}</div><div class="hotel-price-note">${tipoPrecioLabel(simple.tipoPrecioVuelo)}</div></div></div>`:""}</section>`;
+}
 
 function renderPrecios(precios, fallbackPrecio, fallbackTipo){
   if(precios && precios.length){
